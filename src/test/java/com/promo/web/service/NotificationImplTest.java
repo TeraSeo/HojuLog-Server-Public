@@ -1,5 +1,6 @@
 package com.promo.web.service;
 
+import com.promo.web.dto.UserDto;
 import com.promo.web.entity.Notification;
 import com.promo.web.entity.Role;
 import com.promo.web.entity.User;
@@ -24,16 +25,17 @@ class NotificationImplTest {
 
     @Test
     void createNotification() {
-        User user1 = User.builder().email("user1@gmail.com").username("user1").password("1234").role(Role.USER).build();
+        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
         userService.createUser(user1);
+        User createdUser = userService.getUserByEmail(user1.getEmail());
 
-        notificationService.createNotification("LIKE", "notification", user1);
+        notificationService.createNotification("LIKE", "notification", createdUser);
 
-        List<Notification> wholeNotificationsByUserId = notificationService.getWholeNotificationsByUserId(user1.getId());
+        List<Notification> wholeNotificationsByUserId = notificationService.getWholeNotificationsByUserId(createdUser.getId());
         assertEquals(1, wholeNotificationsByUserId.size(), "There should be only one notification for this user");
 
         Notification notification = wholeNotificationsByUserId.get(0);
-        assertEquals(notification.getUser().getId(), user1.getId(), "The notification should be associated with the correct user");
+        assertEquals(notification.getUser().getId(), createdUser.getId(), "The notification should be associated with the correct user");
     }
 
 }

@@ -36,7 +36,15 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.USER;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private EncryptionAlgorithm algorithm = EncryptionAlgorithm.BCRYPT;
+
+    @Builder.Default
+    private Boolean isLocked = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

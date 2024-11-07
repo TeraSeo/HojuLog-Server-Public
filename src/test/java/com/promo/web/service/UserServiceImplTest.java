@@ -1,5 +1,6 @@
 package com.promo.web.service;
 
+import com.promo.web.dto.UserDto;
 import com.promo.web.entity.Role;
 import com.promo.web.entity.User;
 import com.promo.web.exception.PostNotFoundException;
@@ -25,8 +26,8 @@ class UserServiceImplTest {
 
     @Test
     void getWholeUsers() {
-        User user1 = User.builder().email("user1@gmail.com").username("user1").password("1234").role(Role.USER).build();
-        User user2 = User.builder().email("user2@gmail.com").username("user2").password("1234").role(Role.ADMIN).build();
+        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
+        UserDto user2 = UserDto.builder().email("user2@gmail.com").username("user2").password("1234").build();
 
         userService.createUser(user1);
         userService.createUser(user2);
@@ -38,32 +39,30 @@ class UserServiceImplTest {
 
     @Test
     void createUser() {
-        User user1 = User.builder()
+        UserDto user1 = UserDto.builder()
                 .email("user1@gmail.com")
                 .username("user1")
                 .password("1234")
-                .role(Role.USER)
                 .build();
 
         userService.createUser(user1);
-        User createdUser = userService.getUserById(user1.getId());
+        User createdUser = userService.getUserByEmail(user1.getEmail());
 
         assertEquals("user1@gmail.com", createdUser.getEmail());
         assertEquals("user1", createdUser.getUsername());
-        assertEquals("1234", createdUser.getPassword());
         assertEquals(Role.USER, createdUser.getRole());
     }
 
     @Test
     void updateUser() {
-        User user1 = User.builder().email("user1@gmail.com").username("user1").password("1234").role(Role.USER).build();
+        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
         userService.createUser(user1);
-        User createdUser = userService.getUserById(user1.getId());
+        User createdUser = userService.getUserByEmail(user1.getEmail());
 
         User user2 = User.builder().email("user2@gmail.com").username("user2").password("1234").role(Role.ADMIN).build();
         userService.updateUser(createdUser.getId(), user2);
 
-        User updatedUser = userService.getUserById(user1.getId());
+        User updatedUser = userService.getUserById(createdUser.getId());
         assertEquals("user2@gmail.com", updatedUser.getEmail());
         assertEquals("user2", updatedUser.getUsername());
         assertEquals("1234", updatedUser.getPassword());
@@ -72,9 +71,9 @@ class UserServiceImplTest {
 
     @Test
     void deleteUserById() {
-        User user1 = User.builder().email("user1@gmail.com").username("user1").password("1234").role(Role.USER).build();
+        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
         userService.createUser(user1);
-        User createdUser = userService.getUserById(user1.getId());
+        User createdUser = userService.getUserByEmail(user1.getEmail());
         userService.deleteUserById(createdUser.getId());
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {

@@ -1,5 +1,6 @@
 package com.promo.web.service;
 
+import com.promo.web.dto.UserDto;
 import com.promo.web.entity.User;
 
 import java.util.List;
@@ -10,10 +11,11 @@ public interface UserService {
 
     User getUserById(Long id);
 
-    void createUser(User user);
+    User getUserByEmail(String email);
+
+    Boolean createUser(UserDto userDto);
 
     void updateUser(Long id, User user);
 
     void deleteUserById(Long id);
-
 }

@@ -1,5 +1,6 @@
 package com.promo.web.service;
 
+import com.promo.web.dto.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,19 +26,20 @@ class LikeServiceImplTest {
 
     @Test
     void addLike() {
-        User user1 = User.builder().email("user1@gmail.com").username("user1").password("1234").role(Role.USER).build();
+        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
         userService.createUser(user1);
+        User createdUser = userService.getUserByEmail(user1.getEmail());
 
         Post post1 = Post.builder().title("title").content("content").category("category").imageUrl("imageUrl").visibility(Visibility.Public).build();
-        postService.createPost(user1.getId(), post1);
+        postService.createPost(createdUser.getId(), post1);
 
-        likeService.createLike(post1, user1);
+        likeService.createLike(post1, createdUser);
 
         List<PostLike> wholeLikes = likeService.getWholeLikesByPostId(post1.getId());
         assertEquals(1, wholeLikes.size(), "There should be only one like for this post");
 
         PostLike postLike = wholeLikes.get(0);
         assertEquals(post1.getId(), postLike.getPost().getId(), "The like should be associated with the correct post");
-        assertEquals(user1.getId(), postLike.getUser().getId(), "The like should be associated with the correct user");
+        assertEquals(createdUser.getId(), postLike.getUser().getId(), "The like should be associated with the correct user");
     }
 }
