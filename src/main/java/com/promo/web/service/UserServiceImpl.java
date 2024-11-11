@@ -124,4 +124,17 @@ public class UserServiceImpl implements UserService {
             throw e;
         }
     }
+
+    @Override
+    public Boolean authenticateUser(String email, String password) {
+        User user = getUserByEmail(email);
+        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            log.info("Authentication succeeded");
+            return true;
+        }
+        else {
+            log.info("Authentication failed");
+            return false;
+        }
+    }
 }

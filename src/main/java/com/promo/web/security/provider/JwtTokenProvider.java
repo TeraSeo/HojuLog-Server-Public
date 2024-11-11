@@ -1,4 +1,4 @@
-package com.promo.web.security;
+package com.promo.web.security.provider;
 
 import com.promo.web.entity.JwtToken;
 import io.jsonwebtoken.Claims;
@@ -55,11 +55,11 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    public String createAccessToken(Authentication authentication, String authorities) {
+    public String createAccessToken(Authentication authentication, String authority) {
         String accessToken = Jwts.builder()
                 .signWith(key)
                 .setSubject(authentication.getName())
-                .claim("auth", authorities)
+                .claim("auth", authority)
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .compact();
 

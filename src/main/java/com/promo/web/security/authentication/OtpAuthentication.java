@@ -1,4 +1,4 @@
-package com.promo.web.security;
+package com.promo.web.security.authentication;
 
 import org.springframework.security.core.GrantedAuthority;
 

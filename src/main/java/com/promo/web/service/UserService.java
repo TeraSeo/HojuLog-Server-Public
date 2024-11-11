@@ -18,4 +18,6 @@ public interface UserService {
     void updateUser(Long id, User user);
 
     void deleteUserById(Long id);
+
+    Boolean authenticateUser(String email, String password);
 }

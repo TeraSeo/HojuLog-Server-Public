@@ -16,5 +16,21 @@ spring:
     properties:
       hibernate.format_sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: seotj0413@gmail.com
+    password: kdkv oezc jmvn bnbr
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+#            required: true
+#          connectiontimeout: 5000
+#          timeout: 5000
+#          writetimeout: 5000
+
 jwt:
   secret: eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMDc2OTQ4NywiaWF0IjoxNzMwNzY5NDg3fQ.V0TwWaSCpgFfCbzz1n_4sZCouR1O9K5gujCcwh1-y8Q
