@@ -2,6 +2,7 @@ package com.promo.web.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,11 +13,13 @@ import java.util.Set;
 @Table(name = "post")
 @Getter
 @Setter
-@Builder
 @ToString
-@AllArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "post_type", discriminatorType = DiscriminatorType.STRING)
+@SuperBuilder
 @NoArgsConstructor
-public class Post extends BaseEntity {
+public abstract class Post extends PostBaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
@@ -26,25 +29,36 @@ public class Post extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
-    private String content;
+    private String subtitle;
 
     @Column(nullable = false)
-    private String category;
+    private String description;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SubCategory subCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Visibility visibility;
 
+    @Column(nullable = false)
+    private Boolean isOwnWork;
+
+    private String ownerEmail;
+
+    @Column(nullable = false)
+    private Boolean isPortrait;
+
+    private String logoUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<AdditionalUrl> additionalUrls = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -62,4 +76,24 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Image> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Video> videos = new ArrayList<>();
+
+    public Post(String title, String subtitle, String description, Category category, SubCategory subCategory, Visibility visibility, Boolean isOwnWork, String ownerEmail, Boolean isPortrait) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.description = description;
+        this.category = category;
+        this.subCategory = subCategory;
+        this.visibility = visibility;
+        this.isOwnWork = isOwnWork;
+        this.ownerEmail = ownerEmail;
+        this.isPortrait = isPortrait;
+    }
 }

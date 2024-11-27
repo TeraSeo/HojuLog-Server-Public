@@ -4,20 +4,21 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "additional_url")
+@Table(name = "image")
 @Getter
 @Setter
 @Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdditionalUrl {
+public class Image {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "additional_url_id")
+    @Column(name = "image_id")
     private Long id;
 
-    @Column(name = "url", nullable = false)
+    @Column(name = "image_url", nullable = false)
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)

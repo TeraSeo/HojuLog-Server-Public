@@ -36,6 +36,10 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private RegistrationMethod registrationMethod;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
 

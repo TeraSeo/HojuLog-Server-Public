@@ -1,53 +1,71 @@
 package com.promo.web.security.filter;
 
-import com.promo.web.security.authentication.UsernamePasswordAuthentication;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import com.promo.web.security.provider.JwtTokenProvider;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
-    private String signingKey;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = request.getHeader("AccessToken");
-        SecretKey key = Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8));
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        log.info("Processing JwtAuthenticationFilter for path: {}", request.getServletPath());
 
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody();
+        String accessToken = request.getHeader("accessToken");
+        String refreshToken = request.getHeader("refreshToken");
 
-        String username = String.valueOf(claims.get("username"));
+        if (StringUtils.isBlank(accessToken) && StringUtils.isBlank(refreshToken)) {
+            log.error("Missing tokens");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
-        GrantedAuthority a = new SimpleGrantedAuthority("user");
-        var auth = new UsernamePasswordAuthentication(username, null, List.of(a));
+        if (StringUtils.isNotBlank(accessToken) && jwtTokenProvider.validateToken(accessToken)) {
+            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Access token is valid");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        filterChain.doFilter(request, response);
+        if (StringUtils.isNotBlank(refreshToken) && jwtTokenProvider.validateToken(refreshToken)) {
+            String newAccessToken = jwtTokenProvider.regenerateAccessToken(refreshToken);
+            Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Refresh token is valid, new access token generated");
+
+            response.setHeader("accessToken", newAccessToken);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        log.error("Both tokens are invalid");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !request.getServletPath().equals("/api/auth/login");
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth/") || path.startsWith("/api/oauth/") || path.startsWith("/oauth");
     }
 }

@@ -1,14 +1,25 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 240252611342-j5i416ihcmpdas5um0c40nt0uorqcm9g.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - profile
+              - email
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/promo?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/beginners_hub?serverTimezone=Asia/Seoul
     username: root
     password: root1234
 
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         use-new-id-generator-mappings: false
@@ -27,10 +38,21 @@ spring:
           auth: true
           starttls:
             enable: true
-#            required: true
-#          connectiontimeout: 5000
-#          timeout: 5000
-#          writetimeout: 5000
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 50MB
+
+cloud:
+  aws:
+    s3:
+      bucket: beginnershub
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: AKIAXYKJVHAD26WBTWP7
+      secretKey: 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
 
 jwt:
   secret: eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMDc2OTQ4NywiaWF0IjoxNzMwNzY5NDg3fQ.V0TwWaSCpgFfCbzz1n_4sZCouR1O9K5gujCcwh1-y8Q

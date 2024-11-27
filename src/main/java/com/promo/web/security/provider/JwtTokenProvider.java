@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -46,7 +47,7 @@ public class JwtTokenProvider {
         String accessToken = createAccessToken(authentication, authorities);
         String refreshToken = createRefreshToken(authentication, authorities);
 
-        log.info("generate Token success");
+        log.info("Successfully generated tokens");
 
         return JwtToken.builder()
                 .grantType("Bearer")
@@ -55,11 +56,34 @@ public class JwtTokenProvider {
                 .build();
     }
 
+    public String regenerateAccessToken(String refreshToken) {
+        Authentication authentication = getAuthentication(refreshToken);
+
+        String authorities = authentication.getAuthorities()
+                .stream().map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        String accessToken = createAccessToken(authentication, authorities);
+
+        log.info("Successfully regenerated access token");
+
+        return accessToken;
+    }
+
     public String createAccessToken(Authentication authentication, String authority) {
+        String email;
+        if (authentication.getPrincipal() instanceof OAuth2User) {
+            email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
+        }
+        else {
+            email = authentication.getName();
+        }
+
         String accessToken = Jwts.builder()
                 .signWith(key)
                 .setSubject(authentication.getName())
                 .claim("auth", authority)
+                .claim("email", email)
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .compact();
 
@@ -67,10 +91,19 @@ public class JwtTokenProvider {
     }
 
     public String createRefreshToken(Authentication authentication, String authorities) {
+        String email;
+        if (authentication.getPrincipal() instanceof OAuth2User) {
+            email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
+        }
+        else {
+            email = authentication.getName();
+        }
+
         String refreshToken = Jwts.builder()
                 .signWith(key)
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
+                .claim("email", email)
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 72))
                 .compact();
 
@@ -81,7 +114,7 @@ public class JwtTokenProvider {
         Claims claims = parseClaims(accessToken);
 
         if (claims.get("auth") == null) {
-            throw new RuntimeException("권한 정보 없는 토큰 입니다.");
+            throw new RuntimeException("Token doesn't include authorities");
         }
 
         Collection<? extends GrantedAuthority> authorities =
@@ -89,9 +122,9 @@ public class JwtTokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = new User(claims.get("email", String.class), "", authorities);
 
-        log.info("getAuthentication Success");
+        log.info("Successfully got authentication");
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
@@ -116,11 +149,10 @@ public class JwtTokenProvider {
 
     private Claims parseClaims(String accessToken) {
         try {
-            log.info("parse claim success");
+            log.info("Successfully parsed claims");
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
     }
-
 }

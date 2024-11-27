@@ -32,7 +32,7 @@ public class FollowServiceImpl implements FollowService {
                 log.info("Successfully got follow by id: {}", id);
                 return follow.get();
             }
-            throw new FollowNotFoundException("Follow not found");
+            throw new FollowNotFoundException("Follow not found with id: " + id);
         } catch (Exception e) {
             log.error("Failed to get follow by id: {}", id, e);
             throw e;

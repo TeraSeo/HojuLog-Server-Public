@@ -1,6 +1,7 @@
 package com.promo.web.service;
 
 import com.promo.web.dto.UserDto;
+import com.promo.web.entity.RegistrationMethod;
 import com.promo.web.entity.User;
 import com.promo.web.exception.UserAlreadyExistsException;
 import com.promo.web.exception.UserNotFoundException;
@@ -90,6 +91,7 @@ public class UserServiceImpl implements UserService {
                 .username(userDto.getUsername())
                 .email(userDto.getEmail())
                 .password(encodedPassword)
+                .registrationMethod(RegistrationMethod.Otp)
                 .build();
         userRepository.save(user);
         log.info("Successfully created user");

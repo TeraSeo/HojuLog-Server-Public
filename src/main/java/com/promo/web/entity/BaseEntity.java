@@ -19,7 +19,7 @@ public abstract class BaseEntity {
     protected void onCreate() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         this.createdAt = now;
-        this.updatedAt = now; // Set both created and updated at the same time
+        this.updatedAt = now;
     }
 
     @PreUpdate

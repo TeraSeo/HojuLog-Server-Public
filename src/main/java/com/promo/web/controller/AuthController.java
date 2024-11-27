@@ -3,12 +3,17 @@ package com.promo.web.controller;
 import com.promo.web.dto.UserDto;
 import com.promo.web.entity.ApiResponse;
 import com.promo.web.exception.UserAlreadyExistsException;
+import com.promo.web.security.provider.JwtTokenProvider;
 import com.promo.web.service.OtpService;
 import com.promo.web.service.UserService;
+import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,31 +23,14 @@ public class AuthController {
 
     private final UserService userService;
     private final OtpService otpService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public AuthController(UserService userService, OtpService otpService) {
+    public AuthController(UserService userService, OtpService otpService, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.otpService = otpService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
-
-//    @CrossOrigin(origins = "http://localhost:3000")
-//    @PostMapping("login")
-//    public ResponseEntity<ApiResponse> login(@RequestHeader("email") String email, @RequestHeader("password") String password) {
-//        log.info("login");
-//        try {
-//            boolean isAuthenticated = userService.authenticateUser(email, password);
-//            if (isAuthenticated) {
-//                return ResponseEntity.ok(new ApiResponse(true, "Login successful"));
-//            } else {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                        .body(new ApiResponse(false, "Invalid credentials"));
-//            }
-//        } catch (Exception e) {
-//            log.error("Login failed for user: {}", email, e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new ApiResponse(false, "Login failed due to server error"));
-//        }
-//    }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("register")
@@ -68,14 +56,47 @@ public class AuthController {
         }
     }
 
-//    @CrossOrigin(origins = "http://localhost:3000")
-//    @PostMapping("verify/otp")
-//    public ResponseEntity<Boolean> checkOtp(@RequestParam String email, @RequestParam String code) {
-//        try {
-//            Boolean isOtpCorrect = otpService.checkOtp(email, code);
-//            return ResponseEntity.ok(isOtpCorrect);
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(false);
-//        }
-//    }
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("validate/token")
+    public ResponseEntity<?> validateToken(@RequestHeader(required = false) String accessToken,
+                                           @RequestHeader(required = false) String refreshToken,
+                                           HttpServletResponse response) {
+        log.info("Validate JWT token");
+
+        try {
+            if (StringUtils.isBlank(accessToken) && StringUtils.isBlank(refreshToken)) {
+                log.error("Both tokens are missing");
+                return ResponseEntity.badRequest().body("Both tokens are missing");
+            }
+
+            // Validate access token
+            if (StringUtils.isNotBlank(accessToken) && jwtTokenProvider.validateToken(accessToken)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                log.info("Access token is valid");
+                return ResponseEntity.ok(true);
+            }
+
+            // Validate refresh token and regenerate access token
+            if (StringUtils.isNotBlank(refreshToken) && jwtTokenProvider.validateToken(refreshToken)) {
+                String newAccessToken = jwtTokenProvider.regenerateAccessToken(refreshToken);
+                Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                log.info("Refresh token is valid, new access token generated");
+
+                // Add the new access token to the response headers
+                response.setHeader("accessToken", newAccessToken);
+                return ResponseEntity.ok(true);
+            }
+
+            log.error("Both tokens are invalid");
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).body("Both tokens are invalid");
+
+        } catch (Exception e) {
+            log.error("Error while validating tokens", e);
+            return ResponseEntity.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).body("Token validation failed");
+        }
+    }
 }
