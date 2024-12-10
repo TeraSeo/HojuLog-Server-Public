@@ -1,19 +1,15 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.Role;
 import com.promo.web.entity.User;
-import com.promo.web.exception.PostNotFoundException;
 import com.promo.web.exception.UserNotFoundException;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 

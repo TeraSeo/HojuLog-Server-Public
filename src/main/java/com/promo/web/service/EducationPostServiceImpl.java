@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
 import com.promo.web.aws.s3.AwsFileService;
-import com.promo.web.dto.EducationPostDto;
+import com.promo.web.dto.request.EducationPostDto;
 import com.promo.web.entity.*;
 import com.promo.web.exception.EducationPostNotFoundException;
 import com.promo.web.repository.EducationPostRepository;
@@ -64,7 +64,7 @@ public class EducationPostServiceImpl implements EducationPostService {
     }
 
     @Override
-    public Boolean createPost(String email, EducationPostDto educationPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos) {
+    public Post createPost(String email, EducationPostDto educationPostDto, MultipartFile logoImage, MultipartFile[] images) {
         User user = userService.getUserByEmail(email);
         try {
             EducationPost educationPost = EducationPost.builder()
@@ -100,7 +100,7 @@ public class EducationPostServiceImpl implements EducationPostService {
             }
 
             educationPost.setUser(user);
-            educationPostRepository.save(educationPost);
+            EducationPost createdPost = educationPostRepository.save(educationPost);
 
             // save post images data
             if (images != null) {
@@ -110,18 +110,16 @@ public class EducationPostServiceImpl implements EducationPostService {
             }
 
             // save post videos data
-            if (videos != null) {
-                Arrays.stream(videos)
-                        .map(video -> awsFileService.uploadPostFile(video, email))
-                        .forEach(videoUrl -> videoService.createVideo(videoUrl, educationPost));
+            if (educationPostDto.getYoutubeUrl() != null && !educationPostDto.getYoutubeUrl().equals("")) {
+                videoService.createVideo(educationPostDto.getYoutubeUrl(), educationPost);
             }
 
             log.info("Successfully created education post");
 
-            return true;
+            return createdPost;
         } catch (Exception e) {
             log.error("Failed to create education post", e);
-            return false;
+            return null;
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.RestaurantPostDto;
+import com.promo.web.dto.request.RestaurantPostDto;
+import com.promo.web.entity.Post;
 import com.promo.web.entity.RestaurantPost;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,5 +12,5 @@ public interface RestaurantPostService {
 
     RestaurantPost getPostById(Long id);
 
-    Boolean createPost(String email, RestaurantPostDto restaurantPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos);
+    Post createPost(String email, RestaurantPostDto restaurantPostDto, MultipartFile logoImage, MultipartFile[] images);
 }

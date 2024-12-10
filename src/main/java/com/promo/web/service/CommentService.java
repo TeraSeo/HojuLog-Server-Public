@@ -12,7 +12,7 @@ public interface CommentService {
 
     Comment getCommentById(Long id);
 
-    void createComment(Post post, User user, String content);
+    Comment createComment(Post post, User user, String content);
 
     void deleteCommentById(Long id);
 }

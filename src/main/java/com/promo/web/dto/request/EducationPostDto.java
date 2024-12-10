@@ -1,4 +1,4 @@
-package com.promo.web.dto;
+package com.promo.web.dto.request;
 
 import com.promo.web.entity.Category;
 import com.promo.web.entity.SubCategory;
@@ -15,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class LifeStylePostDto {
+public class EducationPostDto {
+
     @NotNull
     private String title;
 
@@ -48,4 +49,7 @@ public class LifeStylePostDto {
 
     @NotNull
     private Boolean isPortrait;
+
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?(youtube\\.com\\/(watch\\?v=[\\w-]{11}|shorts\\/[\\w-]{11}|embed\\/[\\w-]{11})|youtu\\.be\\/[\\w-]{11})$")
+    private String youtubeUrl;
 }

@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.RestaurantPostDto;
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.RestaurantPostDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,8 @@ class RestaurantPostServiceImplTest {
 
         MockMultipartFile logoFile = new MockMultipartFile("file1", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
         MockMultipartFile multipartFile1 = new MockMultipartFile("file2", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
-        MockMultipartFile multipartFile2 = new MockMultipartFile("file3", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
         MockMultipartFile[] images = new MockMultipartFile[]{multipartFile1};
-        MockMultipartFile[] videos = new MockMultipartFile[]{multipartFile2};
 
         RestaurantPostDto restaurantPostDto = RestaurantPostDto.builder()
                 .title("Title")
@@ -47,11 +45,12 @@ class RestaurantPostServiceImplTest {
                 .isOwnWork(true)
                 .isPortrait(true)
                 .webUrl("https://play.google.com")
+                .youtubeUrl("https://youtube/video")
                 .location("location")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
-        restaurantPostService.createPost(createdUser.getEmail(), restaurantPostDto, logoFile, images, videos);
+        restaurantPostService.createPost(createdUser.getEmail(), restaurantPostDto, logoFile, images);
 
         List<RestaurantPost> wholePosts = restaurantPostService.getWholePosts();
 

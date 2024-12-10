@@ -1,6 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.TechnologyPostDto;
+import com.promo.web.dto.request.TechnologyPostDto;
+import com.promo.web.entity.Post;
 import com.promo.web.entity.TechnologyPost;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,5 +12,5 @@ public interface TechnologyPostService {
 
     TechnologyPost getPostById(Long id);
 
-    Boolean createPost(String email, TechnologyPostDto technologyPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos);
+    Post createPost(String email, TechnologyPostDto technologyPostDto, MultipartFile logoImage, MultipartFile[] images);
 }

@@ -1,8 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.Follow;
-import com.promo.web.entity.Role;
 import com.promo.web.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

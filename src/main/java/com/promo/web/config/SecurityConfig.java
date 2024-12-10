@@ -53,7 +53,7 @@ public class SecurityConfig {
             .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
                     auth -> auth
-                            .requestMatchers("/api/auth/**", "/api/oauth/**").permitAll()
+                            .requestMatchers("/api/auth/**", "/api/oauth/**", "/api/post/get/**", "/api/user/get/**", "/api/comment/get/**").permitAll()
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().hasAnyAuthority("USER", "ADMIN")
             );
@@ -99,7 +99,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider);
+        return new JwtAuthenticationFilter(jwtTokenProvider, userRepository);
     }
 
     @Bean
@@ -110,7 +110,7 @@ public class SecurityConfig {
         config.addAllowedMethod("*");                      // Allow all HTTP methods
         config.addAllowedHeader("*");                      // Allow all headers
 
-        config.setExposedHeaders(List.of("accessToken", "refreshToken"));
+        config.setExposedHeaders(List.of("userId", "accessToken", "refreshToken"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

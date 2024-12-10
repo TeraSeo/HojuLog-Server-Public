@@ -1,10 +1,9 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
     List<User> getWholeUsers();

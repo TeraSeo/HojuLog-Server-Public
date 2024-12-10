@@ -5,14 +5,15 @@ import com.promo.web.entity.PostLike;
 import com.promo.web.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface LikeService {
+public interface PostLikeService {
     List<PostLike> getWholeLikesByPostId(Long id);
 
     PostLike getPostLikeById(Long id);
 
-    void createLike(Post post, User user);
+    Long createLike(Post post, User user);
 
-    void deletePostLikeById(Long id);
+    Long deletePostLikeById(Long postId, Long userId);
+
+    Boolean checkIsPostLikedByUser(Long userId, Long postId);
 }

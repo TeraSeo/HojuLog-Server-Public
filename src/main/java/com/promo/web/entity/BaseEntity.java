@@ -1,11 +1,17 @@
 package com.promo.web.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Timestamp;
 
 @MappedSuperclass
+@Getter
+@Setter
+@NoArgsConstructor
 @EntityListeners(value = {AuditingEntityListener.class})
 public abstract class BaseEntity {
 

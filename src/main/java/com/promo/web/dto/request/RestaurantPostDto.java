@@ -1,4 +1,4 @@
-package com.promo.web.dto;
+package com.promo.web.dto.request;
 
 import com.promo.web.entity.Category;
 import com.promo.web.entity.SubCategory;
@@ -6,9 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.springframework.lang.Nullable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class EntertainmentPostDto {
+public class RestaurantPostDto {
 
     @NotNull
     private String title;
@@ -39,6 +37,10 @@ public class EntertainmentPostDto {
     private String webUrl;
 
     @NotNull
+    @Pattern(regexp = "^https://(www\\.)?google\\.[a-z]+/maps(\\?.*|/.*)?$")
+    private String location;
+
+    @NotNull
     private String visibility;
 
     @NotNull
@@ -46,18 +48,12 @@ public class EntertainmentPostDto {
 
     @Email
     private String ownerEmail;
+
     private List<String> tags;
 
     @NotNull
     private Boolean isPortrait;
 
-    @NotNull
-    private LocalDateTime startDateTime;
-
-    @NotNull
-    private LocalDateTime endDateTime;
-
-    @Pattern(regexp = "^https://(www\\.)?google\\.[a-z]+/maps(\\?.*|/.*)?$")
-    @Nullable
-    private String location;
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?(youtube\\.com\\/(watch\\?v=[\\w-]{11}|shorts\\/[\\w-]{11}|embed\\/[\\w-]{11})|youtu\\.be\\/[\\w-]{11})$")
+    private String youtubeUrl;
 }

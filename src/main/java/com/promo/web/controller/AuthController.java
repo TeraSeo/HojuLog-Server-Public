@@ -1,7 +1,8 @@
 package com.promo.web.controller;
 
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.ApiResponse;
+import com.promo.web.entity.User;
 import com.promo.web.exception.UserAlreadyExistsException;
 import com.promo.web.security.provider.JwtTokenProvider;
 import com.promo.web.service.OtpService;
@@ -74,6 +75,11 @@ public class AuthController {
                 Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
+                String email = authentication.getName();
+                User user = userService.getUserByEmail(email);
+                log.info("userId: " + user.getId().toString());
+                response.setHeader("userId", user.getId().toString());
+
                 log.info("Access token is valid");
                 return ResponseEntity.ok(true);
             }
@@ -83,6 +89,10 @@ public class AuthController {
                 String newAccessToken = jwtTokenProvider.regenerateAccessToken(refreshToken);
                 Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                String email = authentication.getName();
+                User user = userService.getUserByEmail(email);
+                response.setHeader("userId", user.getId().toString());
 
                 log.info("Refresh token is valid, new access token generated");
 

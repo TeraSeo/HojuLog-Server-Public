@@ -1,7 +1,12 @@
 package com.promo.web.entity;
 
+import com.promo.web.dto.response.SummarizedCommentDto;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "comment")
@@ -28,4 +33,15 @@ public class Comment extends BaseEntity {
 
     @Column(name = "content", nullable = false)
     private String content;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CommentLike> likes = new ArrayList<>();
+
+    public SummarizedCommentDto convertToSummarizedCommentDto(Long userId) {
+        List<User> likedUsers = likes.stream().map(CommentLike::getUser).collect(Collectors.toList());
+        List<Long> likedUserIds = likedUsers.stream().map(User::getId).collect(Collectors.toList());
+        Boolean isCurrentUserLiked = likedUserIds.contains(userId);
+        return SummarizedCommentDto.builder().commentId(id).content(content).isCurrentUserLiked(isCurrentUserLiked).wholeLikedUserLength(Long.valueOf(likedUsers.size())).summarizedUserDto(user.convertToSummarisedUserDto()).createdAt(getCreatedAt()).build();
+    }
 }

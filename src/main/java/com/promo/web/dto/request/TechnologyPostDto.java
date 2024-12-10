@@ -1,4 +1,4 @@
-package com.promo.web.dto;
+package com.promo.web.dto.request;
 
 import com.promo.web.entity.Category;
 import com.promo.web.entity.SubCategory;
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class RestaurantPostDto {
+public class TechnologyPostDto {
 
     @NotNull
     private String title;
@@ -32,13 +32,14 @@ public class RestaurantPostDto {
     @NotNull
     private SubCategory subCategory;
 
-    @NotNull
+    @Pattern(regexp = "^https://play\\.google\\.com/store/apps/details\\?id=[^&\\s]+$")
+    private String playStoreUrl;
+
+    @Pattern(regexp = "^https://apps\\.apple\\.com/[^\\s]+$")
+    private String appStoreUrl;
+
     @Pattern(regexp = "^https?://[^\\s]+$")
     private String webUrl;
-
-    @NotNull
-    @Pattern(regexp = "^https://(www\\.)?google\\.[a-z]+/maps(\\?.*|/.*)?$")
-    private String location;
 
     @NotNull
     private String visibility;
@@ -53,4 +54,7 @@ public class RestaurantPostDto {
 
     @NotNull
     private Boolean isPortrait;
+
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?(youtube\\.com\\/(watch\\?v=[\\w-]{11}|shorts\\/[\\w-]{11}|embed\\/[\\w-]{11})|youtu\\.be\\/[\\w-]{11})$")
+    private String youtubeUrl;
 }

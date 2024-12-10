@@ -52,17 +52,18 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public void createComment(Post post, User user, String content) {
+    public Comment createComment(Post post, User user, String content) {
         try {
             Comment comment = Comment.builder().post(post).user(user).content(content).build();
 
             post.getComments().add(comment);
             user.getComments().add(comment);
-            commentRepository.save(comment);
+            Comment createdComment = commentRepository.save(comment);
             log.info("Successfully created post comment with post id: {}, user id: {}", post.getId(), user.getId());
+            return createdComment;
         } catch (Exception e) {
             log.error("Failed to create post comment with post id: {}, user id: {}", post.getId(), user.getId(), e);
-            throw e;
+            return null;
         }
     }
 

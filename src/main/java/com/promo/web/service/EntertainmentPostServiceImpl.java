@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
 import com.promo.web.aws.s3.AwsFileService;
-import com.promo.web.dto.EntertainmentPostDto;
+import com.promo.web.dto.request.EntertainmentPostDto;
 import com.promo.web.entity.*;
 import com.promo.web.exception.EntertainmentPostNotFoundException;
 import com.promo.web.repository.EntertainmentPostRepository;
@@ -64,7 +64,7 @@ public class EntertainmentPostServiceImpl implements EntertainmentPostService {
     }
 
     @Override
-    public Boolean createPost(String email, EntertainmentPostDto entertainmentPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos) {
+    public Post createPost(String email, EntertainmentPostDto entertainmentPostDto, MultipartFile logoImage, MultipartFile[] images) {
         User user = userService.getUserByEmail(email);
         try {
             EntertainmentPost entertainmentPost = EntertainmentPost.builder()
@@ -103,7 +103,7 @@ public class EntertainmentPostServiceImpl implements EntertainmentPostService {
             }
 
             entertainmentPost.setUser(user);
-            entertainmentPostRepository.save(entertainmentPost);
+            EntertainmentPost createdPost = entertainmentPostRepository.save(entertainmentPost);
 
             // save post images data
             if (images != null) {
@@ -113,17 +113,15 @@ public class EntertainmentPostServiceImpl implements EntertainmentPostService {
             }
 
             // save post videos data
-            if (videos != null) {
-                Arrays.stream(videos)
-                        .map(video -> awsFileService.uploadPostFile(video, email))
-                        .forEach(videoUrl -> videoService.createVideo(videoUrl, entertainmentPost));
+            if (entertainmentPostDto.getYoutubeUrl() != null && !entertainmentPostDto.getYoutubeUrl().equals("")) {
+                videoService.createVideo(entertainmentPostDto.getYoutubeUrl(), entertainmentPost);
             }
 
             log.info("Successfully created entertainment post");
-            return true;
+            return createdPost;
         } catch (Exception e) {
             log.error("Failed to create entertainment post", e);
-            return false;
+            return null;
         }
     }
 }

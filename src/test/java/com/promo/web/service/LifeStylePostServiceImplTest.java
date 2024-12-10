@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.LifeStylePostDto;
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.LifeStylePostDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,8 @@ class LifeStylePostServiceImplTest {
 
         MockMultipartFile logoFile = new MockMultipartFile("file1", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
         MockMultipartFile multipartFile1 = new MockMultipartFile("file2", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
-        MockMultipartFile multipartFile2 = new MockMultipartFile("file3", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
         MockMultipartFile[] images = new MockMultipartFile[]{multipartFile1};
-        MockMultipartFile[] videos = new MockMultipartFile[]{multipartFile2};
 
         LifeStylePostDto lifeStylePostDto = LifeStylePostDto.builder()
                 .title("Title")
@@ -47,10 +45,11 @@ class LifeStylePostServiceImplTest {
                 .isOwnWork(true)
                 .isPortrait(true)
                 .webUrl("https://play.google.com")
+                .youtubeUrl("https://youtube/video")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
-        lifeStylePostService.createPost(createdUser.getEmail(), lifeStylePostDto, logoFile, images, videos);
+        lifeStylePostService.createPost(createdUser.getEmail(), lifeStylePostDto, logoFile, images);
 
         List<LifeStylePost> wholePosts = lifeStylePostService.getWholePosts();
 

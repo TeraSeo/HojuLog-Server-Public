@@ -1,6 +1,6 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.RegistrationMethod;
 import com.promo.web.entity.User;
 import com.promo.web.exception.UserAlreadyExistsException;

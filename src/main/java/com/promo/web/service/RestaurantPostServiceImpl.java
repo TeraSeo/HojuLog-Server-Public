@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
 import com.promo.web.aws.s3.AwsFileService;
-import com.promo.web.dto.RestaurantPostDto;
+import com.promo.web.dto.request.RestaurantPostDto;
 import com.promo.web.entity.*;
 import com.promo.web.exception.RestaurantPostNotFoundException;
 import com.promo.web.repository.RestaurantPostRepository;
@@ -64,7 +64,7 @@ public class RestaurantPostServiceImpl implements RestaurantPostService {
     }
 
     @Override
-    public Boolean createPost(String email, RestaurantPostDto restaurantPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos) {
+    public Post createPost(String email, RestaurantPostDto restaurantPostDto, MultipartFile logoImage, MultipartFile[] images) {
         User user = userService.getUserByEmail(email);
         try {
             RestaurantPost restaurantPost = RestaurantPost.builder()
@@ -101,7 +101,7 @@ public class RestaurantPostServiceImpl implements RestaurantPostService {
             }
 
             restaurantPost.setUser(user);
-            restaurantPostRepository.save(restaurantPost);
+            RestaurantPost createdPost = restaurantPostRepository.save(restaurantPost);
 
             // save post images data
             if (images != null) {
@@ -111,17 +111,15 @@ public class RestaurantPostServiceImpl implements RestaurantPostService {
             }
 
             // save post videos data
-            if (videos != null) {
-                Arrays.stream(videos)
-                        .map(video -> awsFileService.uploadPostFile(video, email))
-                        .forEach(videoUrl -> videoService.createVideo(videoUrl, restaurantPost));
+            if (restaurantPostDto.getYoutubeUrl() != null && !restaurantPostDto.getYoutubeUrl().equals("")) {
+                videoService.createVideo(restaurantPostDto.getYoutubeUrl(), restaurantPost);
             }
 
             log.info("Successfully created restaurant post");
-            return true;
+            return createdPost;
         } catch (Exception e) {
             log.error("Failed to create restaurant post", e);
-            return false;
+            return null;
         }
     }
 }

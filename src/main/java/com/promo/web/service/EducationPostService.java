@@ -1,7 +1,8 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.EducationPostDto;
+import com.promo.web.dto.request.EducationPostDto;
 import com.promo.web.entity.EducationPost;
+import com.promo.web.entity.Post;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,5 +12,5 @@ public interface EducationPostService {
 
     EducationPost getPostById(Long id);
 
-    Boolean createPost(String email, EducationPostDto educationPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos);
+    Post createPost(String email, EducationPostDto educationPostDto, MultipartFile logoImage, MultipartFile[] images);
 }

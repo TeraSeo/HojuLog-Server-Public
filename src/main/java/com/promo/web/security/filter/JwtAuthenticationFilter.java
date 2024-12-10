@@ -1,5 +1,7 @@
 package com.promo.web.security.filter;
 
+import com.promo.web.entity.User;
+import com.promo.web.repository.UserRepository;
 import com.promo.web.security.provider.JwtTokenProvider;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -8,22 +10,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     @Autowired
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -43,7 +47,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.isNotBlank(accessToken) && jwtTokenProvider.validateToken(accessToken)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String email = authentication.getName();
+            Optional<User> u = userRepository.findByEmail(email);
+            if (u.isPresent()) {
+                User user = u.get();
+                response.setHeader("userId", user.getId().toString());
+            }
+
             log.info("Access token is valid");
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,6 +65,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String newAccessToken = jwtTokenProvider.regenerateAccessToken(refreshToken);
             Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String email = authentication.getName();
+            Optional<User> u = userRepository.findByEmail(email);
+            if (u.isPresent()) {
+                User user = u.get();
+                response.setHeader("userId", user.getId().toString());
+            }
+
             log.info("Refresh token is valid, new access token generated");
 
             response.setHeader("accessToken", newAccessToken);
@@ -66,6 +87,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/api/auth/") || path.startsWith("/api/oauth/") || path.startsWith("/oauth");
+        return path.startsWith("/api/auth/") || path.startsWith("/api/oauth/") || path.startsWith("/oauth") || path.startsWith("/api/post/get") || path.startsWith("/api/user/get") || path.startsWith("/api/comment/get");
     }
 }

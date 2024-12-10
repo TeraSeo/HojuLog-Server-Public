@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.TechnologyPostDto;
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.TechnologyPostDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +36,8 @@ class TechnologyPostServiceImplTest {
         MockMultipartFile multipartFile3 = new MockMultipartFile("file4", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
         MockMultipartFile multipartFile4 = new MockMultipartFile("file5", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
         MockMultipartFile multipartFile5 = new MockMultipartFile("file6", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
-        MockMultipartFile multipartFile6 = new MockMultipartFile("file7", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
         MockMultipartFile[] images = new MockMultipartFile[]{multipartFile1, multipartFile2, multipartFile3, multipartFile4, multipartFile5};
-        MockMultipartFile[] videos = new MockMultipartFile[]{multipartFile6};
 
         TechnologyPostDto technologyPostDto = TechnologyPostDto.builder()
                 .title("Title")
@@ -53,12 +51,13 @@ class TechnologyPostServiceImplTest {
                 .playStoreUrl("https://play.google.com/store/apps/details?id=com.world.lotto")
                 .appStoreUrl("https://apps.apple.com/kr/app/world-lotto/id6505033228?l=en-GB")
                 .webUrl("https://play.google.com/store/apps/details?id=com.world.lotto")
+                .youtubeUrl("https://youtube/video")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
         long startTime = System.nanoTime();
 
-        technologyPostService.createPost(createdUser.getEmail(), technologyPostDto, logoFile, images, videos);
+        technologyPostService.createPost(createdUser.getEmail(), technologyPostDto, logoFile, images);
 
         long endTime = System.nanoTime();
         long durationInMillis = (endTime - startTime) / 1_000_000;

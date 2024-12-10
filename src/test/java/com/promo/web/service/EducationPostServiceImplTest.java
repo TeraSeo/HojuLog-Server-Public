@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.EducationPostDto;
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.EducationPostDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,8 @@ class EducationPostServiceImplTest {
 
         MockMultipartFile logoFile = new MockMultipartFile("file1", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
         MockMultipartFile multipartFile1 = new MockMultipartFile("file2", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
-        MockMultipartFile multipartFile2 = new MockMultipartFile("file3", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
         MockMultipartFile[] images = new MockMultipartFile[]{multipartFile1};
-        MockMultipartFile[] videos = new MockMultipartFile[]{multipartFile2};
 
         EducationPostDto educationPostDto = EducationPostDto.builder()
                 .title("Title")
@@ -47,10 +45,11 @@ class EducationPostServiceImplTest {
                 .isOwnWork(true)
                 .isPortrait(true)
                 .webUrl("https://play.google.com")
+                .youtubeUrl("https://youtube/video")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
-        educationPostService.createPost(createdUser.getEmail(), educationPostDto, logoFile, images, videos);
+        educationPostService.createPost(createdUser.getEmail(), educationPostDto, logoFile, images);
 
         List<EducationPost> wholePosts = educationPostService.getWholePosts();
 

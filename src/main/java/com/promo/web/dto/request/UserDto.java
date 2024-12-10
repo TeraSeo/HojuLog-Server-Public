@@ -1,4 +1,4 @@
-package com.promo.web.dto;
+package com.promo.web.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;

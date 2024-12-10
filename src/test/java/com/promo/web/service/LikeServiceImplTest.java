@@ -1,6 +1,6 @@
 //package com.promo.web.service;
 //
-//import com.promo.web.dto.UserDto;
+//import com.promo.web.dto.request.UserDto;
 //import com.promo.web.entity.*;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
 import com.promo.web.aws.s3.AwsFileService;
-import com.promo.web.dto.TechnologyPostDto;
+import com.promo.web.dto.request.TechnologyPostDto;
 import com.promo.web.entity.*;
 import com.promo.web.exception.TechnologyPostNotFoundException;
 import com.promo.web.repository.TechnologyPostRepository;
@@ -64,7 +64,7 @@ public class TechnologyPostServiceImpl implements TechnologyPostService {
     }
 
     @Override
-    public Boolean createPost(String email, TechnologyPostDto technologyPostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos) {
+    public Post createPost(String email, TechnologyPostDto technologyPostDto, MultipartFile logoImage, MultipartFile[] images) {
         User user = userService.getUserByEmail(email);
         try {
             TechnologyPost technologyPost = TechnologyPost.builder()
@@ -103,7 +103,7 @@ public class TechnologyPostServiceImpl implements TechnologyPostService {
             }
 
             technologyPost.setUser(user);
-            technologyPostRepository.save(technologyPost);
+            TechnologyPost createdPost = technologyPostRepository.save(technologyPost);
 
             // save post images data
             if (images != null) {
@@ -113,17 +113,15 @@ public class TechnologyPostServiceImpl implements TechnologyPostService {
             }
 
             // save post videos data
-            if (videos != null) {
-                Arrays.stream(videos)
-                        .map(video -> awsFileService.uploadPostFile(video, email))
-                        .forEach(videoUrl -> videoService.createVideo(videoUrl, technologyPost));
+            if (technologyPostDto.getYoutubeUrl() != null && !technologyPostDto.getYoutubeUrl().equals("")) {
+                videoService.createVideo(technologyPostDto.getYoutubeUrl(), technologyPost);
             }
 
             log.info("Successfully created technology post");
-            return true;
+            return createdPost;
         } catch (Exception e) {
             log.error("Failed to create technology post", e);
-            return false;
+            return null;
         }
     }
 }

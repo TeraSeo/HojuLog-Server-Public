@@ -1,15 +1,15 @@
 package com.promo.web.service;
 
-import com.promo.web.entity.Image;
 import com.promo.web.entity.Post;
-import com.promo.web.entity.User;
-
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PostService {
     List<Post> getWholePosts();
+
+    Page<Post> getPostsByPageNCondition(Pageable pageable, String condition);
 
     Post getPostById(Long id);
 

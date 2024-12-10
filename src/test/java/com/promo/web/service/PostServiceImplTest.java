@@ -1,12 +1,14 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.RestaurantPostDto;
-import com.promo.web.dto.TechnologyPostDto;
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.RestaurantPostDto;
+import com.promo.web.dto.request.TechnologyPostDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +41,8 @@ class PostServiceImplTest {
 
         MockMultipartFile logoFile = new MockMultipartFile("file1", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
         MockMultipartFile multipartFile1 = new MockMultipartFile("file2", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
-        MockMultipartFile multipartFile2 = new MockMultipartFile("file3", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
         MockMultipartFile[] images = new MockMultipartFile[]{multipartFile1};
-        MockMultipartFile[] videos = new MockMultipartFile[]{multipartFile2};
 
         TechnologyPostDto technologyPostDto = TechnologyPostDto.builder()
                 .title("TechnologyTitle")
@@ -56,10 +56,11 @@ class PostServiceImplTest {
                 .playStoreUrl("https://play.google.com/store/apps/details?id=com.world.lotto")
                 .appStoreUrl("https://apps.apple.com/kr/app/world-lotto/id6505033228?l=en-GB")
                 .webUrl("https://play.google.com/store/apps/details?id=com.world.lotto")
+                .youtubeUrl("https://youtube/videos")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
-        technologyPostService.createPost(createdUser.getId(), technologyPostDto, logoFile, images, videos);
+        technologyPostService.createPost(createdUser.getEmail(), technologyPostDto, logoFile, images);
 
         RestaurantPostDto restaurantPostDto = RestaurantPostDto.builder()
                 .title("RestaurantTitle")
@@ -71,11 +72,12 @@ class PostServiceImplTest {
                 .isOwnWork(true)
                 .isPortrait(true)
                 .webUrl("https://play.google.com")
+                .youtubeUrl("https://youtube/videos")
                 .location("location")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
-        restaurantPostService.createPost(createdUser.getId(), restaurantPostDto, logoFile, images, videos);
+        restaurantPostService.createPost(createdUser.getEmail(), restaurantPostDto, logoFile, images);
 
         List<TechnologyPost> wholeTechnologyPosts = technologyPostService.getWholePosts();
         List<RestaurantPost> wholeRestaurantPosts = restaurantPostService.getWholePosts();
@@ -99,4 +101,11 @@ class PostServiceImplTest {
         assertEquals(restaurantPost.getId(), wholePosts.get(1).getId());
         assertEquals(restaurantPost.getTitle(), wholePosts.get(1).getTitle());
     }
+
+    @Test
+    void getPostsLatestPagination() {
+        Page<Post> posts = postService.getPostsByPageNCondition(PageRequest.of(0, 2), "Latest");
+        assertEquals(posts.getNumberOfElements(), 2);
+    }
+
 }

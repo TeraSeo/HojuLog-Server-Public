@@ -1,13 +1,15 @@
 package com.promo.web.service;
 
-import com.promo.web.dto.EntertainmentPostDto;
-import com.promo.web.dto.UserDto;
+import com.promo.web.dto.request.EntertainmentPostDto;
+import com.promo.web.dto.request.UserDto;
 import com.promo.web.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,6 +30,11 @@ class EntertainmentPostServiceImplTest {
         userService.createUser(user1);
         User createdUser = userService.getUserByEmail(user1.getEmail());
 
+        MockMultipartFile logoFile = new MockMultipartFile("file1", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
+        MockMultipartFile multipartFile1 = new MockMultipartFile("file2", "test1.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
+
+        MockMultipartFile[] images = new MockMultipartFile[]{multipartFile1};
+
         EntertainmentPostDto entertainmentPostDto = EntertainmentPostDto.builder()
                 .title("Title")
                 .subTitle("Sub")
@@ -38,10 +45,11 @@ class EntertainmentPostServiceImplTest {
                 .isOwnWork(true)
                 .isPortrait(true)
                 .webUrl("https://play.google.com")
+                .youtubeUrl("https://youtube/video")
                 .tags(List.of("Tag1", "Tag2"))
                 .build();
 
-        entertainmentPostService.createPost(createdUser.getId(), entertainmentPostDto);
+        entertainmentPostService.createPost(createdUser.getEmail(), entertainmentPostDto, logoFile, images);
 
         List<EntertainmentPost> wholePosts = entertainmentPostService.getWholePosts();
 

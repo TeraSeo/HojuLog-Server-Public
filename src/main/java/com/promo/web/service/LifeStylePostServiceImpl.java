@@ -1,7 +1,7 @@
 package com.promo.web.service;
 
 import com.promo.web.aws.s3.AwsFileService;
-import com.promo.web.dto.LifeStylePostDto;
+import com.promo.web.dto.request.LifeStylePostDto;
 import com.promo.web.entity.*;
 import com.promo.web.exception.LifeStylePostNotFoundException;
 import com.promo.web.repository.LifeStylePostRepository;
@@ -64,7 +64,7 @@ public class LifeStylePostServiceImpl implements LifeStylePostService{
     }
 
     @Override
-    public Boolean createPost(String email, LifeStylePostDto lifeStylePostDto, MultipartFile logoImage, MultipartFile[] images, MultipartFile[] videos) {
+    public Post createPost(String email, LifeStylePostDto lifeStylePostDto, MultipartFile logoImage, MultipartFile[] images) {
         User user = userService.getUserByEmail(email);
         try {
             LifeStylePost lifeStylePost = LifeStylePost.builder()
@@ -100,7 +100,7 @@ public class LifeStylePostServiceImpl implements LifeStylePostService{
             }
 
             lifeStylePost.setUser(user);
-            lifeStylePostRepository.save(lifeStylePost);
+            LifeStylePost createdPost = lifeStylePostRepository.save(lifeStylePost);
 
             // save post images data
             if (images != null) {
@@ -110,18 +110,16 @@ public class LifeStylePostServiceImpl implements LifeStylePostService{
             }
 
             // save post videos data
-            if (videos != null) {
-                Arrays.stream(videos)
-                        .map(video -> awsFileService.uploadPostFile(video, email))
-                        .forEach(videoUrl -> videoService.createVideo(videoUrl, lifeStylePost));
+            if (lifeStylePostDto.getYoutubeUrl() != null && !lifeStylePostDto.getYoutubeUrl().equals("")) {
+                videoService.createVideo(lifeStylePostDto.getYoutubeUrl(), lifeStylePost);
             }
 
             log.info("Successfully created lifestyle post");
 
-            return true;
+            return createdPost;
         } catch (Exception e) {
             log.error("Failed to create lifestyle post", e);
-            return false;
+            return null;
         }
     }
 }
