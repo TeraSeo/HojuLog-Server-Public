@@ -16,4 +16,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @DiscriminatorValue("TRAVEL")
 public class TravelPost extends Post {
+    private String address;
+    private String country;
 }

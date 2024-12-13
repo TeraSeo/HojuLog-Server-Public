@@ -5,11 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -29,12 +26,8 @@ public abstract class Post extends PostBaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    @Size(max = 41)
+    @Size(max = 80)
     private String title;
-
-    @Column(nullable = false)
-    @Size(max = 61)
-    private String subtitle;
 
     @Column(nullable = false)
     @Size(max = 5001)
@@ -48,32 +41,19 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private SubCategory subCategory;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Visibility visibility;
+    private String contact;
 
-    @Column(nullable = false)
-    private Boolean isOwnWork;
-
-    private String ownerEmail;
+    private String email;
 
     @Column(nullable = false)
     private Boolean isPortrait;
 
-    private String logoUrl;
+    @Column(nullable = false)
+    private Long viewCounts;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @ManyToMany
-    @JoinTable(
-            name = "post_tags",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    @Builder.Default
-    private Set<Tag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -91,41 +71,22 @@ public abstract class Post extends PostBaseEntity {
     @Builder.Default
     private List<Image> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Video> videos = new ArrayList<>();
-
-    public Post(String title, String subtitle, String description, Category category, SubCategory subCategory, Visibility visibility, Boolean isOwnWork, String ownerEmail, Boolean isPortrait) {
+    public Post(String title, String description, Category category, SubCategory subCategory, Boolean isPortrait) {
         this.title = title;
-        this.subtitle = subtitle;
         this.description = description;
         this.category = category;
         this.subCategory = subCategory;
-        this.visibility = visibility;
-        this.isOwnWork = isOwnWork;
-        this.ownerEmail = ownerEmail;
         this.isPortrait = isPortrait;
     }
 
     public PostDto convertToPostDto(Long userId) {
         List<String> imageUrls = getImages().stream().map(Image::getUrl).collect(Collectors.toList());
-        List<String> postTags = tags.stream().map(Tag::getName).collect(Collectors.toList());
-        List<Long> recentLaunchedPostIds = user.getPosts().stream()
-                .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
-                .limit(3)
-                .map(Post::getId)
-                .collect(Collectors.toList());
-        String videoUrl = this.getVideos().size() > 0 ? this.getVideos().get(0).getUrl() : "";
-        List<Long> likedUserIds = getLikes().stream().map(like -> like.getUser().getId()).collect(Collectors.toList());
-        Boolean isCurrentUserLiked = likedUserIds.contains(userId);
-
-        List<Long> bookmarkedUserIds = getBookmarks().stream().map(like -> like.getUser().getId()).collect(Collectors.toList());
-        Boolean isCurrentUserBookmarked = bookmarkedUserIds.contains(userId);
-
-        Long wholeCommentsLength = Long.valueOf(comments.size());
 
         try {
             if (this instanceof PropertyPost) {
+                PropertyPost propertyPost = (PropertyPost) this;
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).period(propertyPost.getPeriod()).price(propertyPost.getPrice()).userId(user.getId()).createdAt(getCreatedAt()).build();
+                return postDto;
             }
             else if (this instanceof JobPost) {
             }
@@ -139,11 +100,6 @@ public abstract class Post extends PostBaseEntity {
             else if (this instanceof TravelPost) {
 
             }
-//            else if (this instanceof EntertainmentPost) {
-//                EntertainmentPost entertainmentPost = (EntertainmentPost) this;
-//                PostDto entertainmentPostDto = PostDto.builder().postId(id).title(title).subTitle(subtitle).description(description).category(Category.Entertainment).subCategory(subCategory).visibility(visibility.toString()).isOwnWork(isOwnWork).ownerEmail(ownerEmail).isPortrait(isPortrait).logoUrl(logoUrl).tags(postTags).likedUserCount(Long.valueOf(likes.size())).wholeCommentsLength(wholeCommentsLength).isCurrentUserLiked(isCurrentUserLiked).isCurrentUserBookmarked(isCurrentUserBookmarked).recentLaunchedPostIds(recentLaunchedPostIds).userId(user.getId()).imageUrls(imageUrls).youtubeUrl(videoUrl).webUrl(entertainmentPost.getWebUrl()).location(entertainmentPost.getLocation()).startDateTime(entertainmentPost.getStartDateTime()).endDateTime(entertainmentPost.getEndDateTime()).createdAt(getCreatedAt()).build();
-//                return entertainmentPostDto;
-//            }
             return null;
         } catch (Exception e) {
             return null;

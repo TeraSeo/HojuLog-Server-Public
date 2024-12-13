@@ -16,5 +16,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @DiscriminatorValue("PROPERTY")
 public class PropertyPost extends Post {
+    private Period period;
 
+    private Long price;
+
+    private String address;
+
+    private String availableTime;
 }

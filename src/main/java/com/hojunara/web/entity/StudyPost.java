@@ -16,4 +16,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @DiscriminatorValue("STUDY")
 public class StudyPost extends Post {
+    private String school;
+
+    private String major;
+
 }

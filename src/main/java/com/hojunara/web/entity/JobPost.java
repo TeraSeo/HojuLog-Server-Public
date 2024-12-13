@@ -16,4 +16,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @DiscriminatorValue("JOB")
 public class JobPost extends Post {
+    private JobType jobType;
 }

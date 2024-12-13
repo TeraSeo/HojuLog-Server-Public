@@ -20,14 +20,10 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final UserService userService;
-    private final TagService tagService;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserService userService, TagService tagService) {
+    public PostServiceImpl(PostRepository postRepository) {
         this.postRepository = postRepository;
-        this.userService = userService;
-        this.tagService = tagService;
     }
 
     @Override

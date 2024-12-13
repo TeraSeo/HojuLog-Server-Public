@@ -4,15 +4,15 @@ spring:
       client:
         registration:
           google:
-            client-id: 240252611342-j5i416ihcmpdas5um0c40nt0uorqcm9g.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 619211091396-pc5ik8gqfmsg047ld407vmc14irvalhm.apps.googleusercontent.com
+            client-secret: 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
             scope:
               - profile
               - email
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/beginners_hub?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/hojunara?serverTimezone=Asia/Seoul
     username: root
     password: root1234
 
@@ -47,12 +47,12 @@ spring:
 cloud:
   aws:
     s3:
-      bucket: beginnershub
+      bucket: hojulog
     stack.auto: false
     region.static: ap-northeast-2
     credentials:
-      accessKey: AKIAXYKJVHAD26WBTWP7
-      secretKey: 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
+      accessKey: AKIAXYKJVHADTQ7VT35J
+      secretKey: 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
 
 jwt:
   secret: eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMDc2OTQ4NywiaWF0IjoxNzMwNzY5NDg3fQ.V0TwWaSCpgFfCbzz1n_4sZCouR1O9K5gujCcwh1-y8Q

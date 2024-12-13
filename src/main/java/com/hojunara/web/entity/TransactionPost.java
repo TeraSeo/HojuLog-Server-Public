@@ -16,4 +16,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @DiscriminatorValue("TRANSACTION")
 public class TransactionPost extends Post {
+    private TransactionType transactionType;
+
+    private PriceType priceType;
+
+    private Long price;
 }
