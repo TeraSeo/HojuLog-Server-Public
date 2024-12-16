@@ -7,6 +7,7 @@ import com.hojunara.web.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,14 @@ public class PostServiceImpl implements PostService {
             throw e;
         }
     }
+
+    @Override
+    public List<Post> getRecent5PostsByCategory(Category category) {
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Post> posts = postRepository.findRecent5ByCategoryOrderByCreatedAtDesc(category, pageable);
+        return posts;
+    }
+
 
     @Override
     public Page<Post> getPostsByPageNCondition(Pageable pageable, String condition) {

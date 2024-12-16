@@ -1,12 +1,14 @@
 package com.hojunara.web.entity;
 
 import com.hojunara.web.dto.response.PostDto;
+import com.hojunara.web.dto.response.SummarizedPostDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Entity
@@ -51,6 +53,10 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private Long viewCounts;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Suburb suburb;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -81,28 +87,63 @@ public abstract class Post extends PostBaseEntity {
 
     public PostDto convertToPostDto(Long userId) {
         List<String> imageUrls = getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+        String username = user.getUsername();
 
         try {
             if (this instanceof PropertyPost) {
                 PropertyPost propertyPost = (PropertyPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).period(propertyPost.getPeriod()).price(propertyPost.getPrice()).userId(user.getId()).createdAt(getCreatedAt()).build();
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).period(propertyPost.getPeriod()).price(propertyPost.getPrice()).address(propertyPost.getAddress()).availableTime(propertyPost.getAvailableTime()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
                 return postDto;
             }
             else if (this instanceof JobPost) {
+                JobPost jobPost = (JobPost) this;
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).jobType(jobPost.getJobType()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                return postDto;
             }
             else if (this instanceof TransactionPost) {
+                TransactionPost transactionPost = (TransactionPost) this;
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).transactionType(transactionPost.getTransactionType()).priceType(transactionPost.getPriceType()).price(transactionPost.getPrice()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                return postDto;
             }
             else if (this instanceof SocietyPost) {
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                return postDto;
             }
             else if (this instanceof StudyPost) {
+                StudyPost studyPost = (StudyPost) this;
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).school(studyPost.getSchool()).major(studyPost.getMajor()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                return postDto;
 
             }
             else if (this instanceof TravelPost) {
-
+                TravelPost travelPost = (TravelPost) this;
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).address(travelPost.getAddress()).country(travelPost.getCountry()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                return postDto;
             }
             return null;
         } catch (Exception e) {
             return null;
         }
     }
+
+    public SummarizedPostDto convertToSummarizedPostDto() {
+        try {
+            String imageUrl = images.stream()
+                    .map(Image::getUrl)
+                    .findFirst()
+                    .orElse(null);
+
+            double randomAverageRate = Math.round(ThreadLocalRandom.current().nextDouble(4.0, 5.01) * 10.0) / 10.0;
+
+            return SummarizedPostDto.builder()
+                    .title(title)
+                    .username(user.getUsername())
+                    .averageRate(randomAverageRate)
+                    .imageUrl(imageUrl)
+                    .build();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

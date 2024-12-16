@@ -74,6 +74,7 @@ public class JobPostServiceImpl implements JobPostService {
                     .isPortrait(jobPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .jobType(jobPostDto.getJobType())
+                    .suburb(jobPostDto.getSuburb())
                     .build();
 
             jobPost.setUser(user);

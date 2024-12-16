@@ -2,6 +2,8 @@ package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.request.*;
 import com.hojunara.web.dto.response.PostDto;
+import com.hojunara.web.dto.response.SummarizedPostDto;
+import com.hojunara.web.entity.Category;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.PostPaginationResponse;
 import com.hojunara.web.service.*;
@@ -105,6 +107,17 @@ public class PostController {
 
         PostPaginationResponse postPaginationResponse = PostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
         return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/recent-5-post/by/category")
+    public ResponseEntity<List<SummarizedPostDto>> getPostsByCondition(@RequestParam Category category) {
+        List<Post> posts = postService.getRecent5PostsByCategory(category);
+        List<SummarizedPostDto> summarizedPostDtoList = posts
+                .stream()
+                .map(post -> post.convertToSummarizedPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedPostDtoList);
     }
 
     @GetMapping("get/specific")

@@ -75,6 +75,7 @@ public class StudyPostServiceImpl implements StudyPostService {
                     .viewCounts(0L)
                     .school(studyPostDto.getSchool())
                     .major(studyPostDto.getMajor())
+                    .suburb(studyPostDto.getSuburb())
                     .build();
 
             studyPost.setUser(user);

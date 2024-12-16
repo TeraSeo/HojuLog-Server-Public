@@ -3,11 +3,10 @@ package com.hojunara.web.dto.request;
 import com.hojunara.web.entity.Category;
 import com.hojunara.web.entity.Period;
 import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.Suburb;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -46,4 +45,6 @@ public class PropertyPostDto {
     private String address;
 
     private String availableTime;
+
+    private Suburb suburb;
 }

@@ -76,7 +76,9 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                     .transactionType(transactionPostDto.getTransactionType())
                     .priceType(transactionPostDto.getPriceType())
                     .price(transactionPostDto.getPrice())
+                    .suburb(transactionPostDto.getSuburb())
                     .build();
+
 
             transactionPost.setUser(user);
             TransactionPost createdPost = transactionPostRepository.save(transactionPost);

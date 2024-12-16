@@ -3,11 +3,10 @@ package com.hojunara.web.dto.request;
 import com.hojunara.web.entity.Category;
 import com.hojunara.web.entity.JobType;
 import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.Suburb;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -40,4 +39,6 @@ public class JobPostDto {
     private Boolean isPortrait;
 
     private JobType jobType;
+
+    private Suburb suburb;
 }

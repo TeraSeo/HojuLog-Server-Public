@@ -16,6 +16,8 @@ public class PostDto {
 
     private Long postId;
 
+    private String username;
+
     private String title;
 
     private String description;
@@ -36,7 +38,25 @@ public class PostDto {
 
     private Long price;
 
+    private String address;
+
+    private String availableTime;
+
+    private JobType jobType;
+
+    private String school;
+
+    private String major;
+
+    private TransactionType transactionType;
+
+    private PriceType priceType;
+
+    private String country;
+
     private Long userId;
 
     private Timestamp createdAt;
+
+    private Long viewCounts;
 }

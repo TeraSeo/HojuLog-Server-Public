@@ -19,5 +19,4 @@ public class StudyPost extends Post {
     private String school;
 
     private String major;
-
 }

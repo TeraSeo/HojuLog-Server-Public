@@ -75,6 +75,7 @@ public class TravelPostServiceImpl implements TravelPostService {
                     .viewCounts(0L)
                     .address(travelPostDto.getAddress())
                     .country(travelPostDto.getCountry())
+                    .suburb(travelPostDto.getSuburb())
                     .build();
 
             travelPost.setUser(user);

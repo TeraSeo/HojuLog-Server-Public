@@ -73,6 +73,7 @@ public class SocietyPostServiceImpl implements SocietyPostService {
                     .email(societyPostDto.getEmail())
                     .isPortrait(societyPostDto.getIsPortrait())
                     .viewCounts(0L)
+                    .suburb(societyPostDto.getSuburb())
                     .build();
 
             societyPost.setUser(user);

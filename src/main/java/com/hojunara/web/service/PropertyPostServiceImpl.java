@@ -80,6 +80,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .price(propertyPostDto.getPrice())
                     .address(propertyPostDto.getAddress())
                     .availableTime(propertyPostDto.getAvailableTime())
+                    .suburb(propertyPostDto.getSuburb())
                     .build();
 
             propertyPost.setUser(user);
