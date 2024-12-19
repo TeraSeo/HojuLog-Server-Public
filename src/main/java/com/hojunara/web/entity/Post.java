@@ -1,7 +1,6 @@
 package com.hojunara.web.entity;
 
-import com.hojunara.web.dto.response.PostDto;
-import com.hojunara.web.dto.response.SummarizedPostDto;
+import com.hojunara.web.dto.response.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -92,12 +91,12 @@ public abstract class Post extends PostBaseEntity {
         try {
             if (this instanceof PropertyPost) {
                 PropertyPost propertyPost = (PropertyPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).period(propertyPost.getPeriod()).price(propertyPost.getPrice()).address(propertyPost.getAddress()).availableTime(propertyPost.getAvailableTime()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).period(propertyPost.getPeriod()).price(propertyPost.getPrice()).location(propertyPost.getLocation()).availableTime(propertyPost.getAvailableTime()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
                 return postDto;
             }
             else if (this instanceof JobPost) {
                 JobPost jobPost = (JobPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).jobType(jobPost.getJobType()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).jobType(jobPost.getJobType()).location(jobPost.getLocation()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
                 return postDto;
             }
             else if (this instanceof TransactionPost) {
@@ -117,7 +116,7 @@ public abstract class Post extends PostBaseEntity {
             }
             else if (this instanceof TravelPost) {
                 TravelPost travelPost = (TravelPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).address(travelPost.getAddress()).country(travelPost.getCountry()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
+                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
                 return postDto;
             }
             return null;
@@ -125,25 +124,4 @@ public abstract class Post extends PostBaseEntity {
             return null;
         }
     }
-
-    public SummarizedPostDto convertToSummarizedPostDto() {
-        try {
-            String imageUrl = images.stream()
-                    .map(Image::getUrl)
-                    .findFirst()
-                    .orElse(null);
-
-            double randomAverageRate = Math.round(ThreadLocalRandom.current().nextDouble(4.0, 5.01) * 10.0) / 10.0;
-
-            return SummarizedPostDto.builder()
-                    .title(title)
-                    .username(user.getUsername())
-                    .averageRate(randomAverageRate)
-                    .imageUrl(imageUrl)
-                    .build();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
 }

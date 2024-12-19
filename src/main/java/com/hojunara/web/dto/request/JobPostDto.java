@@ -41,4 +41,6 @@ public class JobPostDto {
     private JobType jobType;
 
     private Suburb suburb;
+
+    private String location;
 }

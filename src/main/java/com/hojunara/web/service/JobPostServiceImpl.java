@@ -46,6 +46,18 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Override
+    public List<JobPost> getRecent5Posts() {
+        try {
+            List<JobPost> posts = jobPostRepository.findTop5ByOrderByCreatedAtDesc();
+            log.info("Successfully got Recent 5 Job Posts");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get Recent 5 Job Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
     public JobPost getPostById(Long id) {
         try {
             Optional<JobPost> j = jobPostRepository.findById(id);
@@ -74,6 +86,7 @@ public class JobPostServiceImpl implements JobPostService {
                     .isPortrait(jobPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .jobType(jobPostDto.getJobType())
+                    .location(jobPostDto.getLocation())
                     .suburb(jobPostDto.getSuburb())
                     .build();
 

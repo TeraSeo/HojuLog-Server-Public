@@ -46,6 +46,18 @@ public class StudyPostServiceImpl implements StudyPostService {
     }
 
     @Override
+    public List<StudyPost> getRecent5Posts() {
+        try {
+            List<StudyPost> posts = studyPostRepository.findTop5ByOrderByCreatedAtDesc();
+            log.info("Successfully got Recent 5 Study Posts");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get Recent 5 Study Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
     public StudyPost getPostById(Long id) {
         try {
             Optional<StudyPost> s = studyPostRepository.findById(id);

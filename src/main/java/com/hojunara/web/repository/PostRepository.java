@@ -18,9 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByOrderByCreatedAtAsc(Pageable pageable);
 
-    @Query("SELECT p FROM Post p WHERE p.category = :category ORDER BY p.createdAt DESC")
-    List<Post> findRecent5ByCategoryOrderByCreatedAtDesc(Category category, Pageable pageable);
-
 //    Page<Post> findAllByOrderByLikesCountDesc(Pageable pageable);
 //
 //    Page<Post> findAllByOrderByLikesCountAsc(Pageable pageable);

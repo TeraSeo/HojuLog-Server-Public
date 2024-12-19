@@ -38,7 +38,7 @@ public class PostDto {
 
     private Long price;
 
-    private String address;
+    private String location;
 
     private String availableTime;
 

@@ -1,11 +1,8 @@
 package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.request.*;
-import com.hojunara.web.dto.response.PostDto;
-import com.hojunara.web.dto.response.SummarizedPostDto;
-import com.hojunara.web.entity.Category;
-import com.hojunara.web.entity.Post;
-import com.hojunara.web.entity.PostPaginationResponse;
+import com.hojunara.web.dto.response.*;
+import com.hojunara.web.entity.*;
 import com.hojunara.web.service.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -109,15 +106,70 @@ public class PostController {
         return ResponseEntity.ok(postPaginationResponse);
     }
 
-    @GetMapping("get/recent-5-post/by/category")
-    public ResponseEntity<List<SummarizedPostDto>> getPostsByCondition(@RequestParam Category category) {
-        List<Post> posts = postService.getRecent5PostsByCategory(category);
-        List<SummarizedPostDto> summarizedPostDtoList = posts
+    @GetMapping("get/recent-5/property/post")
+    public ResponseEntity<List<SummarizedPropertyPostDto>> getRecent5PropertyPost() {
+        List<PropertyPost> propertyPostList = propertyPostService.getRecent5Posts();
+        List<SummarizedPropertyPostDto> summarizedPropertyPostDtoList = propertyPostList
                 .stream()
-                .map(post -> post.convertToSummarizedPostDto())
+                .map(post -> post.convertPostToSummarizedPropertyPostDto())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(summarizedPostDtoList);
+        return ResponseEntity.ok(summarizedPropertyPostDtoList);
+    }
+
+    @GetMapping("get/recent-5/job/post")
+    public ResponseEntity<List<SummarizedJobPostDto>> getRecent5JobPost() {
+        List<JobPost> jobPostList = jobPostService.getRecent5Posts();
+        List<SummarizedJobPostDto> summarizedJobPostDtoList = jobPostList
+                .stream()
+                .map(post -> post.convertPostToSummarizedJobPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedJobPostDtoList);
+    }
+
+    @GetMapping("get/recent-5/transaction/post")
+    public ResponseEntity<List<SummarizedTransactionPostDto>> getRecent5TransactionPost() {
+        List<TransactionPost> transactionPostList = transactionPostService.getRecent5Posts();
+        List<SummarizedTransactionPostDto> summarizedTransactionPostDtoList = transactionPostList
+                .stream()
+                .map(post -> post.convertPostToSummarizedTransactionPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedTransactionPostDtoList);
+    }
+
+    @GetMapping("get/recent-5/society/post")
+    public ResponseEntity<List<SummarizedSocietyPostDto>> getRecent5SocietyPost() {
+        List<SocietyPost> societyPostList = societyPostService.getRecent5Posts();
+        List<SummarizedSocietyPostDto> summarizedSocietyPostDtoList = societyPostList
+                .stream()
+                .map(post -> post.convertPostToSummarizedSocietyPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedSocietyPostDtoList);
+    }
+
+    @GetMapping("get/recent-5/travel/post")
+    public ResponseEntity<List<SummarizedTravelPostDto>> getRecent5TravelPost() {
+        List<TravelPost> travelPostList = travelPostService.getRecent5Posts();
+        List<SummarizedTravelPostDto> summarizedTravelPostDtoList = travelPostList
+                .stream()
+                .map(post -> post.convertPostToSummarizedTravelPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedTravelPostDtoList);
+    }
+
+    @GetMapping("get/recent-5/study/post")
+    public ResponseEntity<List<SummarizedStudyPostDto>> getRecent5StudyPost() {
+        List<StudyPost> studyPostList = studyPostService.getRecent5Posts();
+        List<SummarizedStudyPostDto> summarizedStudyPostDtoList = studyPostList
+                .stream()
+                .map(post -> post.convertPostToSummarizedStudyPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedStudyPostDtoList);
     }
 
     @GetMapping("get/specific")

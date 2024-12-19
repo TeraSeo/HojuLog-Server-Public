@@ -49,6 +49,18 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     }
 
     @Override
+    public List<PropertyPost> getRecent5Posts() {
+        try {
+            List<PropertyPost> posts = propertyPostRepository.findTop5ByOrderByCreatedAtDesc();
+            log.info("Successfully got Recent 5 Property Posts");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get Recent 5 Property Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
     public PropertyPost getPostById(Long id) {
         try {
             Optional<PropertyPost> p = propertyPostRepository.findById(id);
@@ -78,7 +90,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .viewCounts(0L)
                     .period(propertyPostDto.getPeriod())
                     .price(propertyPostDto.getPrice())
-                    .address(propertyPostDto.getAddress())
+                    .location(propertyPostDto.getLocation())
                     .availableTime(propertyPostDto.getAvailableTime())
                     .suburb(propertyPostDto.getSuburb())
                     .build();

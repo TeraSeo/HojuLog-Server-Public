@@ -46,6 +46,18 @@ public class SocietyPostServiceImpl implements SocietyPostService {
     }
 
     @Override
+    public List<SocietyPost> getRecent5Posts() {
+        try {
+            List<SocietyPost> posts = societyPostRepository.findTop5ByOrderByCreatedAtDesc();
+            log.info("Successfully got Recent 5 Society Posts");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get Recent 5 Society Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
     public SocietyPost getPostById(Long id) {
         try {
             Optional<SocietyPost> s = societyPostRepository.findById(id);

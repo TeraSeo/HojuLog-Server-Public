@@ -21,10 +21,19 @@ class PostServiceImplTest {
     @Autowired
     private PostService postService;
 
+    @Autowired
+    private PropertyPostService propertyPostService;
+
     @Test
     void getRecent5PostsByCategory() {
         List<Post> recentTop5PostsByCategory = postService.getRecent5PostsByCategory(Category.부동산);
         assertEquals(recentTop5PostsByCategory.size(), 5);
+    }
+
+    @Test
+    void getRecent5PropertyPostsB() {
+        List<PropertyPost> propertyPostList = propertyPostService.getRecent5Posts();
+        assertEquals(propertyPostList.size(), 5);
     }
 
     @Test

@@ -10,6 +10,8 @@ import java.util.List;
 public interface SocietyPostService {
     List<SocietyPost> getWholePosts();
 
+    List<SocietyPost> getRecent5Posts();
+
     SocietyPost getPostById(Long id);
 
     Post createPost(SocietyPostDto societyPostDto, MultipartFile[] images);

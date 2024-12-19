@@ -46,6 +46,18 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     }
 
     @Override
+    public List<TransactionPost> getRecent5Posts() {
+        try {
+            List<TransactionPost> posts = transactionPostRepository.findTop5ByOrderByCreatedAtDesc();
+            log.info("Successfully got Recent 5 Transaction Posts");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get Recent 5 Transaction Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
     public TransactionPost getPostById(Long id) {
         try {
             Optional<TransactionPost> t = transactionPostRepository.findById(id);

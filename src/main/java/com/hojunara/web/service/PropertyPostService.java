@@ -10,6 +10,8 @@ import java.util.List;
 public interface PropertyPostService {
     List<PropertyPost> getWholePosts();
 
+    List<PropertyPost> getRecent5Posts();
+
     PropertyPost getPostById(Long id);
 
     Post createPost(PropertyPostDto propertyPostDto, MultipartFile[] images);

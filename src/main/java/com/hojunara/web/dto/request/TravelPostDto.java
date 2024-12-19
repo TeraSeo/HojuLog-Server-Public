@@ -37,9 +37,7 @@ public class TravelPostDto {
     @NotNull
     private Boolean isPortrait;
 
-    private String address;
-
-    private String country;
-
     private Suburb suburb;
+
+    private String location;
 }

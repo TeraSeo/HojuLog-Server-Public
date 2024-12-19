@@ -46,6 +46,18 @@ public class TravelPostServiceImpl implements TravelPostService {
     }
 
     @Override
+    public List<TravelPost> getRecent5Posts() {
+        try {
+            List<TravelPost> posts = travelPostRepository.findTop5ByOrderByCreatedAtDesc();
+            log.info("Successfully got Recent 5 Travel Posts");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get Recent 5 Travel Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
     public TravelPost getPostById(Long id) {
         try {
             Optional<TravelPost> t = travelPostRepository.findById(id);
@@ -73,9 +85,8 @@ public class TravelPostServiceImpl implements TravelPostService {
                     .email(travelPostDto.getEmail())
                     .isPortrait(travelPostDto.getIsPortrait())
                     .viewCounts(0L)
-                    .address(travelPostDto.getAddress())
-                    .country(travelPostDto.getCountry())
                     .suburb(travelPostDto.getSuburb())
+                    .location(travelPostDto.getLocation())
                     .build();
 
             travelPost.setUser(user);
