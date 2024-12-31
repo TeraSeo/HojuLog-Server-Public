@@ -7,6 +7,8 @@ import com.hojunara.web.exception.SocietyPostNotFoundException;
 import com.hojunara.web.repository.SocietyPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +48,18 @@ public class SocietyPostServiceImpl implements SocietyPostService {
     }
 
     @Override
+    public Page<SocietyPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+        try {
+            Page<SocietyPost> posts = societyPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got pageable Society Posts order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Society Posts order by createdAt Desc", e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<SocietyPost> getRecent5Posts() {
         try {
             List<SocietyPost> posts = societyPostRepository.findTop5ByOrderByCreatedAtDesc();
@@ -79,11 +93,10 @@ public class SocietyPostServiceImpl implements SocietyPostService {
             SocietyPost societyPost = SocietyPost.builder()
                     .title(societyPostDto.getTitle())
                     .description(societyPostDto.getDescription())
-                    .category(Category.동호회)
+                    .category(Category.생활)
                     .subCategory(societyPostDto.getSubCategory())
                     .contact(societyPostDto.getContact())
                     .email(societyPostDto.getEmail())
-                    .isPortrait(societyPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .suburb(societyPostDto.getSuburb())
                     .build();

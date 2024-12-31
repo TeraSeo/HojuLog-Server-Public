@@ -1,5 +1,6 @@
 package com.hojunara.web.dto.response;
 
+import com.hojunara.web.entity.Suburb;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -10,12 +11,20 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @ToString
 @Builder
-public class SummarizedStudyPostDto {
+public class NormalTravelPostDto {
     private Long postId;
 
     private String title;
 
-    private Timestamp createdAt;
+    private String description;
 
     private double rate;
+
+    private Timestamp createdAt;
+
+    private Suburb suburb;
+
+    private Long viewCounts;
+
+    private String location;
 }

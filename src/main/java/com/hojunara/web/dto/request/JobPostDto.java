@@ -35,9 +35,6 @@ public class JobPostDto {
     @Email
     private String email;
 
-    @NotNull
-    private Boolean isPortrait;
-
     private JobType jobType;
 
     private Suburb suburb;

@@ -34,8 +34,5 @@ public class SocietyPostDto {
     @Email
     private String email;
 
-    @NotNull
-    private Boolean isPortrait;
-
     private Suburb suburb;
 }

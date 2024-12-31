@@ -1,6 +1,9 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.response.DetailedTravelPostDto;
+import com.hojunara.web.dto.response.NormalTravelPostDto;
 import com.hojunara.web.dto.response.SummarizedTravelPostDto;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -9,7 +12,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -19,10 +23,26 @@ import java.util.concurrent.ThreadLocalRandom;
 @NoArgsConstructor
 @DiscriminatorValue("TRAVEL")
 public class TravelPost extends Post {
+
+    @Column(nullable = false)
     private String location;
 
+    @Column(nullable = false)
+    private double rate;
+
     public SummarizedTravelPostDto convertPostToSummarizedTravelPostDto() {
-        double randomAverageRate = Math.round(ThreadLocalRandom.current().nextDouble(4.0, 5.01) * 10.0) / 10.0;
-        return SummarizedTravelPostDto.builder().title(getTitle()).averageRate(randomAverageRate).location(location).createdAt(getCreatedAt()).build();
+        return SummarizedTravelPostDto.builder().postId(getId()).title(getTitle()).rate(rate).location(location).createdAt(getCreatedAt()).build();
+    }
+
+    public NormalTravelPostDto convertPostToNormalTravelPostDto() {
+        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).rate(rate).suburb(getSuburb()).viewCounts(getViewCounts()).location(location).createdAt(getCreatedAt()).build();
+    }
+
+    public DetailedTravelPostDto convertPostToDetailedTravelPostDto() {
+        List<String> imageUrls = getImages().stream()
+                .map(Image::getUrl)
+                .collect(Collectors.toList());
+
+        return DetailedTravelPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).location(location).rate(rate).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
     }
 }

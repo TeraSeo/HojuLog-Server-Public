@@ -1,8 +1,8 @@
 package com.hojunara.web.dto.response;
 
-import com.hojunara.web.entity.Period;
-import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.PriceType;
 import com.hojunara.web.entity.Suburb;
+import com.hojunara.web.entity.TransactionType;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -13,22 +13,24 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @ToString
 @Builder
-public class SummarizedPropertyPostDto {
+public class NormalTransactionPostDto {
     private Long postId;
 
     private String title;
 
-    private SubCategory subCategory;
-
     private String imageUrl;
-
-    private String location;
 
     private Timestamp createdAt;
 
-    private Period period;
+    private Suburb suburb;
 
     private Long price;
 
-    private Suburb suburb;
+    private TransactionType transactionType;
+
+    private PriceType priceType;
+
+    private Long viewCounts;
+
+    private Long commentCounts;
 }

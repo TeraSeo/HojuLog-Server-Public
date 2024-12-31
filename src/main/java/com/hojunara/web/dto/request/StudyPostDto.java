@@ -34,12 +34,11 @@ public class StudyPostDto {
     @Email
     private String email;
 
-    @NotNull
-    private Boolean isPortrait;
-
     private String school;
 
     private String major;
 
     private Suburb suburb;
+
+    private double rate;
 }

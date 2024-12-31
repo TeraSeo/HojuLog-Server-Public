@@ -7,6 +7,8 @@ import com.hojunara.web.exception.TravelPostNotFoundException;
 import com.hojunara.web.repository.TravelPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +43,18 @@ public class TravelPostServiceImpl implements TravelPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get Whole Travel Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TravelPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+        try {
+            Page<TravelPost> posts = travelPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got pageable Travel Posts order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Travel Posts order by createdAt Desc", e);
             throw e;
         }
     }
@@ -83,10 +97,10 @@ public class TravelPostServiceImpl implements TravelPostService {
                     .subCategory(travelPostDto.getSubCategory())
                     .contact(travelPostDto.getContact())
                     .email(travelPostDto.getEmail())
-                    .isPortrait(travelPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .suburb(travelPostDto.getSuburb())
                     .location(travelPostDto.getLocation())
+                    .rate(travelPostDto.getRate())
                     .build();
 
             travelPost.setUser(user);

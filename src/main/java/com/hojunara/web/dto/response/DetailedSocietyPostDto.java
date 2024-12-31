@@ -4,6 +4,7 @@ import com.hojunara.web.entity.SubCategory;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,14 +12,24 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @ToString
 @Builder
-public class SummarizedJobPostDto {
+public class DetailedSocietyPostDto {
     private Long postId;
+
+    private String username;
 
     private String title;
 
-    private double viewCounts;
+    private String description;
 
     private SubCategory subCategory;
 
+    private String contact;
+
+    private String email;
+
+    private List<String> imageUrls;
+
     private Timestamp createdAt;
+
+    private double viewCounts;
 }

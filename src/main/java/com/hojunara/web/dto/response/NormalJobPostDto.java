@@ -1,6 +1,8 @@
 package com.hojunara.web.dto.response;
 
+import com.hojunara.web.entity.JobType;
 import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.Suburb;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -11,14 +13,20 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @ToString
 @Builder
-public class SummarizedJobPostDto {
+public class NormalJobPostDto {
     private Long postId;
 
     private String title;
 
-    private double viewCounts;
-
-    private SubCategory subCategory;
+    private String location;
 
     private Timestamp createdAt;
+
+    private Suburb suburb;
+
+    private JobType jobType;
+
+    private Long viewCounts;
+
+    private SubCategory subCategory;
 }

@@ -34,9 +34,6 @@ public class TransactionPostDto {
     @Email
     private String email;
 
-    @NotNull
-    private Boolean isPortrait;
-
     private TransactionType transactionType;
 
     private PriceType priceType;

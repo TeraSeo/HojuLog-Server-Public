@@ -94,15 +94,75 @@ public class PostController {
         return ResponseEntity.ok(post != null);
     }
 
-    @GetMapping("get/whole-by-page-n-condition")
-    public ResponseEntity<PostPaginationResponse> getPostsByCondition(@RequestParam int page, @RequestParam int size, @RequestParam String condition, @RequestParam Long userId) {
-        Page<Post> posts = postService.getPostsByPageNCondition(PageRequest.of(page - 1, size), condition);
-        List<PostDto> postDtoList = posts.getContent()
+    @GetMapping("get/pageable/recent/property")
+    public ResponseEntity<PropertyPostPaginationResponse> getRecentPageablePropertyPosts(@RequestParam int page, @RequestParam int size) {
+        Page<PropertyPost> posts = propertyPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalPropertyPostDto> postDtoList = posts.getContent()
                 .stream()
-                .map(post -> post.convertToPostDto(userId))
+                .map(post -> post.convertPostToNormalPropertyPostDto())
                 .collect(Collectors.toList());
 
-        PostPaginationResponse postPaginationResponse = PostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        PropertyPostPaginationResponse postPaginationResponse = PropertyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/recent/job")
+    public ResponseEntity<JobPostPaginationResponse> getRecentPageableJobPosts(@RequestParam int page, @RequestParam int size) {
+        Page<JobPost> posts = jobPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalJobPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalJobPostDto())
+                .collect(Collectors.toList());
+
+        JobPostPaginationResponse postPaginationResponse = JobPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/recent/transaction")
+    public ResponseEntity<TransactionPostPaginationResponse> getRecentPageableTransactionPosts(@RequestParam int page, @RequestParam int size) {
+        Page<TransactionPost> posts = transactionPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalTransactionPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalTransactionPostDto())
+                .collect(Collectors.toList());
+
+        TransactionPostPaginationResponse postPaginationResponse = TransactionPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/recent/society")
+    public ResponseEntity<SocietyPostPaginationResponse> getRecentPageableSocietyPosts(@RequestParam int page, @RequestParam int size) {
+        Page<SocietyPost> posts = societyPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalSocietyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalSocietyPostDto())
+                .collect(Collectors.toList());
+
+        SocietyPostPaginationResponse postPaginationResponse = SocietyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/recent/travel")
+    public ResponseEntity<TravelPostPaginationResponse> getRecentPageableTravelPosts(@RequestParam int page, @RequestParam int size) {
+        Page<TravelPost> posts = travelPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalTravelPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalTravelPostDto())
+                .collect(Collectors.toList());
+
+        TravelPostPaginationResponse postPaginationResponse = TravelPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/recent/study")
+    public ResponseEntity<StudyPostPaginationResponse> getRecentPageableStudyPosts(@RequestParam int page, @RequestParam int size) {
+        Page<StudyPost> posts = studyPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalStudyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalStudyPostDto())
+                .collect(Collectors.toList());
+
+        StudyPostPaginationResponse postPaginationResponse = StudyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
         return ResponseEntity.ok(postPaginationResponse);
     }
 
@@ -172,11 +232,45 @@ public class PostController {
         return ResponseEntity.ok(summarizedStudyPostDtoList);
     }
 
-    @GetMapping("get/specific")
-    public ResponseEntity<PostDto> getSpecificPost(@RequestParam Long postId, @RequestParam Long userId) {
-        Post post = postService.getPostById(postId);
-        PostDto postDto = post.convertToPostDto(userId);
-        return ResponseEntity.ok(postDto);
+    @GetMapping("get/specific/property")
+    public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId) {
+        PropertyPost propertyPost = propertyPostService.getPostById(postId);
+        DetailedPropertyPostDto detailedPropertyPostDto = propertyPost.convertPostToDetailedPropertyPostDto();
+        return ResponseEntity.ok(detailedPropertyPostDto);
     }
 
+    @GetMapping("get/specific/job")
+    public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId) {
+        JobPost jobPost = jobPostService.getPostById(postId);
+        DetailedJobPostDto detailedJobPostDto = jobPost.convertPostToDetailedJobPostDto();
+        return ResponseEntity.ok(detailedJobPostDto);
+    }
+
+    @GetMapping("get/specific/transaction")
+    public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId) {
+        TransactionPost transactionPost = transactionPostService.getPostById(postId);
+        DetailedTransactionPostDto detailedTransactionPostDto = transactionPost.convertPostToDetailedTransactionPostDto();
+        return ResponseEntity.ok(detailedTransactionPostDto);
+    }
+
+    @GetMapping("get/specific/society")
+    public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId) {
+        SocietyPost societyPost = societyPostService.getPostById(postId);
+        DetailedSocietyPostDto detailedSocietyPostDto = societyPost.convertPostToDetailedSocietyPostDto();
+        return ResponseEntity.ok(detailedSocietyPostDto);
+    }
+
+    @GetMapping("get/specific/travel")
+    public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId) {
+        TravelPost travelPost = travelPostService.getPostById(postId);
+        DetailedTravelPostDto detailedTravelPostDto = travelPost.convertPostToDetailedTravelPostDto();
+        return ResponseEntity.ok(detailedTravelPostDto);
+    }
+
+    @GetMapping("get/specific/study")
+    public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId) {
+        StudyPost studyPost = studyPostService.getPostById(postId);
+        DetailedStudyPostDto detailedStudyPostDto = studyPost.convertPostToDetailedStudyPostDto();
+        return ResponseEntity.ok(detailedStudyPostDto);
+    }
 }

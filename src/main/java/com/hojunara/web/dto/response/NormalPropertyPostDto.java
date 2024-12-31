@@ -1,5 +1,6 @@
 package com.hojunara.web.dto.response;
 
+import com.hojunara.web.entity.BathroomType;
 import com.hojunara.web.entity.Period;
 import com.hojunara.web.entity.SubCategory;
 import com.hojunara.web.entity.Suburb;
@@ -13,12 +14,10 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @ToString
 @Builder
-public class SummarizedPropertyPostDto {
+public class NormalPropertyPostDto {
     private Long postId;
 
     private String title;
-
-    private SubCategory subCategory;
 
     private String imageUrl;
 
@@ -26,9 +25,21 @@ public class SummarizedPropertyPostDto {
 
     private Timestamp createdAt;
 
-    private Period period;
+    private Suburb suburb;
 
     private Long price;
 
-    private Suburb suburb;
+    private Period period;
+
+    private Long viewCounts;
+
+    private SubCategory subCategory;
+
+    private String roomCount;
+
+    private BathroomType bathroomType;
+
+    private Boolean isParkable;
+
+    private Boolean isBillIncluded;
 }

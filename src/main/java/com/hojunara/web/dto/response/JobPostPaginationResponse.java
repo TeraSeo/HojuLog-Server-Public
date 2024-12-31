@@ -1,6 +1,5 @@
-package com.hojunara.web.entity;
+package com.hojunara.web.dto.response;
 
-import com.hojunara.web.dto.response.PostDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,9 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostPaginationResponse {
+public class JobPostPaginationResponse {
     private int pageSize;
     private int currentPage;
     private int currentPagePostsCount;
-    private List<PostDto> posts;
+    private List<NormalJobPostDto> posts;
 }

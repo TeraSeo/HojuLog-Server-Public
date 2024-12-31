@@ -7,6 +7,8 @@ import com.hojunara.web.exception.TransactionPostNotFoundException;
 import com.hojunara.web.repository.TransactionPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +43,18 @@ public class TransactionPostServiceImpl implements TransactionPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get Whole Transaction Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc", e);
             throw e;
         }
     }
@@ -83,7 +97,6 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                     .subCategory(transactionPostDto.getSubCategory())
                     .contact(transactionPostDto.getContact())
                     .email(transactionPostDto.getEmail())
-                    .isPortrait(transactionPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .transactionType(transactionPostDto.getTransactionType())
                     .priceType(transactionPostDto.getPriceType())

@@ -7,6 +7,8 @@ import com.hojunara.web.exception.StudyPostNotFoundException;
 import com.hojunara.web.repository.StudyPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +43,18 @@ public class StudyPostServiceImpl implements StudyPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get Whole Study Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<StudyPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+        try {
+            Page<StudyPost> posts = studyPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got pageable Study Posts order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Study Posts order by createdAt Desc", e);
             throw e;
         }
     }
@@ -83,11 +97,11 @@ public class StudyPostServiceImpl implements StudyPostService {
                     .subCategory(studyPostDto.getSubCategory())
                     .contact(studyPostDto.getContact())
                     .email(studyPostDto.getEmail())
-                    .isPortrait(studyPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .school(studyPostDto.getSchool())
                     .major(studyPostDto.getMajor())
                     .suburb(studyPostDto.getSuburb())
+                    .rate(studyPostDto.getRate())
                     .build();
 
             studyPost.setUser(user);

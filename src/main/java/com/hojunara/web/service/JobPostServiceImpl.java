@@ -7,6 +7,8 @@ import com.hojunara.web.exception.JobPostNotFoundException;
 import com.hojunara.web.repository.JobPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +43,18 @@ public class JobPostServiceImpl implements JobPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get Whole Job Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+        try {
+            Page<JobPost> posts = jobPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got pageable Job Posts order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Job Posts order by createdAt Desc", e);
             throw e;
         }
     }
@@ -83,7 +97,6 @@ public class JobPostServiceImpl implements JobPostService {
                     .subCategory(jobPostDto.getSubCategory())
                     .contact(jobPostDto.getContact())
                     .email(jobPostDto.getEmail())
-                    .isPortrait(jobPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .jobType(jobPostDto.getJobType())
                     .location(jobPostDto.getLocation())

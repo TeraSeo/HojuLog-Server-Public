@@ -34,10 +34,9 @@ public class TravelPostDto {
     @Email
     private String email;
 
-    @NotNull
-    private Boolean isPortrait;
-
     private Suburb suburb;
 
     private String location;
+
+    private double rate;
 }

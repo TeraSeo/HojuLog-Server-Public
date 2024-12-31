@@ -1,9 +1,12 @@
-package com.hojunara.web.dto.request;
+package com.hojunara.web.dto.response;
 
-import com.hojunara.web.entity.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import com.hojunara.web.entity.BathroomType;
+import com.hojunara.web.entity.Period;
+import com.hojunara.web.entity.SubCategory;
 import lombok.*;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,26 +14,22 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class PropertyPostDto {
-    @NotNull
-    private Long userId;
+public class DetailedPropertyPostDto {
+    private Long postId;
 
-    @NotNull
+    private String username;
+
     private String title;
 
-    @NotNull
     private String description;
 
-    @NotNull
-    private Category category;
-
-    @NotNull
     private SubCategory subCategory;
 
     private String contact;
 
-    @Email
     private String email;
+
+    private List<String> imageUrls;
 
     private Period period;
 
@@ -40,8 +39,6 @@ public class PropertyPostDto {
 
     private String availableTime;
 
-    private Suburb suburb;
-
     private String roomCount;
 
     private BathroomType bathroomType;
@@ -49,4 +46,8 @@ public class PropertyPostDto {
     private Boolean isParkable;
 
     private Boolean isBillIncluded;
+
+    private Timestamp createdAt;
+
+    private double viewCounts;
 }

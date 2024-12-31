@@ -1,14 +1,11 @@
 package com.hojunara.web.entity;
 
-import com.hojunara.web.dto.response.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "post")
@@ -47,9 +44,6 @@ public abstract class Post extends PostBaseEntity {
     private String email;
 
     @Column(nullable = false)
-    private Boolean isPortrait;
-
-    @Column(nullable = false)
     private Long viewCounts;
 
     @Enumerated(EnumType.STRING)
@@ -76,52 +70,10 @@ public abstract class Post extends PostBaseEntity {
     @Builder.Default
     private List<Image> images = new ArrayList<>();
 
-    public Post(String title, String description, Category category, SubCategory subCategory, Boolean isPortrait) {
+    public Post(String title, String description, Category category, SubCategory subCategory) {
         this.title = title;
         this.description = description;
         this.category = category;
         this.subCategory = subCategory;
-        this.isPortrait = isPortrait;
-    }
-
-    public PostDto convertToPostDto(Long userId) {
-        List<String> imageUrls = getImages().stream().map(Image::getUrl).collect(Collectors.toList());
-        String username = user.getUsername();
-
-        try {
-            if (this instanceof PropertyPost) {
-                PropertyPost propertyPost = (PropertyPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).period(propertyPost.getPeriod()).price(propertyPost.getPrice()).location(propertyPost.getLocation()).availableTime(propertyPost.getAvailableTime()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
-                return postDto;
-            }
-            else if (this instanceof JobPost) {
-                JobPost jobPost = (JobPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).jobType(jobPost.getJobType()).location(jobPost.getLocation()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
-                return postDto;
-            }
-            else if (this instanceof TransactionPost) {
-                TransactionPost transactionPost = (TransactionPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).transactionType(transactionPost.getTransactionType()).priceType(transactionPost.getPriceType()).price(transactionPost.getPrice()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
-                return postDto;
-            }
-            else if (this instanceof SocietyPost) {
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
-                return postDto;
-            }
-            else if (this instanceof StudyPost) {
-                StudyPost studyPost = (StudyPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).school(studyPost.getSchool()).major(studyPost.getMajor()).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
-                return postDto;
-
-            }
-            else if (this instanceof TravelPost) {
-                TravelPost travelPost = (TravelPost) this;
-                PostDto postDto = PostDto.builder().postId(id).title(title).description(description).category(category).subCategory(subCategory).contact(contact).email(email).isPortrait(isPortrait).imageUrls(imageUrls).userId(user.getId()).username(username).viewCounts(viewCounts).createdAt(getCreatedAt()).build();
-                return postDto;
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

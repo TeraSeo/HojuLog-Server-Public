@@ -11,12 +11,13 @@ import java.sql.Timestamp;
 @ToString
 @Builder
 public class SummarizedTravelPostDto {
-    private String title;
+    private Long postId;
 
-    private double averageRate;
+    private String title;
 
     private String location;
 
     private Timestamp createdAt;
 
+    private double rate;
 }

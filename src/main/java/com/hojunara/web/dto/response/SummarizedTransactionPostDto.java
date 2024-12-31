@@ -11,11 +11,15 @@ import java.sql.Timestamp;
 @ToString
 @Builder
 public class SummarizedTransactionPostDto {
+    private Long postId;
+
     private String title;
 
-    private double averageRate;
+    private String username;
 
     private String imageUrl;
 
     private Timestamp createdAt;
+
+    private Long price;
 }

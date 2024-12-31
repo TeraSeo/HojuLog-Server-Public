@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 @ToString
 @Builder
 public class SummarizedSocietyPostDto {
+    private Long postId;
+
     private String title;
 
     private String username;

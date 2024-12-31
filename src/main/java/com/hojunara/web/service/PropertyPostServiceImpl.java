@@ -10,6 +10,8 @@ import com.hojunara.web.exception.PropertyPostNotFoundException;
 import com.hojunara.web.repository.PropertyPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +46,18 @@ public class PropertyPostServiceImpl implements PropertyPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get Whole Property Posts", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc", e);
             throw e;
         }
     }
@@ -86,13 +100,16 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .subCategory(propertyPostDto.getSubCategory())
                     .contact(propertyPostDto.getContact())
                     .email(propertyPostDto.getEmail())
-                    .isPortrait(propertyPostDto.getIsPortrait())
                     .viewCounts(0L)
                     .period(propertyPostDto.getPeriod())
                     .price(propertyPostDto.getPrice())
                     .location(propertyPostDto.getLocation())
                     .availableTime(propertyPostDto.getAvailableTime())
                     .suburb(propertyPostDto.getSuburb())
+                    .roomCount(propertyPostDto.getRoomCount())
+                    .bathroomType(propertyPostDto.getBathroomType())
+                    .isParkable(propertyPostDto.getIsParkable())
+                    .isBillIncluded(propertyPostDto.getIsBillIncluded())
                     .build();
 
             propertyPost.setUser(user);
