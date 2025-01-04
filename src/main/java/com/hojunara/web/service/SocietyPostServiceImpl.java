@@ -95,6 +95,7 @@ public class SocietyPostServiceImpl implements SocietyPostService {
                     .description(societyPostDto.getDescription())
                     .category(Category.생활)
                     .subCategory(societyPostDto.getSubCategory())
+                    .postType(PostType.NORMAL)
                     .contact(societyPostDto.getContact())
                     .email(societyPostDto.getEmail())
                     .viewCounts(0L)

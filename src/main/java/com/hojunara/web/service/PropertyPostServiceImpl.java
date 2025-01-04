@@ -2,10 +2,7 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.PropertyPostDto;
-import com.hojunara.web.entity.Category;
-import com.hojunara.web.entity.Post;
-import com.hojunara.web.entity.PropertyPost;
-import com.hojunara.web.entity.User;
+import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.PropertyPostNotFoundException;
 import com.hojunara.web.repository.PropertyPostRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +95,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .description(propertyPostDto.getDescription())
                     .category(Category.부동산)
                     .subCategory(propertyPostDto.getSubCategory())
+                    .postType(PostType.NORMAL)
                     .contact(propertyPostDto.getContact())
                     .email(propertyPostDto.getEmail())
                     .viewCounts(0L)

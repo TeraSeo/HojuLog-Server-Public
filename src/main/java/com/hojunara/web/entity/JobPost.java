@@ -1,7 +1,6 @@
 package com.hojunara.web.entity;
 
 import com.hojunara.web.dto.response.DetailedJobPostDto;
-import com.hojunara.web.dto.response.DetailedPropertyPostDto;
 import com.hojunara.web.dto.response.NormalJobPostDto;
 import com.hojunara.web.dto.response.SummarizedJobPostDto;
 import jakarta.persistence.Column;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @NoArgsConstructor
 @DiscriminatorValue("JOB")
-public class JobPost extends Post {
+public class JobPost extends NormalPost {
 
     @Column(nullable = false)
     private JobType jobType;
@@ -38,11 +37,16 @@ public class JobPost extends Post {
         return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts(getViewCounts()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedJobPostDto convertPostToDetailedJobPostDto() {
+    public DetailedJobPostDto convertPostToDetailedJobPostDto(Long userId) {
         List<String> imageUrls = getImages().stream()
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
-        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).username(getUser().getUsername()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts(getViewCounts()).createdAt(getCreatedAt()).build();
+        Boolean isUserLiked = getLikes().stream()
+                .map(PostLike::getUser)
+                .map(User::getId)
+                .anyMatch(id -> id.equals(userId));
+
+        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).username(getUser().getUsername()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts(getViewCounts()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).build();
     }
 }

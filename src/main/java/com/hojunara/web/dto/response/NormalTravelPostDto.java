@@ -22,8 +22,6 @@ public class NormalTravelPostDto {
 
     private Timestamp createdAt;
 
-    private Suburb suburb;
-
     private Long viewCounts;
 
     private String location;

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,14 +24,16 @@ public class StudyPostServiceImpl implements StudyPostService {
     private final StudyPostRepository studyPostRepository;
     private final UserService userService;
     private final AwsFileService awsFileService;
-    private final ImageService imageService;
+    private final BlogDescriptionContentService blogDescriptionContentService;
+    private final BlogImageContentService blogImageContentService;
 
     @Autowired
-    public StudyPostServiceImpl(StudyPostRepository studyPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService) {
+    public StudyPostServiceImpl(StudyPostRepository studyPostRepository, UserService userService, AwsFileService awsFileService, BlogDescriptionContentService blogDescriptionContentService, BlogImageContentService blogImageContentService) {
         this.studyPostRepository = studyPostRepository;
         this.userService = userService;
         this.awsFileService = awsFileService;
-        this.imageService = imageService;
+        this.blogDescriptionContentService = blogDescriptionContentService;
+        this.blogImageContentService = blogImageContentService;
     }
 
     @Override
@@ -92,15 +93,12 @@ public class StudyPostServiceImpl implements StudyPostService {
         try {
             StudyPost studyPost = StudyPost.builder()
                     .title(studyPostDto.getTitle())
-                    .description(studyPostDto.getDescription())
                     .category(Category.유학)
+                    .postType(PostType.BLOG)
                     .subCategory(studyPostDto.getSubCategory())
-                    .contact(studyPostDto.getContact())
-                    .email(studyPostDto.getEmail())
                     .viewCounts(0L)
                     .school(studyPostDto.getSchool())
                     .major(studyPostDto.getMajor())
-                    .suburb(studyPostDto.getSuburb())
                     .rate(studyPostDto.getRate())
                     .build();
 
@@ -108,10 +106,25 @@ public class StudyPostServiceImpl implements StudyPostService {
             StudyPost createdPost = studyPostRepository.save(studyPost);
 
             // save post images data
-            if (images != null) {
-                Arrays.stream(images)
-                        .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
-                        .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
+          if (studyPostDto.getBlogContents().size() > 0) {
+                List<BlogContent> blogContents = BlogContent.convertMapToBlogContent(studyPostDto.getBlogContents());
+                int imgCnt = 0;
+                for (int i = 0; i < blogContents.size(); i++) {
+                    BlogContent blogContent = blogContents.get(i);
+                    if (blogContent.getType().toString().equals("image")) {
+                        if (imgCnt < images.length) {
+                            String imgUrl = awsFileService.uploadPostFile(images[imgCnt], user.getEmail());
+                            ImageContent imageContent = (ImageContent) blogContent;
+                            imageContent.setImageUrl(imgUrl);
+                            blogImageContentService.createBlogImageContent(imageContent, studyPost);
+                            imgCnt++;
+                        }
+                    }
+                    else {
+                        DescriptionContent descriptionContent = (DescriptionContent) blogContent;
+                        blogDescriptionContentService.createBlogDescriptionContent(descriptionContent, studyPost);
+                    }
+                }
             }
 
             log.info("Successfully created study post");

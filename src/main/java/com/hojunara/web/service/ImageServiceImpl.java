@@ -1,17 +1,19 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.entity.Image;
-import com.hojunara.web.entity.Post;
+import com.hojunara.web.entity.NormalPost;
 import com.hojunara.web.exception.ImageNotFoundException;
 import com.hojunara.web.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
@@ -37,7 +39,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void createImage(String url, Post post) {
+    public void createImage(String url, NormalPost post) {
         try {
             Image img = Image.builder().url(url).post(post).build();
             post.getImages().add(img);

@@ -50,4 +50,10 @@ public class DetailedPropertyPostDto {
     private Timestamp createdAt;
 
     private double viewCounts;
+
+    private Long likeCounts;
+
+    private Long commentCounts;
+
+    private Boolean isUserLiked;
 }

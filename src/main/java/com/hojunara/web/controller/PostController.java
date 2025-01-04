@@ -233,44 +233,50 @@ public class PostController {
     }
 
     @GetMapping("get/specific/property")
-    public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId) {
+    public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId, @RequestParam Long userId) {
         PropertyPost propertyPost = propertyPostService.getPostById(postId);
-        DetailedPropertyPostDto detailedPropertyPostDto = propertyPost.convertPostToDetailedPropertyPostDto();
+        DetailedPropertyPostDto detailedPropertyPostDto = propertyPost.convertPostToDetailedPropertyPostDto(userId);
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedPropertyPostDto);
     }
 
     @GetMapping("get/specific/job")
-    public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId) {
+    public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId, @RequestParam Long userId) {
         JobPost jobPost = jobPostService.getPostById(postId);
-        DetailedJobPostDto detailedJobPostDto = jobPost.convertPostToDetailedJobPostDto();
+        DetailedJobPostDto detailedJobPostDto = jobPost.convertPostToDetailedJobPostDto(userId);
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedJobPostDto);
     }
 
     @GetMapping("get/specific/transaction")
-    public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId) {
+    public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId, @RequestParam Long userId) {
         TransactionPost transactionPost = transactionPostService.getPostById(postId);
-        DetailedTransactionPostDto detailedTransactionPostDto = transactionPost.convertPostToDetailedTransactionPostDto();
+        DetailedTransactionPostDto detailedTransactionPostDto = transactionPost.convertPostToDetailedTransactionPostDto(userId);
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedTransactionPostDto);
     }
 
     @GetMapping("get/specific/society")
-    public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId) {
+    public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId, @RequestParam Long userId) {
         SocietyPost societyPost = societyPostService.getPostById(postId);
-        DetailedSocietyPostDto detailedSocietyPostDto = societyPost.convertPostToDetailedSocietyPostDto();
+        DetailedSocietyPostDto detailedSocietyPostDto = societyPost.convertPostToDetailedSocietyPostDto(userId);
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedSocietyPostDto);
     }
 
     @GetMapping("get/specific/travel")
-    public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId) {
+    public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId, @RequestParam Long userId) {
         TravelPost travelPost = travelPostService.getPostById(postId);
-        DetailedTravelPostDto detailedTravelPostDto = travelPost.convertPostToDetailedTravelPostDto();
+        DetailedTravelPostDto detailedTravelPostDto = travelPost.convertPostToDetailedTravelPostDto(userId);
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedTravelPostDto);
     }
 
     @GetMapping("get/specific/study")
-    public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId) {
+    public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId, @RequestParam Long userId) {
         StudyPost studyPost = studyPostService.getPostById(postId);
-        DetailedStudyPostDto detailedStudyPostDto = studyPost.convertPostToDetailedStudyPostDto();
+        DetailedStudyPostDto detailedStudyPostDto = studyPost.convertPostToDetailedStudyPostDto(userId);
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedStudyPostDto);
     }
 }

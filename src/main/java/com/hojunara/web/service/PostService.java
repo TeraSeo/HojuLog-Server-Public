@@ -1,6 +1,5 @@
 package com.hojunara.web.service;
 
-import com.hojunara.web.entity.Category;
 import com.hojunara.web.entity.Post;
 import java.util.List;
 
@@ -14,4 +13,5 @@ public interface PostService {
 
     Post getPostById(Long id);
 
+    void addViewCount(Long id);
 }

@@ -95,6 +95,7 @@ public class JobPostServiceImpl implements JobPostService {
                     .description(jobPostDto.getDescription())
                     .category(Category.구인구직)
                     .subCategory(jobPostDto.getSubCategory())
+                    .postType(PostType.NORMAL)
                     .contact(jobPostDto.getContact())
                     .email(jobPostDto.getEmail())
                     .viewCounts(0L)

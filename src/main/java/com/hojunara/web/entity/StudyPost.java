@@ -13,7 +13,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @NoArgsConstructor
 @DiscriminatorValue("STUDY")
-public class StudyPost extends Post {
+public class StudyPost extends BlogPost {
 
     private String school;
 
@@ -36,14 +36,25 @@ public class StudyPost extends Post {
     }
 
     public NormalStudyPostDto convertPostToNormalStudyPostDto() {
-        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).rate(rate).suburb(getSuburb()).viewCounts(getViewCounts()).createdAt(getCreatedAt()).build();
+        List<BlogContent> blogContents = getBlogContents();
+        String description = blogContents.stream()
+                .filter(blogContent -> blogContent.getType().equals("description"))
+                .map(blogContent -> (DescriptionContent) blogContent)
+                .map(DescriptionContent::getContent)
+                .findFirst()
+                .orElse("");
+
+        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts(getViewCounts()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedStudyPostDto convertPostToDetailedStudyPostDto() {
-        List<String> imageUrls = getImages().stream()
-                .map(Image::getUrl)
-                .collect(Collectors.toList());
+    public DetailedStudyPostDto convertPostToDetailedStudyPostDto(Long userId) {
+        List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
 
-        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).school(school).major(major).rate(rate).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
+        Boolean isUserLiked = getLikes().stream()
+                .map(PostLike::getUser)
+                .map(User::getId)
+                .anyMatch(id -> id.equals(userId));
+
+        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).subCategory(getSubCategory()).school(school).major(major).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).blogContents(blogContentMap).build();
     }
 }

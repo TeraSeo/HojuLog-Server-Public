@@ -13,7 +13,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -22,7 +22,9 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @NoArgsConstructor
 @DiscriminatorValue("TRAVEL")
-public class TravelPost extends Post {
+public class TravelPost extends BlogPost {
+    @Column(nullable = false)
+    private String country;
 
     @Column(nullable = false)
     private String location;
@@ -35,14 +37,25 @@ public class TravelPost extends Post {
     }
 
     public NormalTravelPostDto convertPostToNormalTravelPostDto() {
-        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).rate(rate).suburb(getSuburb()).viewCounts(getViewCounts()).location(location).createdAt(getCreatedAt()).build();
+        List<BlogContent> blogContents = getBlogContents();
+        String description = blogContents.stream()
+                .filter(blogContent -> blogContent.getType().equals("description"))
+                .map(blogContent -> (DescriptionContent) blogContent)
+                .map(DescriptionContent::getContent)
+                .findFirst()
+                .orElse("");
+
+        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts(getViewCounts()).location(location).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedTravelPostDto convertPostToDetailedTravelPostDto() {
-        List<String> imageUrls = getImages().stream()
-                .map(Image::getUrl)
-                .collect(Collectors.toList());
+    public DetailedTravelPostDto convertPostToDetailedTravelPostDto(Long userId) {
+        List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
 
-        return DetailedTravelPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).location(location).rate(rate).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
+        Boolean isUserLiked = getLikes().stream()
+                .map(PostLike::getUser)
+                .map(User::getId)
+                .anyMatch(id -> id.equals(userId));
+
+        return DetailedTravelPostDto.builder().postId(getId()).username(getUser().getUsername()).title(getTitle()).subCategory(getSubCategory()).location(location).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).blogContents(blogContentMap).build();
     }
 }

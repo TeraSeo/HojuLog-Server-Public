@@ -27,10 +27,6 @@ public abstract class Post extends PostBaseEntity {
     @Size(max = 80)
     private String title;
 
-    @Column(nullable = false)
-    @Size(max = 5001)
-    private String description;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
@@ -39,16 +35,12 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private SubCategory subCategory;
 
-    private String contact;
-
-    private String email;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PostType postType;
 
     @Column(nullable = false)
     private Long viewCounts;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Suburb suburb;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -65,15 +57,4 @@ public abstract class Post extends PostBaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostBookmark> bookmarks = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Image> images = new ArrayList<>();
-
-    public Post(String title, String description, Category category, SubCategory subCategory) {
-        this.title = title;
-        this.description = description;
-        this.category = category;
-        this.subCategory = subCategory;
-    }
 }

@@ -77,4 +77,16 @@ public class PostServiceImpl implements PostService {
             throw e;
         }
     }
+
+    @Override
+    public void addViewCount(Long id) {
+        Post post = getPostById(id);
+        try {
+            post.setViewCounts(post.getViewCounts() + 1);
+            log.info("Successfully added view count with id: {}", id);
+        } catch (Exception e) {
+            log.error("Failed to add view count with id: {}", id, e);
+            throw e;
+        }
+    }
 }

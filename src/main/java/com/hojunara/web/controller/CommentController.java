@@ -35,11 +35,8 @@ public class CommentController {
 
     @PostMapping("create")
     public ResponseEntity<Boolean> createComment(@RequestBody CommentRequestDto commentRequestDto) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-
         Post post = postService.getPostById(commentRequestDto.getPostId());
-        User user = userService.getUserByEmail(email);
+        User user = userService.getUserById(commentRequestDto.getUserId());
 
         Comment createdComment = commentService.createComment(post, user, commentRequestDto.getContent());
         return ResponseEntity.ok(createdComment != null);

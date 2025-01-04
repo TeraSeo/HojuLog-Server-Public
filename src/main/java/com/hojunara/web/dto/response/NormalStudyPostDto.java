@@ -20,8 +20,6 @@ public class NormalStudyPostDto {
 
     private Timestamp createdAt;
 
-    private Suburb suburb;
-
     private Long viewCounts;
 
     private double rate;

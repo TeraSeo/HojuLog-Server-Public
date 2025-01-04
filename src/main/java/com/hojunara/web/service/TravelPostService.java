@@ -1,6 +1,7 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.TravelPostDto;
+import com.hojunara.web.entity.BlogPost;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.SocietyPost;
 import com.hojunara.web.entity.TravelPost;

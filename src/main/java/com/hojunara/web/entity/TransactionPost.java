@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @NoArgsConstructor
 @DiscriminatorValue("TRANSACTION")
-public class TransactionPost extends Post {
+public class TransactionPost extends NormalPost {
 
     @Column(nullable = false)
     private TransactionType transactionType;
@@ -49,11 +49,16 @@ public class TransactionPost extends Post {
         return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts(getViewCounts()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedTransactionPostDto convertPostToDetailedTransactionPostDto() {
+    public DetailedTransactionPostDto convertPostToDetailedTransactionPostDto(Long userId) {
         List<String> imageUrls = getImages().stream()
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
-        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
+        Boolean isUserLiked = getLikes().stream()
+                .map(PostLike::getUser)
+                .map(User::getId)
+                .anyMatch(id -> id.equals(userId));
+
+        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
     }
 }

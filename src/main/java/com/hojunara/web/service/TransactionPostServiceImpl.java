@@ -95,6 +95,7 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                     .description(transactionPostDto.getDescription())
                     .category(Category.사고팔기)
                     .subCategory(transactionPostDto.getSubCategory())
+                    .postType(PostType.NORMAL)
                     .contact(transactionPostDto.getContact())
                     .email(transactionPostDto.getEmail())
                     .viewCounts(0L)

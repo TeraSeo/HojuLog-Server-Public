@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -19,15 +20,7 @@ public class DetailedTravelPostDto {
 
     private String title;
 
-    private String description;
-
     private SubCategory subCategory;
-
-    private String contact;
-
-    private String email;
-
-    private List<String> imageUrls;
 
     private String location;
 
@@ -36,4 +29,12 @@ public class DetailedTravelPostDto {
     private Timestamp createdAt;
 
     private double viewCounts;
+
+    private List<Map<String, String>> blogContents;
+
+    private Long likeCounts;
+
+    private Long commentCounts;
+
+    private Boolean isUserLiked;
 }
