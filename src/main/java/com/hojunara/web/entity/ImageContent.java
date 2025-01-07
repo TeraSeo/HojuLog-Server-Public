@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@DiscriminatorValue("IMAGE")
+@Table(name = "image_content")
 @Getter
 @Setter
 @ToString(callSuper = true)

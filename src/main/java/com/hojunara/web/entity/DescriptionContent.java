@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@DiscriminatorValue("DESCRIPTION")
+@Table(name = "description_content")
 @Getter
 @Setter
 @ToString(callSuper = true)

@@ -1,31 +1,29 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.response.ResponseCommentDto;
 import com.hojunara.web.dto.response.SummarizedCommentDto;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "comment")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
-@Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment extends BaseEntity {
+@SuperBuilder
+public abstract class Comment extends PostBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "comment_id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,10 +36,7 @@ public class Comment extends BaseEntity {
     @Builder.Default
     private List<CommentLike> likes = new ArrayList<>();
 
-    public SummarizedCommentDto convertToSummarizedCommentDto(Long userId) {
-        List<User> likedUsers = likes.stream().map(CommentLike::getUser).collect(Collectors.toList());
-        List<Long> likedUserIds = likedUsers.stream().map(User::getId).collect(Collectors.toList());
-        Boolean isCurrentUserLiked = likedUserIds.contains(userId);
-        return SummarizedCommentDto.builder().commentId(id).content(content).isCurrentUserLiked(isCurrentUserLiked).wholeLikedUserLength(Long.valueOf(likedUsers.size())).summarizedUserDto(user.convertToSummarisedUserDto()).createdAt(getCreatedAt()).build();
-    }
+    public abstract SummarizedCommentDto convertToSummarizedCommentDto(Long userId);
+
+    public abstract ResponseCommentDto convertToResponseCommentDto(Long userId);
 }

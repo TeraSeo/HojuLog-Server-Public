@@ -11,6 +11,7 @@ import java.util.Map;
 
 @Entity
 @Table(name = "blog_content")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 @ToString
@@ -31,7 +32,7 @@ public class BlogContent {
 
     public static List<BlogContent> convertMapToBlogContent(List<Map<String, String>> blogContents) {
         List<BlogContent> blogContentList = new ArrayList<>();
-        blogContents.stream().forEach(blogContent -> {
+        blogContents.forEach(blogContent -> {
             if ("description".equals(blogContent.get("type"))) {
                 blogContentList.add(DescriptionContent.builder()
                         .type("description")
@@ -51,7 +52,7 @@ public class BlogContent {
 
     public static List<Map<String, String>> convertBlogContentToMap(List<BlogContent> blogContents) {
         List<Map<String, String>> blogContentList = new ArrayList<>();
-        blogContents.stream().forEach(blogContent -> {
+        blogContents.forEach(blogContent -> {
             Map<String, String> map = new HashMap<>();
             if ("description".equals(blogContent.getType())) {
                 DescriptionContent descriptionContent = (DescriptionContent) blogContent;
