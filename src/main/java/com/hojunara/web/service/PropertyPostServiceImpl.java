@@ -98,7 +98,6 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .postType(PostType.NORMAL)
                     .contact(propertyPostDto.getContact())
                     .email(propertyPostDto.getEmail())
-                    .viewCounts(0L)
                     .period(propertyPostDto.getPeriod())
                     .price(propertyPostDto.getPrice())
                     .location(propertyPostDto.getLocation())

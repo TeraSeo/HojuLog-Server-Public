@@ -28,7 +28,7 @@ public class DetailedTravelPostDto {
 
     private Timestamp createdAt;
 
-    private double viewCounts;
+    private Long viewCounts;
 
     private List<Map<String, String>> blogContents;
 

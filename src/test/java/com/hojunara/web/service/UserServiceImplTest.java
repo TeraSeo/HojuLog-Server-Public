@@ -49,21 +49,21 @@ class UserServiceImplTest {
         assertEquals(Role.USER, createdUser.getRole());
     }
 
-    @Test
-    void updateUser() {
-        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
-        userService.createUser(user1);
-        User createdUser = userService.getUserByEmail(user1.getEmail());
-
-        User user2 = User.builder().email("user2@gmail.com").username("user2").password("1234").role(Role.ADMIN).build();
-        userService.updateUser(createdUser.getId(), user2);
-
-        User updatedUser = userService.getUserById(createdUser.getId());
-        assertEquals("user2@gmail.com", updatedUser.getEmail());
-        assertEquals("user2", updatedUser.getUsername());
-        assertEquals("1234", updatedUser.getPassword());
-        assertEquals(Role.ADMIN, updatedUser.getRole());
-    }
+//    @Test
+//    void updateUser() {
+//        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
+//        userService.createUser(user1);
+//        User createdUser = userService.getUserByEmail(user1.getEmail());
+//
+//        User user2 = User.builder().email("user2@gmail.com").username("user2").password("1234").role(Role.ADMIN).build();
+//        userService.updateUser(createdUser.getId(), user2);
+//
+//        User updatedUser = userService.getUserById(createdUser.getId());
+//        assertEquals("user2@gmail.com", updatedUser.getEmail());
+//        assertEquals("user2", updatedUser.getUsername());
+//        assertEquals("1234", updatedUser.getPassword());
+//        assertEquals(Role.ADMIN, updatedUser.getRole());
+//    }
 
     @Test
     void deleteUserById() {

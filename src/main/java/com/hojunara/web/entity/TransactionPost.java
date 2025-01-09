@@ -46,19 +46,22 @@ public class TransactionPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts(getViewCounts()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).build();
+        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedTransactionPostDto convertPostToDetailedTransactionPostDto(Long userId) {
+    public DetailedTransactionPostDto convertPostToDetailedTransactionPostDto(String userId) {
         List<String> imageUrls = getImages().stream()
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
-        Boolean isUserLiked = getLikes().stream()
-                .map(PostLike::getUser)
-                .map(User::getId)
-                .anyMatch(id -> id.equals(userId));
+        Boolean isUserLiked = false;
+        if (userId != null) {
+            isUserLiked = getLikes().stream()
+                    .map(PostLike::getUser)
+                    .map(User::getId)
+                    .anyMatch(id -> id.equals(userId));
+        }
 
-        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
+        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
     }
 }

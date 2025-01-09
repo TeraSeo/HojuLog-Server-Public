@@ -34,6 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        String path = request.getServletPath();
+
         log.info("Processing JwtAuthenticationFilter for path: {}", request.getServletPath());
 
         String accessToken = request.getHeader("accessToken");
@@ -53,6 +55,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Optional<User> u = userRepository.findByEmail(email);
             if (u.isPresent()) {
                 User user = u.get();
+                if (path.contains("own")) {
+                    String userId = request.getHeader("userId");
+                    if (!user.getId().toString().equals(userId)) {
+                        return;
+                    }
+                }
                 response.setHeader("userId", user.getId().toString());
             }
 
@@ -71,6 +79,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Optional<User> u = userRepository.findByEmail(email);
             if (u.isPresent()) {
                 User user = u.get();
+                if (path.contains("own")) {
+                    String userId = request.getHeader("userId");
+                    if (!user.getId().toString().equals(userId)) {
+                        return;
+                    }
+                }
                 response.setHeader("userId", user.getId().toString());
             }
 

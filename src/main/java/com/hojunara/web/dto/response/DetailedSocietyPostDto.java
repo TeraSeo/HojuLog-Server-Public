@@ -31,7 +31,7 @@ public class DetailedSocietyPostDto {
 
     private Timestamp createdAt;
 
-    private double viewCounts;
+    private Long viewCounts;
 
     private Long likeCounts;
 

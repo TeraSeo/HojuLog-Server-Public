@@ -96,7 +96,6 @@ public class TravelPostServiceImpl implements TravelPostService {
                     .category(Category.여행)
                     .subCategory(travelPostDto.getSubCategory())
                     .postType(PostType.BLOG)
-                    .viewCounts(0L)
                     .country(travelPostDto.getCountry())
                     .location(travelPostDto.getLocation())
                     .rate(travelPostDto.getRate())

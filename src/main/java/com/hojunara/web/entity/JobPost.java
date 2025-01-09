@@ -30,23 +30,26 @@ public class JobPost extends NormalPost {
     private String location;
 
     public SummarizedJobPostDto convertPostToSummarizedJobPostDto() {
-        return SummarizedJobPostDto.builder().postId(getId()).title(getTitle()).viewCounts(getViewCounts()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
+        return SummarizedJobPostDto.builder().postId(getId()).title(getTitle()).viewCounts((long) getViewedUsers().size()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
     }
 
     public NormalJobPostDto convertPostToNormalJobPostDto() {
-        return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts(getViewCounts()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
+        return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedJobPostDto convertPostToDetailedJobPostDto(Long userId) {
+    public DetailedJobPostDto convertPostToDetailedJobPostDto(String userId) {
         List<String> imageUrls = getImages().stream()
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
-        Boolean isUserLiked = getLikes().stream()
-                .map(PostLike::getUser)
-                .map(User::getId)
-                .anyMatch(id -> id.equals(userId));
+        Boolean isUserLiked = false;
+        if (userId != null) {
+            isUserLiked = getLikes().stream()
+                    .map(PostLike::getUser)
+                    .map(User::getId)
+                    .anyMatch(id -> id.equals(userId));
+        }
 
-        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).username(getUser().getUsername()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts(getViewCounts()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).build();
+        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).username(getUser().getUsername()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).build();
     }
 }

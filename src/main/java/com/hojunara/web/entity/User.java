@@ -1,5 +1,6 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.response.DetailedOwnUserDto;
 import com.hojunara.web.dto.response.SummarizedUserDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,6 +8,7 @@ import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user")
@@ -88,5 +90,12 @@ public class User extends BaseEntity {
 
     public SummarizedUserDto convertToSummarisedUserDto() {
         return SummarizedUserDto.builder().id(id).username(username).email(email).description(description).profilePicture(profilePicture).build();
+    }
+
+    public DetailedOwnUserDto convertToDetailedOwnUserDto() {
+        List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
+        List<Long> likedPostIds = postLikes.stream().map(PostLike::getPost).limit(5).map(Post::getId).collect(Collectors.toList());
+        List<Long> requestedIds = new ArrayList<>();
+        return DetailedOwnUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).build();
     }
 }

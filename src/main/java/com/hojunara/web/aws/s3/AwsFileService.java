@@ -26,12 +26,31 @@ public class AwsFileService {
     }
 
     public String uploadPostFile(MultipartFile uploadFile, String email) {
-        String originalFileName = uploadFile.getOriginalFilename();
-        String timestamp = String.valueOf(Instant.now().toEpochMilli());
-        String uuid = UUID.randomUUID().toString();
-        String fileName = email + "/post/" + timestamp + "_" + uuid + "_" + originalFileName;
-        String uploadImageUrl = putS3(uploadFile, fileName);
-        return uploadImageUrl;
+        try {
+            String originalFileName = uploadFile.getOriginalFilename();
+            String timestamp = String.valueOf(Instant.now().toEpochMilli());
+            String uuid = UUID.randomUUID().toString();
+            String fileName = email + "/post/" + timestamp + "_" + uuid + "_" + originalFileName;
+            String uploadImageUrl = putS3(uploadFile, fileName);
+            return uploadImageUrl;
+        } catch (Exception e) {
+            log.error("Failed to upload post file", e);
+            return "";
+        }
+    }
+
+    public String uploadProfileFile(MultipartFile uploadFile, String email) {
+        try {
+            String originalFileName = uploadFile.getOriginalFilename();
+            String timestamp = String.valueOf(Instant.now().toEpochMilli());
+            String uuid = UUID.randomUUID().toString();
+            String fileName = email + "/profile/" + timestamp + "_" + uuid + "_" + originalFileName;
+            String uploadImageUrl = putS3(uploadFile, fileName);
+            return uploadImageUrl;
+        } catch (Exception e) {
+            log.error("Failed to upload profile file", e);
+            return "";
+        }
     }
 
     public String putS3(MultipartFile uploadFile, String fileName) {
@@ -48,6 +67,17 @@ public class AwsFileService {
             throw new RuntimeException(e);
         } catch (Exception e) {
             log.error("Failed to upload s3 file with filename: " + fileName);
+            throw e;
+        }
+    }
+
+    public void removeProfileFile(String email, String fileName) {
+        try {
+            String fileUrl = email + "/profile/" + fileName.substring(fileName.lastIndexOf('/') + 1);
+            amazonS3Client.deleteObject(bucket, fileUrl);
+            log.info("Successfully removed profile file with file url: " + fileUrl);
+        } catch (Exception e) {
+            log.error("Failed to remove profile file");
             throw e;
         }
     }

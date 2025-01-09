@@ -16,7 +16,7 @@ public class SummarizedJobPostDto {
 
     private String title;
 
-    private double viewCounts;
+    private Long viewCounts;
 
     private SubCategory subCategory;
 

@@ -1,5 +1,6 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.response.SummarizedPostDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -39,8 +40,10 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private PostType postType;
 
-    @Column(nullable = false)
-    private Long viewCounts;
+    @ElementCollection
+    @CollectionTable(name = "viewed_users", joinColumns = @JoinColumn(name = "post_id"))
+    @Builder.Default
+    private List<Long> viewedUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -57,4 +60,8 @@ public abstract class Post extends PostBaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostBookmark> bookmarks = new ArrayList<>();
+
+    public SummarizedPostDto convertToSummarizedPostDto() {
+        return SummarizedPostDto.builder().id(id).title(title).category(category).viewCounts((long) viewedUsers.size()).createdAt(getCreatedAt()).build();
+    }
 }

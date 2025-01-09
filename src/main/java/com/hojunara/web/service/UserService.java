@@ -1,7 +1,9 @@
 package com.hojunara.web.service;
 
+import com.hojunara.web.dto.request.UpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
 import com.hojunara.web.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public interface UserService {
 
     Boolean createUser(UserDto userDto);
 
-    void updateUser(Long id, User user);
+    Boolean updateUser(Long userId, String username, String description, MultipartFile profilePicture);
 
     void deleteUserById(Long id);
 

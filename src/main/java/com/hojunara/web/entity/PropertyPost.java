@@ -60,19 +60,22 @@ public class PropertyPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts(getViewCounts()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getCreatedAt()).isBillIncluded(isBillIncluded).build();
+        return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getCreatedAt()).isBillIncluded(isBillIncluded).build();
     }
 
-    public DetailedPropertyPostDto convertPostToDetailedPropertyPostDto(Long userId) {
+    public DetailedPropertyPostDto convertPostToDetailedPropertyPostDto(String userId) {
         List<String> imageUrls = getImages().stream()
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
-        Boolean isUserLiked = getLikes().stream()
-                .map(PostLike::getUser)
-                .map(User::getId)
-                .anyMatch(id -> id.equals(userId));
+        Boolean isUserLiked = false;
+        if (userId != null) {
+            isUserLiked = getLikes().stream()
+                    .map(PostLike::getUser)
+                    .map(User::getId)
+                    .anyMatch(id -> id.equals(userId));
+        }
 
-        return DetailedPropertyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
+        return DetailedPropertyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
     }
 }

@@ -49,7 +49,7 @@ public class DetailedPropertyPostDto {
 
     private Timestamp createdAt;
 
-    private double viewCounts;
+    private Long viewCounts;
 
     private Long likeCounts;
 

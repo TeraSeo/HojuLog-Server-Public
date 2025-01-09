@@ -98,7 +98,6 @@ public class SocietyPostServiceImpl implements SocietyPostService {
                     .postType(PostType.NORMAL)
                     .contact(societyPostDto.getContact())
                     .email(societyPostDto.getEmail())
-                    .viewCounts(0L)
                     .suburb(societyPostDto.getSuburb())
                     .build();
 

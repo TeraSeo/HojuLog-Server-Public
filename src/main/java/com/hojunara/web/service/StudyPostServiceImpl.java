@@ -96,7 +96,6 @@ public class StudyPostServiceImpl implements StudyPostService {
                     .category(Category.유학)
                     .postType(PostType.BLOG)
                     .subCategory(studyPostDto.getSubCategory())
-                    .viewCounts(0L)
                     .school(studyPostDto.getSchool())
                     .major(studyPostDto.getMajor())
                     .rate(studyPostDto.getRate())

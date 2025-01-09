@@ -1,5 +1,6 @@
 package com.hojunara.web.service;
 
+import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.UserDto;
 import com.hojunara.web.entity.RegistrationMethod;
 import com.hojunara.web.entity.User;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +23,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final AwsFileService awsFileService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, AwsFileService awsFileService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.awsFileService = awsFileService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -99,19 +103,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(Long id, User user) {
-        User existingUser = getUserById(id);
-
+    public Boolean updateUser(Long userId, String username, String description, MultipartFile profilePicture) {
+        User existingUser = getUserById(userId);
         try {
-            existingUser.setEmail(user.getEmail());
-            existingUser.setUsername(user.getUsername());
-            existingUser.setPassword(user.getPassword());
-            existingUser.setRole(user.getRole());
+            String profilePictureUrl = "";
 
-            userRepository.save(existingUser);
-            log.info("Successfully updated user with id: {}", id);
+            if (profilePicture != null) {
+                awsFileService.removeProfileFile(existingUser.getEmail(), existingUser.getProfilePicture());
+                profilePictureUrl = awsFileService.uploadProfileFile(profilePicture, existingUser.getEmail());
+                existingUser.setProfilePicture(profilePictureUrl);
+            }
+
+            existingUser.setUsername(username);
+            existingUser.setDescription(description);
+
+            log.info("Successfully updated user with id: {}", userId);
+
+            return true;
         } catch (Exception e) {
-            log.error("Failed to update user with id: {}", id, e);
+            log.error("Failed to update user with id: {}", userId, e);
             throw e;
         }
     }

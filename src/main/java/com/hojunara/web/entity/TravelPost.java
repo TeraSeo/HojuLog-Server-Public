@@ -45,17 +45,21 @@ public class TravelPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts(getViewCounts()).location(location).createdAt(getCreatedAt()).build();
+        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts((long) getViewedUsers().size()).location(location).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedTravelPostDto convertPostToDetailedTravelPostDto(Long userId) {
+    public DetailedTravelPostDto convertPostToDetailedTravelPostDto(String userId) {
         List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
 
-        Boolean isUserLiked = getLikes().stream()
-                .map(PostLike::getUser)
-                .map(User::getId)
-                .anyMatch(id -> id.equals(userId));
+        Boolean isUserLiked = false;
+        if (!userId.isEmpty()) {
+            Long uId = Long.valueOf(userId);
+            isUserLiked = getLikes().stream()
+                    .map(PostLike::getUser)
+                    .map(User::getId)
+                    .anyMatch(id -> id.equals(uId));
+        }
 
-        return DetailedTravelPostDto.builder().postId(getId()).username(getUser().getUsername()).title(getTitle()).subCategory(getSubCategory()).location(location).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).blogContents(blogContentMap).build();
+        return DetailedTravelPostDto.builder().postId(getId()).username(getUser().getUsername()).title(getTitle()).subCategory(getSubCategory()).location(location).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
     }
 }

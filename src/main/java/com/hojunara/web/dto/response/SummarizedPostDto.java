@@ -1,6 +1,9 @@
 package com.hojunara.web.dto.response;
 
+import com.hojunara.web.entity.Category;
 import lombok.*;
+
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -9,13 +12,13 @@ import lombok.*;
 @ToString
 @Builder
 public class SummarizedPostDto {
+    private Long id;
 
     private String title;
 
-    private String username;
+    private Category category;
 
-    private double averageRate;
+    private Long viewCounts;
 
-    private String imageUrl;
-
+    private Timestamp createdAt;
 }

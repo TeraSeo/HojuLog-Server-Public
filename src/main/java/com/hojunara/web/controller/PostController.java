@@ -233,50 +233,57 @@ public class PostController {
     }
 
     @GetMapping("get/specific/property")
-    public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId, @RequestParam Long userId) {
+    public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId, @RequestHeader String userId) {
         PropertyPost propertyPost = propertyPostService.getPostById(postId);
         DetailedPropertyPostDto detailedPropertyPostDto = propertyPost.convertPostToDetailedPropertyPostDto(userId);
-        postService.addViewCount(postId);
+        postService.addViewCount(postId, userId);
         return ResponseEntity.ok(detailedPropertyPostDto);
     }
 
     @GetMapping("get/specific/job")
-    public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId, @RequestParam Long userId) {
+    public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId, @RequestHeader String userId) {
         JobPost jobPost = jobPostService.getPostById(postId);
         DetailedJobPostDto detailedJobPostDto = jobPost.convertPostToDetailedJobPostDto(userId);
-        postService.addViewCount(postId);
+        postService.addViewCount(postId, userId);
         return ResponseEntity.ok(detailedJobPostDto);
     }
 
     @GetMapping("get/specific/transaction")
-    public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId, @RequestParam Long userId) {
+    public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId, @RequestHeader String userId) {
         TransactionPost transactionPost = transactionPostService.getPostById(postId);
         DetailedTransactionPostDto detailedTransactionPostDto = transactionPost.convertPostToDetailedTransactionPostDto(userId);
-        postService.addViewCount(postId);
+        postService.addViewCount(postId, userId);
         return ResponseEntity.ok(detailedTransactionPostDto);
     }
 
     @GetMapping("get/specific/society")
-    public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId, @RequestParam Long userId) {
+    public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId, @RequestHeader String userId) {
         SocietyPost societyPost = societyPostService.getPostById(postId);
         DetailedSocietyPostDto detailedSocietyPostDto = societyPost.convertPostToDetailedSocietyPostDto(userId);
-        postService.addViewCount(postId);
+        postService.addViewCount(postId, userId);
         return ResponseEntity.ok(detailedSocietyPostDto);
     }
 
     @GetMapping("get/specific/travel")
-    public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId, @RequestParam Long userId) {
+    public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId, @RequestHeader String userId) {
         TravelPost travelPost = travelPostService.getPostById(postId);
         DetailedTravelPostDto detailedTravelPostDto = travelPost.convertPostToDetailedTravelPostDto(userId);
-        postService.addViewCount(postId);
+        postService.addViewCount(postId, userId);
         return ResponseEntity.ok(detailedTravelPostDto);
     }
 
     @GetMapping("get/specific/study")
-    public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId, @RequestParam Long userId) {
+    public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId, @RequestHeader String userId) {
         StudyPost studyPost = studyPostService.getPostById(postId);
         DetailedStudyPostDto detailedStudyPostDto = studyPost.convertPostToDetailedStudyPostDto(userId);
-        postService.addViewCount(postId);
+        postService.addViewCount(postId, userId);
         return ResponseEntity.ok(detailedStudyPostDto);
+    }
+
+    @GetMapping("get/summarised/specific/post")
+    public ResponseEntity<SummarizedPostDto> getSummarizedOwnPost(@RequestParam Long postId) {
+        Post post = postService.getPostById(postId);
+        SummarizedPostDto summarizedPostDto = post.convertToSummarizedPostDto();
+        return ResponseEntity.ok(summarizedPostDto);
     }
 }

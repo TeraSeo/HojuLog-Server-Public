@@ -36,7 +36,7 @@ public class DetailedJobPostDto {
 
     private Timestamp createdAt;
 
-    private double viewCounts;
+    private Long viewCounts;
 
     private Long likeCounts;
 

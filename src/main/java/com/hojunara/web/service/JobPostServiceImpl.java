@@ -98,7 +98,6 @@ public class JobPostServiceImpl implements JobPostService {
                     .postType(PostType.NORMAL)
                     .contact(jobPostDto.getContact())
                     .email(jobPostDto.getEmail())
-                    .viewCounts(0L)
                     .jobType(jobPostDto.getJobType())
                     .location(jobPostDto.getLocation())
                     .suburb(jobPostDto.getSuburb())

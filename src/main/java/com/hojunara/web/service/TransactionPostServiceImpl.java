@@ -98,7 +98,6 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                     .postType(PostType.NORMAL)
                     .contact(transactionPostDto.getContact())
                     .email(transactionPostDto.getEmail())
-                    .viewCounts(0L)
                     .transactionType(transactionPostDto.getTransactionType())
                     .priceType(transactionPostDto.getPriceType())
                     .price(transactionPostDto.getPrice())

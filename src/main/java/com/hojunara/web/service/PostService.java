@@ -13,5 +13,5 @@ public interface PostService {
 
     Post getPostById(Long id);
 
-    void addViewCount(Long id);
+    void addViewCount(Long postId, String userId);
 }

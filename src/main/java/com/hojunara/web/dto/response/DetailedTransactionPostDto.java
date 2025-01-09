@@ -39,7 +39,7 @@ public class DetailedTransactionPostDto {
 
     private Timestamp createdAt;
 
-    private double viewCounts;
+    private Long viewCounts;
 
     private Long likeCounts;
 

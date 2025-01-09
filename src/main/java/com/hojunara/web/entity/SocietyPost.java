@@ -30,19 +30,22 @@ public class SocietyPost extends NormalPost {
 
     public NormalSocietyPostDto convertPostToNormalSocietyPostDto() {
         double randomAverageRate = Math.round(ThreadLocalRandom.current().nextDouble(4.0, 5.01) * 10.0) / 10.0;
-        return NormalSocietyPostDto.builder().postId(getId()).title(getTitle()).averageRate(randomAverageRate).suburb(getSuburb()).viewCounts(getViewCounts()).createdAt(getCreatedAt()).build();
+        return NormalSocietyPostDto.builder().postId(getId()).title(getTitle()).averageRate(randomAverageRate).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedSocietyPostDto convertPostToDetailedSocietyPostDto(Long userId) {
+    public DetailedSocietyPostDto convertPostToDetailedSocietyPostDto(String userId) {
         List<String> imageUrls = getImages().stream()
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
-        Boolean isUserLiked = getLikes().stream()
-                .map(PostLike::getUser)
-                .map(User::getId)
-                .anyMatch(id -> id.equals(userId));
+        Boolean isUserLiked = false;
+        if (userId != null) {
+            isUserLiked = getLikes().stream()
+                    .map(PostLike::getUser)
+                    .map(User::getId)
+                    .anyMatch(id -> id.equals(userId));
+        }
 
-        return DetailedSocietyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).build();
+        return DetailedSocietyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
     }
 }

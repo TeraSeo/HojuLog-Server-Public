@@ -44,17 +44,20 @@ public class StudyPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts(getViewCounts()).createdAt(getCreatedAt()).build();
+        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts((long) getViewedUsers().size()).createdAt(getCreatedAt()).build();
     }
 
-    public DetailedStudyPostDto convertPostToDetailedStudyPostDto(Long userId) {
+    public DetailedStudyPostDto convertPostToDetailedStudyPostDto(String userId) {
         List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
 
-        Boolean isUserLiked = getLikes().stream()
-                .map(PostLike::getUser)
-                .map(User::getId)
-                .anyMatch(id -> id.equals(userId));
+        Boolean isUserLiked = false;
+        if (userId != null) {
+            isUserLiked = getLikes().stream()
+                    .map(PostLike::getUser)
+                    .map(User::getId)
+                    .anyMatch(id -> id.equals(userId));
+        }
 
-        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).subCategory(getSubCategory()).school(school).major(major).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts(getViewCounts()).blogContents(blogContentMap).build();
+        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).subCategory(getSubCategory()).school(school).major(major).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
     }
 }
