@@ -40,10 +40,9 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private PostType postType;
 
-    @ElementCollection
-    @CollectionTable(name = "viewed_users", joinColumns = @JoinColumn(name = "post_id"))
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Long> viewedUsers = new ArrayList<>();
+    private List<ViewedUser> viewedUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

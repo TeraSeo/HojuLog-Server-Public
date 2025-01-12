@@ -60,6 +60,18 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     }
 
     @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc and subcategory: {}", subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Des cand subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<TransactionPost> getRecent5Posts() {
         try {
             List<TransactionPost> posts = transactionPostRepository.findTop5ByOrderByCreatedAtDesc();

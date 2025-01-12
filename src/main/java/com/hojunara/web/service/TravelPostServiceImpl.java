@@ -61,6 +61,18 @@ public class TravelPostServiceImpl implements TravelPostService {
     }
 
     @Override
+    public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<TravelPost> posts = travelPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            log.info("Successfully got pageable Travel Posts order by createdAt Desc and subcategory: {}", subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Travel Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<TravelPost> getRecent5Posts() {
         try {
             List<TravelPost> posts = travelPostRepository.findTop5ByOrderByCreatedAtDesc();

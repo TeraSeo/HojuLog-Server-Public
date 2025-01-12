@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +56,18 @@ public class PropertyPostServiceImpl implements PropertyPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get pageable Property Posts order by createdAt Desc", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc and subCategory: {}", subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc and subCategory: {}", subCategory, e);
             throw e;
         }
     }

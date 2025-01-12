@@ -166,6 +166,102 @@ public class PostController {
         return ResponseEntity.ok(postPaginationResponse);
     }
 
+    @GetMapping("get/pageable/property/subcategory")
+    public ResponseEntity<PropertyPostPaginationResponse> getRecentPageablePropertyPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<PropertyPost> posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalPropertyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalPropertyPostDto())
+                .collect(Collectors.toList());
+
+        PropertyPostPaginationResponse postPaginationResponse = PropertyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/job/subcategory")
+    public ResponseEntity<JobPostPaginationResponse> getRecentPageableJobPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<JobPost> posts = jobPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalJobPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalJobPostDto())
+                .collect(Collectors.toList());
+
+        JobPostPaginationResponse postPaginationResponse = JobPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/transaction/subcategory")
+    public ResponseEntity<TransactionPostPaginationResponse> getRecentPageableTransactionPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<TransactionPost> posts = transactionPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalTransactionPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalTransactionPostDto())
+                .collect(Collectors.toList());
+
+        TransactionPostPaginationResponse postPaginationResponse = TransactionPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/society/subcategory")
+    public ResponseEntity<SocietyPostPaginationResponse> getRecentPageableSocietyPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<SocietyPost> posts = societyPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalSocietyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalSocietyPostDto())
+                .collect(Collectors.toList());
+
+        SocietyPostPaginationResponse postPaginationResponse = SocietyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/travel/subcategory")
+    public ResponseEntity<TravelPostPaginationResponse> getRecentPageableTravelPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<TravelPost> posts = travelPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalTravelPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalTravelPostDto())
+                .collect(Collectors.toList());
+
+        TravelPostPaginationResponse postPaginationResponse = TravelPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/study/subcategory")
+    public ResponseEntity<StudyPostPaginationResponse> getRecentPageableStudyPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<StudyPost> posts = studyPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalStudyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalStudyPostDto())
+                .collect(Collectors.toList());
+
+        StudyPostPaginationResponse postPaginationResponse = StudyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/own/posts")
+    public ResponseEntity<WholePostPaginationResponse> getPageableOwnPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
+        Page<Post> posts = postService.getPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        List<SummarizedPostDto> summarizedPostDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertToSummarizedPostDto())
+                .collect(Collectors.toList());
+
+        WholePostPaginationResponse postPaginationResponse = WholePostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(summarizedPostDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/liked/posts")
+    public ResponseEntity<WholePostPaginationResponse> getPageableLikedPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
+        Page<Post> posts = postService.getPostsByPageNLiked(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        List<SummarizedPostDto> summarizedPostDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertToSummarizedPostDto())
+                .collect(Collectors.toList());
+
+        WholePostPaginationResponse postPaginationResponse = WholePostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(summarizedPostDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
     @GetMapping("get/recent-5/property/post")
     public ResponseEntity<List<SummarizedPropertyPostDto>> getRecent5PropertyPost() {
         List<PropertyPost> propertyPostList = propertyPostService.getRecent5Posts();

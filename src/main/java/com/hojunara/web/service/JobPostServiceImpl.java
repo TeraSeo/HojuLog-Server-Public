@@ -60,6 +60,18 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Override
+    public Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<JobPost> posts = jobPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            log.info("Successfully got pageable Job Posts order by createdAt Desc and subcategory: {}", subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Job Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<JobPost> getRecent5Posts() {
         try {
             List<JobPost> posts = jobPostRepository.findTop5ByOrderByCreatedAtDesc();

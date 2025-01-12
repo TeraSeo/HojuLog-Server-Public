@@ -1,5 +1,6 @@
 package com.hojunara.web.repository;
 
+import com.hojunara.web.entity.SubCategory;
 import com.hojunara.web.entity.TransactionPost;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,4 +14,6 @@ public interface TransactionPostRepository extends JpaRepository<TransactionPost
     Page<TransactionPost> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     List<TransactionPost> findTop5ByOrderByCreatedAtDesc();
+
+    Page<TransactionPost> findAllBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory, Pageable pageable);
 }

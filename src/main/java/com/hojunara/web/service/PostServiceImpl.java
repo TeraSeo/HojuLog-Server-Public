@@ -4,15 +4,19 @@ import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.PostNotFoundException;
 import com.hojunara.web.exception.PostPaginationFailedException;
 import com.hojunara.web.repository.PostRepository;
+import com.hojunara.web.repository.ViewedUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,10 +24,14 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final ViewedUserRepository viewedUserRepository;
+    private final UserService userService;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, ViewedUserRepository viewedUserRepository, UserService userService) {
         this.postRepository = postRepository;
+        this.viewedUserRepository = viewedUserRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -64,6 +72,32 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<Post> getPostsByPageNUser(Long userId, Pageable pageable) {
+        User user = userService.getUserById(userId);
+        List<Post> posts = user.getPosts();
+        try {
+            log.info("Successfully found own posts with paging and user id : {}", userId);
+            return getPostsAsPage(posts, pageable);
+        } catch (Exception e) {
+            log.error("Failed to find own posts with paging and user id: {}", userId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<Post> getPostsByPageNLiked(Long userId, Pageable pageable) {
+        User user = userService.getUserById(userId);
+        List<Post> userLikedPosts = user.getPostLikes().stream().map(PostLike::getPost).collect(Collectors.toList());
+        try {
+            log.info("Successfully found liked posts with paging and user id : {}", userId);
+            return getPostsAsPage(userLikedPosts, pageable);
+        } catch (Exception e) {
+            log.error("Failed to find liked posts with paging and user id: {}", userId, e);
+            throw e;
+        }
+    }
+
+    @Override
     public Post getPostById(Long id) {
         try {
             Optional<Post> p = postRepository.findById(id);
@@ -83,14 +117,40 @@ public class PostServiceImpl implements PostService {
         if (!userId.isEmpty()) {
             Post post = getPostById(postId);
             try {
-                if (!post.getViewedUsers().contains(Long.valueOf(userId))) {
-                    post.getViewedUsers().add(Long.valueOf(userId));
+                List<ViewedUser> viewedUsers = post.getViewedUsers();
+                boolean isViewed = false;
+                for (int i = 0; i < viewedUsers.size(); i++) {
+                    if (viewedUsers.get(i).getUserId() == Long.valueOf(userId)) {
+                        isViewed = true;
+                    }
+                }
+                if (!isViewed) {
+                    ViewedUser viewedUser = new ViewedUser();
+                    viewedUser.setPost(post);
+                    viewedUser.setUserId(Long.valueOf(userId));
+                    viewedUserRepository.save(viewedUser);
+                    post.getViewedUsers().add(viewedUser);
                     log.info("Successfully added view count with user id: {}", userId);
                 }
             } catch (Exception e) {
                 log.error("Failed to add view count with user id: {}", userId, e);
                 throw e;
             }
+        }
+    }
+
+    @Override
+    public Page<Post> getPostsAsPage(List<Post> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<Post> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }

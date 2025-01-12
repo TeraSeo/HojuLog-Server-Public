@@ -60,6 +60,18 @@ public class SocietyPostServiceImpl implements SocietyPostService {
     }
 
     @Override
+    public Page<SocietyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<SocietyPost> posts = societyPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            log.info("Successfully got pageable Society Posts order by createdAt Desc and subcategory: {}", subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Society Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<SocietyPost> getRecent5Posts() {
         try {
             List<SocietyPost> posts = societyPostRepository.findTop5ByOrderByCreatedAtDesc();

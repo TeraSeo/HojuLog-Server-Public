@@ -54,5 +54,27 @@ class PostServiceImplTest {
         assertEquals(postDtoList.size(), 6);
     }
 
+    @Test
+    void getPropertyPostsLatestPaginationNSubCategory() {
+        Page<PropertyPost> posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategory(SubCategory.렌트, PageRequest.of(0, 10));
+        List<SummarizedPropertyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToSummarizedPropertyPostDto())
+                .collect(Collectors.toList());
+        assertEquals(postDtoList.size(), 1);
+    }
 
+    @Test
+    void getPostsByUserLatestPagination() {
+        Page<Post> posts = postService.getPostsByPageNUser(1L ,PageRequest.of(0, 10));
+        List<Post> postList = posts.getContent();
+        assertEquals(postList.size(), 1);
+    }
+
+    @Test
+    void getLikedPostsByPagination() {
+        Page<Post> posts = postService.getPostsByPageNLiked(1L ,PageRequest.of(0, 10));
+        List<Post> postList = posts.getContent();
+        assertEquals(postList.size(), 1);
+    }
 }

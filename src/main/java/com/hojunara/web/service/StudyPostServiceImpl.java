@@ -61,6 +61,18 @@ public class StudyPostServiceImpl implements StudyPostService {
     }
 
     @Override
+    public Page<StudyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<StudyPost> posts = studyPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            log.info("Successfully got pageable Study Posts order by createdAt Desc and subcategory: {}", subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Study Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<StudyPost> getRecent5Posts() {
         try {
             List<StudyPost> posts = studyPostRepository.findTop5ByOrderByCreatedAtDesc();
