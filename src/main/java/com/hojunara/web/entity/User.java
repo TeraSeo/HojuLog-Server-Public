@@ -1,6 +1,7 @@
 package com.hojunara.web.entity;
 
 import com.hojunara.web.dto.response.DetailedOwnUserDto;
+import com.hojunara.web.dto.response.DetailedUserDto;
 import com.hojunara.web.dto.response.SummarizedUserDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -90,6 +91,11 @@ public class User extends BaseEntity {
 
     public SummarizedUserDto convertToSummarisedUserDto() {
         return SummarizedUserDto.builder().id(id).username(username).email(email).description(description).profilePicture(profilePicture).build();
+    }
+
+    public DetailedUserDto convertToDetailedUserDto() {
+        List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
+        return DetailedUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).build();
     }
 
     public DetailedOwnUserDto convertToDetailedOwnUserDto() {

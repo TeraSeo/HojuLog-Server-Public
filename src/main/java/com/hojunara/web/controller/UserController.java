@@ -1,6 +1,6 @@
 package com.hojunara.web.controller;
 
-import com.hojunara.web.dto.response.DetailedOwnUserDto;
+import com.hojunara.web.dto.response.DetailedUserDto;
 import com.hojunara.web.dto.response.SummarizedUserDto;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.service.UserService;
@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/user")
@@ -23,9 +22,16 @@ public class UserController {
     }
 
     @GetMapping("get/summarised/specific")
-    public ResponseEntity<SummarizedUserDto> getSpecificPost(@RequestParam Long userId) {
+    public ResponseEntity<SummarizedUserDto> getSpecificSummarizedUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
         SummarizedUserDto summarisedUserDto = user.convertToSummarisedUserDto();
         return ResponseEntity.ok(summarisedUserDto);
+    }
+
+    @GetMapping("get/specific")
+    public ResponseEntity<DetailedUserDto> getSpecificDetailedUser(@RequestHeader Long userId) {
+        User user = userService.getUserById(userId);
+        DetailedUserDto detailedUserDto = user.convertToDetailedUserDto();
+        return ResponseEntity.ok(detailedUserDto);
     }
 }
