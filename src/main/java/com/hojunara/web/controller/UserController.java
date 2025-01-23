@@ -2,6 +2,7 @@ package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.response.DetailedUserDto;
 import com.hojunara.web.dto.response.SummarizedUserDto;
+import com.hojunara.web.dto.response.SummarizedUserProfileDto;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +34,12 @@ public class UserController {
         User user = userService.getUserById(userId);
         DetailedUserDto detailedUserDto = user.convertToDetailedUserDto();
         return ResponseEntity.ok(detailedUserDto);
+    }
+
+    @GetMapping("get/summarized/specific/profile")
+    public ResponseEntity<SummarizedUserProfileDto> getSpecificSummarizedUserProfile(@RequestHeader Long userId) {
+        User user = userService.getUserById(userId);
+        SummarizedUserProfileDto summarizedUserProfileDto = user.convertToSummarizedUserProfileDto();
+        return ResponseEntity.ok(summarizedUserProfileDto);
     }
 }

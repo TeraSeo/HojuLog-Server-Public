@@ -1,2 +1,36 @@
-package com.hojunara.web.controller;public class InquiryController {
+package com.hojunara.web.controller;
+
+import com.hojunara.web.dto.request.InquiryDto;
+import com.hojunara.web.entity.Inquiry;
+import com.hojunara.web.service.InquiryService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("api/inquiry")
+public class InquiryController {
+    private final InquiryService inquiryService;
+
+    @Autowired
+    public InquiryController(InquiryService inquiryService) {
+        this.inquiryService = inquiryService;
+    }
+
+    @GetMapping("get/specific")
+    public ResponseEntity<Inquiry> getSpecificInquiry(@RequestParam Long inquiryId) {
+        Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
+        return ResponseEntity.ok(inquiry);
+    }
+
+    @PostMapping("create")
+    public ResponseEntity<Boolean> createInquiry(
+            @Valid @RequestPart InquiryDto inquiryDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Inquiry inquiry = inquiryService.createInquiry(inquiryDto, images);
+        return ResponseEntity.ok(inquiry != null);
+    }
 }

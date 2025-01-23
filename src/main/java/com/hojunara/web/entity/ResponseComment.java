@@ -21,14 +21,18 @@ public class ResponseComment extends Comment {
     private ParentComment parentComment;
 
     @Override
-    public SummarizedCommentDto convertToSummarizedCommentDto(Long userId) {
+    public SummarizedCommentDto convertToSummarizedCommentDto(String userId) {
         return null;
     }
 
     @Override
-    public ResponseCommentDto convertToResponseCommentDto(Long userId) {
+    public ResponseCommentDto convertToResponseCommentDto(String userId) {
         List<Long> likedUserIds = getLikes().stream().map(CommentLike::getUser).map(User::getId).toList();
-        Boolean isCurrentUserLiked = likedUserIds.contains(userId);
+        Boolean isCurrentUserLiked = false;
+        if (userId != null && userId != "") {
+            long parsedId = Long.parseLong(userId);
+            isCurrentUserLiked = likedUserIds.contains(parsedId);
+        }
         return ResponseCommentDto.builder()
                 .commentId(getId())
                 .content(getContent())

@@ -52,14 +52,14 @@ public class TravelPost extends BlogPost {
         List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
 
         Boolean isUserLiked = false;
-        if (!userId.isEmpty()) {
-            Long uId = Long.valueOf(userId);
+        if (userId != null && userId != "") {
+            Long parsedId = Long.valueOf(userId);
             isUserLiked = getLikes().stream()
                     .map(PostLike::getUser)
                     .map(User::getId)
-                    .anyMatch(id -> id.equals(uId));
+                    .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedTravelPostDto.builder().postId(getId()).username(getUser().getUsername()).title(getTitle()).subCategory(getSubCategory()).location(location).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
+        return DetailedTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).location(location).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
     }
 }

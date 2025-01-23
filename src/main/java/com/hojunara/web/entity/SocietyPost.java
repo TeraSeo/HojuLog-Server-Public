@@ -39,13 +39,14 @@ public class SocietyPost extends NormalPost {
                 .collect(Collectors.toList());
 
         Boolean isUserLiked = false;
-        if (userId != null) {
+        if (userId != null && userId != "") {
+            Long parsedId = Long.valueOf(userId);
             isUserLiked = getLikes().stream()
                     .map(PostLike::getUser)
                     .map(User::getId)
-                    .anyMatch(id -> id.equals(userId));
+                    .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedSocietyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
+        return DetailedSocietyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
     }
 }

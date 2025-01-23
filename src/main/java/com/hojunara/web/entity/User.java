@@ -3,6 +3,7 @@ package com.hojunara.web.entity;
 import com.hojunara.web.dto.response.DetailedOwnUserDto;
 import com.hojunara.web.dto.response.DetailedUserDto;
 import com.hojunara.web.dto.response.SummarizedUserDto;
+import com.hojunara.web.dto.response.SummarizedUserProfileDto;
 import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
@@ -57,6 +58,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    private List<Inquiry> inquiries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -96,6 +101,10 @@ public class User extends BaseEntity {
     public DetailedUserDto convertToDetailedUserDto() {
         List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
         return DetailedUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).build();
+    }
+
+    public SummarizedUserProfileDto convertToSummarizedUserProfileDto() {
+        return SummarizedUserProfileDto.builder().id(id).username(username).profilePicture(profilePicture).build();
     }
 
     public DetailedOwnUserDto convertToDetailedOwnUserDto() {

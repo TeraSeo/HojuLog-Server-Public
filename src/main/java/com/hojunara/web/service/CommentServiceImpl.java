@@ -37,10 +37,11 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public void deleteCommentById(Long id) {
+    public Boolean deleteCommentById(Long id) {
         try {
             commentRepository.deleteById(id);
             log.info("Successfully deleted post comment with id: {}", id);
+            return true;
         } catch (Exception e) {
             log.error("Failed to delete post comment with id: {}", id, e);
             throw e;

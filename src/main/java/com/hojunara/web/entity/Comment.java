@@ -36,7 +36,7 @@ public abstract class Comment extends PostBaseEntity {
     @Builder.Default
     private List<CommentLike> likes = new ArrayList<>();
 
-    public abstract SummarizedCommentDto convertToSummarizedCommentDto(Long userId);
+    public abstract SummarizedCommentDto convertToSummarizedCommentDto(String userId);
 
-    public abstract ResponseCommentDto convertToResponseCommentDto(Long userId);
+    public abstract ResponseCommentDto convertToResponseCommentDto(String userId);
 }

@@ -43,13 +43,14 @@ public class JobPost extends NormalPost {
                 .collect(Collectors.toList());
 
         Boolean isUserLiked = false;
-        if (userId != null) {
+        if (userId != null && userId != "") {
+            Long parsedId = Long.valueOf(userId);
             isUserLiked = getLikes().stream()
                     .map(PostLike::getUser)
                     .map(User::getId)
-                    .anyMatch(id -> id.equals(userId));
+                    .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).username(getUser().getUsername()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).build();
+        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).userId(getUser().getId()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).build();
     }
 }

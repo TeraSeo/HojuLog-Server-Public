@@ -16,7 +16,7 @@ import java.util.Map;
 public class DetailedTravelPostDto {
     private Long postId;
 
-    private String username;
+    private Long userId;
 
     private String title;
 

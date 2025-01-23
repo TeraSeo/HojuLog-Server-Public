@@ -6,5 +6,5 @@ public interface CommentService {
 
     Comment getCommentById(Long id);
 
-    void deleteCommentById(Long id);
+    Boolean deleteCommentById(Long id);
 }

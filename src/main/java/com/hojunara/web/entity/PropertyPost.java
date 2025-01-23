@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @DiscriminatorValue("PROPERTY")
 public class PropertyPost extends NormalPost {
-    @Column(nullable = false)
     private Period period;
 
     @Column(nullable = false)
@@ -38,13 +37,11 @@ public class PropertyPost extends NormalPost {
     @Column(nullable = false)
     private String roomCount;
 
-    @Column(nullable = false)
     private BathroomType bathroomType;
 
     @Column(nullable = false)
     private Boolean isParkable;
 
-    @Column(nullable = false)
     private Boolean isBillIncluded;
 
     public SummarizedPropertyPostDto convertPostToSummarizedPropertyPostDto() {
@@ -69,13 +66,14 @@ public class PropertyPost extends NormalPost {
                 .collect(Collectors.toList());
 
         Boolean isUserLiked = false;
-        if (userId != null) {
+        if (userId != null && userId != "") {
+            Long parsedId = Long.valueOf(userId);
             isUserLiked = getLikes().stream()
                     .map(PostLike::getUser)
                     .map(User::getId)
-                    .anyMatch(id -> id.equals(userId));
+                    .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedPropertyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
+        return DetailedPropertyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).build();
     }
 }

@@ -26,10 +26,15 @@ public class ParentComment extends Comment {
     private List<ResponseComment> responseComments = new ArrayList<>();
 
     @Override
-    public SummarizedCommentDto convertToSummarizedCommentDto(Long userId) {
+    public SummarizedCommentDto convertToSummarizedCommentDto(String userId) {
         List<Long> responseCommentIds = responseComments.stream().map(ResponseComment::getId).toList();
         List<Long> likedUserIds = getLikes().stream().map(CommentLike::getUser).map(User::getId).toList();
-        Boolean isCurrentUserLiked = likedUserIds.contains(userId);
+        Boolean isCurrentUserLiked = false;
+        if (userId != null && userId != "") {
+            long parsedId = Long.parseLong(userId);
+            isCurrentUserLiked = likedUserIds.contains(parsedId);
+        }
+
         return SummarizedCommentDto.builder()
                 .commentId(getId())
                 .content(getContent())
@@ -42,7 +47,7 @@ public class ParentComment extends Comment {
     }
 
     @Override
-    public ResponseCommentDto convertToResponseCommentDto(Long userId) {
+    public ResponseCommentDto convertToResponseCommentDto(String userId) {
         return null;
     }
 }

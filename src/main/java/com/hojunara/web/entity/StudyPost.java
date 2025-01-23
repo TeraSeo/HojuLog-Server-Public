@@ -51,13 +51,14 @@ public class StudyPost extends BlogPost {
         List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
 
         Boolean isUserLiked = false;
-        if (userId != null) {
+        if (userId != null && userId != "") {
+            Long parsedId = Long.valueOf(userId);
             isUserLiked = getLikes().stream()
                     .map(PostLike::getUser)
                     .map(User::getId)
-                    .anyMatch(id -> id.equals(userId));
+                    .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).subCategory(getSubCategory()).school(school).major(major).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
+        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).school(school).major(major).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
     }
 }

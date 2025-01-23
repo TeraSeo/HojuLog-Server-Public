@@ -250,6 +250,18 @@ public class PostController {
         return ResponseEntity.ok(postPaginationResponse);
     }
 
+    @GetMapping("get/pageable/others/posts")
+    public ResponseEntity<WholePostPaginationResponse> getPageableOthersPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
+        Page<Post> posts = postService.getPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        List<SummarizedPostDto> summarizedPostDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertToSummarizedPostDto())
+                .collect(Collectors.toList());
+
+        WholePostPaginationResponse postPaginationResponse = WholePostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(summarizedPostDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
     @GetMapping("get/pageable/liked/posts")
     public ResponseEntity<WholePostPaginationResponse> getPageableLikedPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
         Page<Post> posts = postService.getPostsByPageNLiked(Long.valueOf(userId), PageRequest.of(page - 1, size));
@@ -332,7 +344,9 @@ public class PostController {
     public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId, @RequestHeader String userId) {
         PropertyPost propertyPost = propertyPostService.getPostById(postId);
         DetailedPropertyPostDto detailedPropertyPostDto = propertyPost.convertPostToDetailedPropertyPostDto(userId);
-        postService.addViewCount(postId, userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
         return ResponseEntity.ok(detailedPropertyPostDto);
     }
 
@@ -340,7 +354,9 @@ public class PostController {
     public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId, @RequestHeader String userId) {
         JobPost jobPost = jobPostService.getPostById(postId);
         DetailedJobPostDto detailedJobPostDto = jobPost.convertPostToDetailedJobPostDto(userId);
-        postService.addViewCount(postId, userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
         return ResponseEntity.ok(detailedJobPostDto);
     }
 
@@ -348,7 +364,9 @@ public class PostController {
     public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId, @RequestHeader String userId) {
         TransactionPost transactionPost = transactionPostService.getPostById(postId);
         DetailedTransactionPostDto detailedTransactionPostDto = transactionPost.convertPostToDetailedTransactionPostDto(userId);
-        postService.addViewCount(postId, userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
         return ResponseEntity.ok(detailedTransactionPostDto);
     }
 
@@ -356,7 +374,9 @@ public class PostController {
     public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId, @RequestHeader String userId) {
         SocietyPost societyPost = societyPostService.getPostById(postId);
         DetailedSocietyPostDto detailedSocietyPostDto = societyPost.convertPostToDetailedSocietyPostDto(userId);
-        postService.addViewCount(postId, userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
         return ResponseEntity.ok(detailedSocietyPostDto);
     }
 
@@ -364,7 +384,9 @@ public class PostController {
     public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId, @RequestHeader String userId) {
         TravelPost travelPost = travelPostService.getPostById(postId);
         DetailedTravelPostDto detailedTravelPostDto = travelPost.convertPostToDetailedTravelPostDto(userId);
-        postService.addViewCount(postId, userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
         return ResponseEntity.ok(detailedTravelPostDto);
     }
 
@@ -372,7 +394,9 @@ public class PostController {
     public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId, @RequestHeader String userId) {
         StudyPost studyPost = studyPostService.getPostById(postId);
         DetailedStudyPostDto detailedStudyPostDto = studyPost.convertPostToDetailedStudyPostDto(userId);
-        postService.addViewCount(postId, userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
         return ResponseEntity.ok(detailedStudyPostDto);
     }
 

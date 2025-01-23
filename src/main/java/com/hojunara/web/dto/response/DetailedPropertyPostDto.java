@@ -17,7 +17,7 @@ import java.util.List;
 public class DetailedPropertyPostDto {
     private Long postId;
 
-    private String username;
+    private Long userId;
 
     private String title;
 
