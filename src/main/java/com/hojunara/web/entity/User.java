@@ -110,7 +110,7 @@ public class User extends BaseEntity {
     public DetailedOwnUserDto convertToDetailedOwnUserDto() {
         List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
         List<Long> likedPostIds = postLikes.stream().map(PostLike::getPost).limit(5).map(Post::getId).collect(Collectors.toList());
-        List<Long> requestedIds = new ArrayList<>();
-        return DetailedOwnUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).build();
+        List<Long> requestedIds = inquiries.stream().map(Inquiry::getId).limit(5).collect(Collectors.toList());
+        return DetailedOwnUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).role(role).build();
     }
 }

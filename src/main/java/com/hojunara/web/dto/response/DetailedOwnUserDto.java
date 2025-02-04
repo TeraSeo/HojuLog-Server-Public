@@ -1,5 +1,6 @@
 package com.hojunara.web.dto.response;
 
+import com.hojunara.web.entity.Role;
 import lombok.*;
 
 import java.util.List;
@@ -25,4 +26,6 @@ public class DetailedOwnUserDto {
     private List<Long> likedPostIds;
 
     private List<Long> requestedIds;
+
+    private Role role;
 }

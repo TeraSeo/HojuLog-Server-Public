@@ -1,6 +1,7 @@
 package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.request.InquiryDto;
+import com.hojunara.web.dto.response.SummarizedInquiryDto;
 import com.hojunara.web.entity.Inquiry;
 import com.hojunara.web.service.InquiryService;
 import jakarta.validation.Valid;
@@ -20,9 +21,10 @@ public class InquiryController {
     }
 
     @GetMapping("get/specific")
-    public ResponseEntity<Inquiry> getSpecificInquiry(@RequestParam Long inquiryId) {
+    public ResponseEntity<SummarizedInquiryDto> getSpecificInquiry(@RequestParam Long inquiryId) {
         Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
-        return ResponseEntity.ok(inquiry);
+        SummarizedInquiryDto summarizedInquiryDto = inquiry.convertToSummarizedInquiryDto();
+        return ResponseEntity.ok(summarizedInquiryDto);
     }
 
     @PostMapping("create")
