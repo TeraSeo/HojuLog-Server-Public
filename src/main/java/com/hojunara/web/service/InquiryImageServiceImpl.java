@@ -1,19 +1,12 @@
 package com.hojunara.web.service;
 
-import com.hojunara.web.dto.request.InquiryDto;
-import com.hojunara.web.entity.Image;
-import com.hojunara.web.entity.Inquiry;
-import com.hojunara.web.entity.InquiryImage;
-import com.hojunara.web.entity.NormalPost;
-import com.hojunara.web.exception.ImageNotFoundException;
+import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.InquiryImageNotFoundException;
-import com.hojunara.web.repository.ImageRepository;
 import com.hojunara.web.repository.InquiryImageRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 

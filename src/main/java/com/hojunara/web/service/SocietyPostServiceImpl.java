@@ -2,6 +2,7 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.SocietyPostDto;
+import com.hojunara.web.dto.request.UpdateSocietyPostDto;
 import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.SocietyPostNotFoundException;
 import com.hojunara.web.repository.SocietyPostRepository;
@@ -13,9 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,15 +24,15 @@ public class SocietyPostServiceImpl implements SocietyPostService {
 
     private final SocietyPostRepository societyPostRepository;
     private final UserService userService;
-    private final AwsFileService awsFileService;
-    private final ImageService imageService;
+    private final KeywordService keywordService;
+    private final BlogContentService blogContentService;
 
     @Autowired
-    public SocietyPostServiceImpl(SocietyPostRepository societyPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService) {
+    public SocietyPostServiceImpl(SocietyPostRepository societyPostRepository, UserService userService, KeywordService keywordService, BlogContentService blogContentService) {
         this.societyPostRepository = societyPostRepository;
         this.userService = userService;
-        this.awsFileService = awsFileService;
-        this.imageService = imageService;
+        this.keywordService = keywordService;
+        this.blogContentService = blogContentService;
     }
 
     @Override
@@ -104,30 +104,196 @@ public class SocietyPostServiceImpl implements SocietyPostService {
         try {
             SocietyPost societyPost = SocietyPost.builder()
                     .title(societyPostDto.getTitle())
-                    .description(societyPostDto.getDescription())
                     .category(Category.생활)
                     .subCategory(societyPostDto.getSubCategory())
                     .postType(PostType.NORMAL)
-                    .contact(societyPostDto.getContact())
-                    .email(societyPostDto.getEmail())
-                    .suburb(societyPostDto.getSuburb())
+                    .isPublic(societyPostDto.getIsPublic())
+                    .isCommentAllowed(societyPostDto.getIsCommentAllowed())
                     .build();
 
             societyPost.setUser(user);
             SocietyPost createdPost = societyPostRepository.save(societyPost);
 
             // save post images data
-            if (images != null) {
-                Arrays.stream(images)
-                        .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
-                        .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
+            if (societyPostDto.getBlogContents().size() > 0) {
+                List<BlogContent> blogContents = BlogContent.convertMapToBlogContent(societyPostDto.getBlogContents());
+                blogContentService.saveBlogContentList(blogContents, images, user.getEmail(), createdPost);
             }
+
+            // save keywords
+            societyPostDto.getSelectedKeywords().stream().forEach(
+                    keyword -> keywordService.createKeyword(keyword, createdPost)
+            );
 
             log.info("Successfully created society post");
 
             return createdPost;
         } catch (Exception e) {
             log.error("Failed to create society post", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Post updatePost(UpdateSocietyPostDto updateSocietyPostDto, MultipartFile[] images) {
+        User user = userService.getUserById(updateSocietyPostDto.getUserId());
+        try {
+            SocietyPost societyPost = getPostById(updateSocietyPostDto.getPostId());
+
+            boolean isUpdated = false;
+            boolean isBlogUpdated = false;
+
+            if (!societyPost.getTitle().equals(updateSocietyPostDto.getTitle())) {
+                societyPost.setTitle(updateSocietyPostDto.getTitle());
+                isUpdated = true;
+            }
+            if (!societyPost.getIsPublic().equals(updateSocietyPostDto.getIsPublic())) {
+                societyPost.setIsPublic(updateSocietyPostDto.getIsPublic());
+                isUpdated = true;
+            }
+            if (!societyPost.getIsCommentAllowed().equals(updateSocietyPostDto.getIsCommentAllowed())) {
+                societyPost.setIsCommentAllowed(updateSocietyPostDto.getIsCommentAllowed());
+                isUpdated = true;
+            }
+
+            // 블로그 contents 업데이트
+            List<Map<String, String>> originalBlogContentMap = BlogContent.convertBlogContentToMap(societyPost.getBlogContents());
+            List<Map<String, String>> updatedBlogContentMap = updateSocietyPostDto.getBlogContents();
+            if (!originalBlogContentMap.equals(updatedBlogContentMap)) {
+                List<Map<String, String>> addedContentList = new ArrayList<>();
+                List<Long> addedContentOrderList = new ArrayList<>();
+
+                // 새로 더해진 contents 구분 후 순서 부여
+                for (int i = 0; i < updatedBlogContentMap.size(); i++) {
+                    Map<String, String> updatedMap = updatedBlogContentMap.get(i);
+                    if (!originalBlogContentMap.contains(updatedMap)) {
+                        addedContentList.add(updatedMap);
+                        addedContentOrderList.add((long) i);
+                    }
+                    else {
+                        originalBlogContentMap.remove(updatedMap);
+                    }
+                }
+
+                List<Map<String, String>> removedContentList = new ArrayList<>(originalBlogContentMap);
+
+                if (!addedContentList.isEmpty()) {
+                    List<BlogContent> addedBlogContents = BlogContent.convertMapToBlogContent(addedContentList);
+                    blogContentService.updateBlogContentList(addedBlogContents, addedContentOrderList, images, user.getEmail(), societyPost);
+                }
+
+                // 삭제된 contents 삭제
+                if (!removedContentList.isEmpty()) {
+                    // 중복되는 contents 전체 삭제 방지
+                    Map<Map<String, String>, Integer> removalCounts = new HashMap<>();
+                    for (Map<String, String> removedMap : removedContentList) {
+                        removalCounts.put(removedMap, removalCounts.getOrDefault(removedMap, 0) + 1);
+                    }
+
+                    Iterator<BlogContent> iterator = societyPost.getBlogContents().iterator();
+                    while (iterator.hasNext()) {
+                        BlogContent blogContent = iterator.next();
+                        Map<String, String> blogContentMap = BlogContent.convertBlogContentToMap(List.of(blogContent)).get(0);
+
+                        if (removalCounts.containsKey(blogContentMap) && removalCounts.get(blogContentMap) > 0) {
+                            iterator.remove();
+                            removalCounts.put(blogContentMap, removalCounts.get(blogContentMap) - 1);
+                        }
+                    }
+                }
+
+                isBlogUpdated = true;
+            }
+
+            // 키워드 업데이트
+            List<String> originalKeywords = societyPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+            List<String> updatedKeywords = updateSocietyPostDto.getSelectedKeywords();
+            if (!originalKeywords.equals(updatedKeywords)) {
+                List<String> addedKeywords = updatedKeywords.stream()
+                        .filter(keyword -> !originalKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                List<String> removedKeywords = originalKeywords.stream()
+                        .filter(keyword -> !updatedKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                if (!addedKeywords.isEmpty()) {
+                    addedKeywords.forEach(keyword -> {
+                        keywordService.createKeyword(keyword, societyPost);
+                    });
+                }
+
+                if (!removedKeywords.isEmpty()) {
+                    societyPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
+                }
+
+                isUpdated = true;
+            }
+
+            if (isUpdated || isBlogUpdated) {
+                societyPostRepository.save(societyPost);
+                societyPostRepository.flush(); // 업데이트 내용 반영
+            }
+
+            // contents 순서 알맞게 변경
+            if (isBlogUpdated) {
+                SocietyPost updatedSocietyPost = getPostById(updateSocietyPostDto.getPostId());
+
+                List<BlogContent> orderedBlogContents = new ArrayList<>();
+                List<BlogContent> updatedBlogContents = new ArrayList<>(updatedSocietyPost.getBlogContents());
+
+                for (int i = 0; i < updatedBlogContentMap.size(); i++) {
+                    Map<String, String> blogMap = updatedBlogContentMap.get(i);
+
+                    Optional<BlogContent> matchingContent = updatedBlogContents.stream()
+                            .filter(blogContent -> {
+                                String blogType = blogMap.get("type");
+                                if (blogType == null) return false;
+
+                                if (blogContent instanceof ImageContent) {
+                                    return "image".equals(blogType) &&
+                                            ((ImageContent) blogContent).getImageUrl().equals(blogMap.get("imageUrl"));
+                                }
+                                else if (blogContent instanceof DescriptionContent) {
+                                    if (!"description".equals(blogType)) return false;
+
+                                    Map<String, String> blogContentToMap = BlogContent.convertBlogContentToMap(List.of(blogContent)).get(0);
+                                    return blogContentToMap.get("content").equals(blogMap.get("content")) &&
+                                            blogContentToMap.get("fontSize").equals(blogMap.get("fontSize")) &&
+                                            blogContentToMap.get("fontWeight").equals(blogMap.get("fontWeight"));
+                                }
+                                return false;
+                            })
+                            .findFirst();
+
+                    if (matchingContent.isEmpty()) {
+                        orderedBlogContents.add(null);
+                    }
+                    else {
+                        matchingContent.ifPresent(content -> {
+                            orderedBlogContents.add(content);
+                            updatedBlogContents.remove(content);
+                        });
+                    }
+                }
+
+                for (int i = 0; i < orderedBlogContents.size(); i++) {
+                    BlogContent content = orderedBlogContents.get(i);
+                    if (content != null) {
+                        content.setOrderIndex((long) i);
+
+                        blogContentService.updateBlogContent(content);
+                    }
+                }
+
+                return updatedSocietyPost;
+            }
+
+            log.info("Successfully updated society post");
+
+            return societyPost;
+        } catch (Exception e) {
+            log.error("Failed to update society post", e);
             return null;
         }
     }

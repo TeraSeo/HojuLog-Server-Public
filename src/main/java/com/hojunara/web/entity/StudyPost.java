@@ -1,9 +1,9 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.request.UpdateStudyPostDto;
 import com.hojunara.web.dto.response.DetailedStudyPostDto;
 import com.hojunara.web.dto.response.NormalStudyPostDto;
 import com.hojunara.web.dto.response.SummarizedStudyPostDto;
-import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -14,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -26,13 +27,8 @@ public class StudyPost extends BlogPost {
 
     private String school;
 
-    private String major;
-
-    @Column(nullable = false)
-    private double rate;
-
     public SummarizedStudyPostDto convertPostToSummarizedStudyPostDto() {
-        return SummarizedStudyPostDto.builder().postId(getId()).title(getTitle()).rate(rate).createdAt(getCreatedAt()).build();
+        return SummarizedStudyPostDto.builder().postId(getId()).title(getTitle()).createdAt(getCreatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalStudyPostDto convertPostToNormalStudyPostDto() {
@@ -44,11 +40,22 @@ public class StudyPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).rate(rate).viewCounts((long) getViewedUsers().size()).createdAt(getCreatedAt()).build();
+        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+    }
+
+    public UpdateStudyPostDto convertToUpdateStudyPostDto() {
+        List<Map<String, String>> blogContents = BlogContent.convertBlogContentToMap(getBlogContents());
+        List<String> keywords = getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+
+        return UpdateStudyPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).school(school).blogContents(blogContents).selectedKeywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 
     public DetailedStudyPostDto convertPostToDetailedStudyPostDto(String userId) {
         List<Map<String, String>> blogContentMap = BlogContent.convertBlogContentToMap(getBlogContents());
+
+        List<String> keywords = getKeywords().stream()
+                .map(Keyword::getKeyWord)
+                .collect(Collectors.toList());
 
         Boolean isUserLiked = false;
         if (userId != null && userId != "") {
@@ -59,6 +66,6 @@ public class StudyPost extends BlogPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).school(school).major(major).rate(rate).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).build();
+        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).school(school).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

@@ -42,6 +42,10 @@ public class JobPost extends NormalPost {
                 .map(Image::getUrl)
                 .collect(Collectors.toList());
 
+        List<String> keywords = getKeywords().stream()
+                .map(Keyword::getKeyWord)
+                .collect(Collectors.toList());
+
         Boolean isUserLiked = false;
         if (userId != null && userId != "") {
             Long parsedId = Long.valueOf(userId);
@@ -51,6 +55,6 @@ public class JobPost extends NormalPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).userId(getUser().getId()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).build();
+        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).userId(getUser().getId()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

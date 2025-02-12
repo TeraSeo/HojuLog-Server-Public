@@ -1,7 +1,5 @@
 package com.hojunara.web.dto.request;
 
-import com.hojunara.web.entity.Category;
-import com.hojunara.web.entity.SubCategory;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -14,22 +12,17 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 @Builder
-public class TravelPostDto {
+public class UpdateStudyPostDto {
+    @NotNull
+    private Long postId;
+
     @NotNull
     private Long userId;
 
     @NotNull
     private String title;
 
-    @NotNull
-    private Category category;
-
-    @NotNull
-    private SubCategory subCategory;
-
-    private String country;
-
-    private String location;
+    private String school;
 
     private List<Map<String, String>> blogContents;
 

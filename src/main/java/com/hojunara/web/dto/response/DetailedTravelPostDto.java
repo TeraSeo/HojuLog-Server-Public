@@ -24,8 +24,6 @@ public class DetailedTravelPostDto {
 
     private String location;
 
-    private double rate;
-
     private Timestamp createdAt;
 
     private Long viewCounts;
@@ -37,4 +35,10 @@ public class DetailedTravelPostDto {
     private Long commentCounts;
 
     private Boolean isUserLiked;
+
+    private List<String> keywords;
+
+    private Boolean isPublic;
+
+    private Boolean isCommentAllowed;
 }

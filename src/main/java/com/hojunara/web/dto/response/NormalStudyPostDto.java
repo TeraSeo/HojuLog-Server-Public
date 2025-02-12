@@ -22,5 +22,11 @@ public class NormalStudyPostDto {
 
     private Long viewCounts;
 
-    private double rate;
+    private Boolean isPublic;
+
+    private Long likeCounts;
+
+    private Long commentCounts;
+
+    private Boolean isCommentAllowed;
 }

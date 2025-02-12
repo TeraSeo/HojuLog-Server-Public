@@ -17,5 +17,5 @@ public class SummarizedStudyPostDto {
 
     private Timestamp createdAt;
 
-    private double rate;
+    private Boolean isPublic;
 }

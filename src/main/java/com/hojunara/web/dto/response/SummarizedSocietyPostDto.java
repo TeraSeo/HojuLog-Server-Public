@@ -21,4 +21,5 @@ public class SummarizedSocietyPostDto {
 
     private Timestamp createdAt;
 
+    private Boolean isPublic;
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 public class ViewedUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "view_id")
     private Long id;
 

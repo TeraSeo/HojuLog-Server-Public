@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @EqualsAndHashCode
 public class PostBookmark {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "like_id")
     private Long id;
 

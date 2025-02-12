@@ -26,13 +26,15 @@ public class JobPostServiceImpl implements JobPostService {
     private final UserService userService;
     private final AwsFileService awsFileService;
     private final ImageService imageService;
+    private final KeywordService keywordService;
 
     @Autowired
-    public JobPostServiceImpl(JobPostRepository jobPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService) {
+    public JobPostServiceImpl(JobPostRepository jobPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService, KeywordService keywordService) {
         this.jobPostRepository = jobPostRepository;
         this.userService = userService;
         this.awsFileService = awsFileService;
         this.imageService = imageService;
+        this.keywordService = keywordService;
     }
 
     @Override
@@ -113,6 +115,7 @@ public class JobPostServiceImpl implements JobPostService {
                     .jobType(jobPostDto.getJobType())
                     .location(jobPostDto.getLocation())
                     .suburb(jobPostDto.getSuburb())
+                    .isCommentAllowed(jobPostDto.getIsCommentAllowed())
                     .build();
 
             jobPost.setUser(user);
@@ -124,6 +127,11 @@ public class JobPostServiceImpl implements JobPostService {
                         .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
                         .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
             }
+
+            // save keywords
+            jobPostDto.getSelectedKeywords().stream().forEach(
+                    keyword -> keywordService.createKeyword(keyword, createdPost)
+            );
 
             log.info("Successfully created job post");
 

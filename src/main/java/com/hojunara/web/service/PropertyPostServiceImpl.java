@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,13 +26,15 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     private final UserService userService;
     private final AwsFileService awsFileService;
     private final ImageService imageService;
+    private final KeywordService keywordService;
 
     @Autowired
-    public PropertyPostServiceImpl(PropertyPostRepository propertyPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService) {
+    public PropertyPostServiceImpl(PropertyPostRepository propertyPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService, KeywordService keywordService) {
         this.propertyPostRepository = propertyPostRepository;
         this.userService = userService;
         this.awsFileService = awsFileService;
         this.imageService = imageService;
+        this.keywordService = keywordService;
     }
 
     @Override
@@ -120,6 +121,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .bathroomType(propertyPostDto.getBathroomType())
                     .isParkable(propertyPostDto.getIsParkable())
                     .isBillIncluded(propertyPostDto.getIsBillIncluded())
+                    .isCommentAllowed(propertyPostDto.getIsCommentAllowed())
                     .build();
 
             propertyPost.setUser(user);
@@ -131,6 +133,11 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                         .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
                         .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
             }
+
+            // save keywords
+            propertyPostDto.getSelectedKeywords().stream().forEach(
+                    keyword -> keywordService.createKeyword(keyword, createdPost)
+            );
 
             log.info("Successfully created property post");
 

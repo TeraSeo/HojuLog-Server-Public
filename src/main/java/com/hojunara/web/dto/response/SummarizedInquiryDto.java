@@ -9,6 +9,8 @@ import lombok.*;
 @ToString
 @Builder
 public class SummarizedInquiryDto {
+    private Long inquiryId;
+
     private String title;
 
     private String description;

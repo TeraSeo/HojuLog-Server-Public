@@ -1,7 +1,7 @@
 package com.hojunara.web.service;
 
-import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.TravelPostDto;
+import com.hojunara.web.dto.request.UpdateTravelPostDto;
 import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.TravelPostNotFoundException;
 import com.hojunara.web.repository.TravelPostRepository;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -23,17 +23,15 @@ public class TravelPostServiceImpl implements TravelPostService {
 
     private final TravelPostRepository travelPostRepository;
     private final UserService userService;
-    private final AwsFileService awsFileService;
-    private final BlogDescriptionContentService blogDescriptionContentService;
-    private final BlogImageContentService blogImageContentService;
+    private final KeywordService keywordService;
+    private final BlogContentService blogContentService;
 
     @Autowired
-    public TravelPostServiceImpl(TravelPostRepository travelPostRepository, UserService userService, AwsFileService awsFileService, BlogDescriptionContentService blogDescriptionContentService, BlogImageContentService blogImageContentService) {
+    public TravelPostServiceImpl(TravelPostRepository travelPostRepository, UserService userService, KeywordService keywordService, BlogContentService blogContentService) {
         this.travelPostRepository = travelPostRepository;
         this.userService = userService;
-        this.awsFileService = awsFileService;
-        this.blogDescriptionContentService = blogDescriptionContentService;
-        this.blogImageContentService = blogImageContentService;
+        this.keywordService = keywordService;
+        this.blogContentService = blogContentService;
     }
 
     @Override
@@ -110,7 +108,8 @@ public class TravelPostServiceImpl implements TravelPostService {
                     .postType(PostType.BLOG)
                     .country(travelPostDto.getCountry())
                     .location(travelPostDto.getLocation())
-                    .rate(travelPostDto.getRate())
+                    .isPublic(travelPostDto.getIsPublic())
+                    .isCommentAllowed(travelPostDto.getIsCommentAllowed())
                     .build();
 
             travelPost.setUser(user);
@@ -119,30 +118,191 @@ public class TravelPostServiceImpl implements TravelPostService {
             // save post images data
             if (travelPostDto.getBlogContents().size() > 0) {
                 List<BlogContent> blogContents = BlogContent.convertMapToBlogContent(travelPostDto.getBlogContents());
-                int imgCnt = 0;
-                for (int i = 0; i < blogContents.size(); i++) {
-                    BlogContent blogContent = blogContents.get(i);
-                    if (blogContent.getType().toString().equals("image")) {
-                        if (imgCnt < images.length) {
-                            String imgUrl = awsFileService.uploadPostFile(images[imgCnt], user.getEmail());
-                            ImageContent imageContent = (ImageContent) blogContent;
-                            imageContent.setImageUrl(imgUrl);
-                            blogImageContentService.createBlogImageContent(imageContent, travelPost);
-                            imgCnt++;
-                        }
-                    }
-                    else {
-                        DescriptionContent descriptionContent = (DescriptionContent) blogContent;
-                        blogDescriptionContentService.createBlogDescriptionContent(descriptionContent, travelPost);
-                    }
-                }
+                blogContentService.saveBlogContentList(blogContents, images, user.getEmail(), createdPost);
             }
+
+            // save keywords
+            travelPostDto.getSelectedKeywords().stream().forEach(
+                    keyword -> keywordService.createKeyword(keyword, createdPost)
+            );
 
             log.info("Successfully created travel post");
 
             return createdPost;
         } catch (Exception e) {
             log.error("Failed to create travel post", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Post updatePost(UpdateTravelPostDto updateTravelPostDto, MultipartFile[] images) {
+        User user = userService.getUserById(updateTravelPostDto.getUserId());
+        try {
+            TravelPost travelPost = getPostById(updateTravelPostDto.getPostId());
+
+            boolean isUpdated = false;
+            boolean isBlogUpdated = false;
+
+            if (!travelPost.getTitle().equals(updateTravelPostDto.getTitle())) {
+                travelPost.setTitle(updateTravelPostDto.getTitle());
+                isUpdated = true;
+            }
+            if (!travelPost.getCountry().equals(updateTravelPostDto.getCountry())) {
+                travelPost.setCountry(updateTravelPostDto.getCountry());
+                isUpdated = true;
+            }
+            if (!travelPost.getLocation().equals(updateTravelPostDto.getLocation())) {
+                travelPost.setLocation(updateTravelPostDto.getLocation());
+                isUpdated = true;
+            }
+            if (!travelPost.getIsPublic().equals(updateTravelPostDto.getIsPublic())) {
+                travelPost.setIsPublic(updateTravelPostDto.getIsPublic());
+                isUpdated = true;
+            }
+            if (!travelPost.getIsCommentAllowed().equals(updateTravelPostDto.getIsCommentAllowed())) {
+                travelPost.setIsCommentAllowed(updateTravelPostDto.getIsCommentAllowed());
+                isUpdated = true;
+            }
+
+            // 블로그 contents 업데이트
+            List<Map<String, String>> originalBlogContentMap = BlogContent.convertBlogContentToMap(travelPost.getBlogContents());
+            List<Map<String, String>> updatedBlogContentMap = updateTravelPostDto.getBlogContents();
+            if (!originalBlogContentMap.equals(updatedBlogContentMap)) {
+                List<Map<String, String>> addedContentList = new ArrayList<>();
+                List<Long> addedContentOrderList = new ArrayList<>();
+
+                // 새로 더해진 contents 구분 후 순서 부여
+                for (int i = 0; i < updatedBlogContentMap.size(); i++) {
+                    Map<String, String> updatedMap = updatedBlogContentMap.get(i);
+                    if (!originalBlogContentMap.contains(updatedMap)) {
+                        addedContentList.add(updatedMap);
+                        addedContentOrderList.add((long) i);
+                    }
+                    else {
+                        originalBlogContentMap.remove(updatedMap);
+                    }
+                }
+
+                List<Map<String, String>> removedContentList = new ArrayList<>(originalBlogContentMap);
+
+                if (!addedContentList.isEmpty()) {
+                    List<BlogContent> addedBlogContents = BlogContent.convertMapToBlogContent(addedContentList);
+                    blogContentService.updateBlogContentList(addedBlogContents, addedContentOrderList, images, user.getEmail(), travelPost);
+                }
+
+                // 삭제된 contents 삭제
+                if (!removedContentList.isEmpty()) {
+                    // 중복되는 contents 전체 삭제 방지
+                    Map<Map<String, String>, Integer> removalCounts = new HashMap<>();
+                    for (Map<String, String> removedMap : removedContentList) {
+                        removalCounts.put(removedMap, removalCounts.getOrDefault(removedMap, 0) + 1);
+                    }
+
+                    Iterator<BlogContent> iterator = travelPost.getBlogContents().iterator();
+                    while (iterator.hasNext()) {
+                        BlogContent blogContent = iterator.next();
+                        Map<String, String> blogContentMap = BlogContent.convertBlogContentToMap(List.of(blogContent)).get(0);
+
+                        if (removalCounts.containsKey(blogContentMap) && removalCounts.get(blogContentMap) > 0) {
+                            iterator.remove();
+                            removalCounts.put(blogContentMap, removalCounts.get(blogContentMap) - 1);
+                        }
+                    }
+                }
+
+                isBlogUpdated = true;
+            }
+
+            // 키워드 업데이트
+            List<String> originalKeywords = travelPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+            List<String> updatedKeywords = updateTravelPostDto.getSelectedKeywords();
+            if (!originalKeywords.equals(updatedKeywords)) {
+                List<String> addedKeywords = updatedKeywords.stream()
+                        .filter(keyword -> !originalKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                List<String> removedKeywords = originalKeywords.stream()
+                        .filter(keyword -> !updatedKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                if (!addedKeywords.isEmpty()) {
+                    addedKeywords.forEach(keyword -> {
+                        keywordService.createKeyword(keyword, travelPost);
+                    });
+                }
+
+                if (!removedKeywords.isEmpty()) {
+                    travelPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
+                }
+
+                isUpdated = true;
+            }
+
+            if (isUpdated || isBlogUpdated) {
+                travelPostRepository.save(travelPost);
+                travelPostRepository.flush(); // 업데이트 내용 반영
+            }
+
+            // contents 순서 알맞게 변경
+            if (isBlogUpdated) {
+                TravelPost updatedTravelPost = getPostById(updateTravelPostDto.getPostId());
+
+                List<BlogContent> orderedBlogContents = new ArrayList<>();
+                List<BlogContent> updatedBlogContents = new ArrayList<>(updatedTravelPost.getBlogContents());
+
+                for (int i = 0; i < updatedBlogContentMap.size(); i++) {
+                    Map<String, String> blogMap = updatedBlogContentMap.get(i);
+
+                    Optional<BlogContent> matchingContent = updatedBlogContents.stream()
+                            .filter(blogContent -> {
+                                String blogType = blogMap.get("type");
+                                if (blogType == null) return false;
+
+                                if (blogContent instanceof ImageContent) {
+                                    return "image".equals(blogType) &&
+                                            ((ImageContent) blogContent).getImageUrl().equals(blogMap.get("imageUrl"));
+                                }
+                                else if (blogContent instanceof DescriptionContent) {
+                                    if (!"description".equals(blogType)) return false;
+
+                                    Map<String, String> blogContentToMap = BlogContent.convertBlogContentToMap(List.of(blogContent)).get(0);
+                                    return blogContentToMap.get("content").equals(blogMap.get("content")) &&
+                                            blogContentToMap.get("fontSize").equals(blogMap.get("fontSize")) &&
+                                            blogContentToMap.get("fontWeight").equals(blogMap.get("fontWeight"));
+                                }
+                                return false;
+                            })
+                            .findFirst();
+
+                    if (matchingContent.isEmpty()) {
+                        orderedBlogContents.add(null);
+                    }
+                    else {
+                        matchingContent.ifPresent(content -> {
+                            orderedBlogContents.add(content);
+                            updatedBlogContents.remove(content);
+                        });
+                    }
+                }
+
+                for (int i = 0; i < orderedBlogContents.size(); i++) {
+                    BlogContent content = orderedBlogContents.get(i);
+                    if (content != null) {
+                        content.setOrderIndex((long) i);
+
+                        blogContentService.updateBlogContent(content);
+                    }
+                }
+
+                return updatedTravelPost;
+            }
+
+            log.info("Successfully updated travel post");
+
+            return travelPost;
+        } catch (Exception e) {
+            log.error("Failed to update travel post", e);
             return null;
         }
     }

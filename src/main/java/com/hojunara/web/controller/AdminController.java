@@ -1,8 +1,11 @@
 package com.hojunara.web.controller;
 
+import com.hojunara.web.dto.response.AdminResponseDto;
+import com.hojunara.web.entity.Inquiry;
 import com.hojunara.web.entity.Role;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.security.provider.JwtTokenProvider;
+import com.hojunara.web.service.InquiryService;
 import com.hojunara.web.service.UserService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,21 +14,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/admin")
 @Slf4j
 public class AdminController {
     private final UserService userService;
+    private final InquiryService inquiryService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public AdminController(UserService userService, JwtTokenProvider jwtTokenProvider) {
+    public AdminController(UserService userService, InquiryService inquiryService, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
+        this.inquiryService = inquiryService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -61,5 +66,13 @@ public class AdminController {
             log.error("Error while validating tokens", e);
             return ResponseEntity.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).body("Token validation failed");
         }
+    }
+
+    @GetMapping("get/specific")
+    public ResponseEntity<AdminResponseDto> getAdminSpecific() {
+        List<Long> userIds = userService.getWholeUsers().stream().map(User::getId).limit(5).collect(Collectors.toList());
+        List<Long> inquiryIds = inquiryService.getWholeInquiries().stream().map(Inquiry::getId).limit(5).collect(Collectors.toList());
+        AdminResponseDto adminResponseDto = AdminResponseDto.builder().userIds(userIds).inquiryIds(inquiryIds).build();
+        return ResponseEntity.ok(adminResponseDto);
     }
 }

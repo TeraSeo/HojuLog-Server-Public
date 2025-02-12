@@ -16,11 +16,17 @@ public class NormalSocietyPostDto {
 
     private String title;
 
-    private double averageRate;
+    private String description;
 
     private Timestamp createdAt;
 
-    private Suburb suburb;
-
     private Long viewCounts;
+
+    private Boolean isPublic;
+
+    private Long likeCounts;
+
+    private Long commentCounts;
+
+    private Boolean isCommentAllowed;
 }

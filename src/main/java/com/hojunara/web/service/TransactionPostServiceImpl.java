@@ -26,13 +26,15 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     private final UserService userService;
     private final AwsFileService awsFileService;
     private final ImageService imageService;
+    private final KeywordService keywordService;
 
     @Autowired
-    public TransactionPostServiceImpl(TransactionPostRepository transactionPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService) {
+    public TransactionPostServiceImpl(TransactionPostRepository transactionPostRepository, UserService userService, AwsFileService awsFileService, ImageService imageService, KeywordService keywordService) {
         this.transactionPostRepository = transactionPostRepository;
         this.userService = userService;
         this.awsFileService = awsFileService;
         this.imageService = imageService;
+        this.keywordService = keywordService;
     }
 
     @Override
@@ -114,6 +116,7 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                     .priceType(transactionPostDto.getPriceType())
                     .price(transactionPostDto.getPrice())
                     .suburb(transactionPostDto.getSuburb())
+                    .isCommentAllowed(transactionPostDto.getIsCommentAllowed())
                     .build();
 
 
@@ -126,6 +129,11 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                         .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
                         .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
             }
+
+            // save keywords
+            transactionPostDto.getSelectedKeywords().stream().forEach(
+                    keyword -> keywordService.createKeyword(keyword, createdPost)
+            );
 
             log.info("Successfully created transaction post");
 

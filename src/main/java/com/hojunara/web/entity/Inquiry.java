@@ -45,7 +45,7 @@ public class Inquiry extends BaseEntity {
     private List<InquiryImage> images = new ArrayList<>();
 
     public SummarizedInquiryDto convertToSummarizedInquiryDto() {
-        SummarizedInquiryDto summarizedInquiryDto = SummarizedInquiryDto.builder().title(title).description(description).isSolved(isSolved).build();
+        SummarizedInquiryDto summarizedInquiryDto = SummarizedInquiryDto.builder().inquiryId(id).title(title).description(description).isSolved(isSolved).build();
         return summarizedInquiryDto;
     }
 }

@@ -26,6 +26,9 @@ public class BlogContent {
 
     private String type;
 
+    @Column(nullable = false)
+    private Long orderIndex;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;

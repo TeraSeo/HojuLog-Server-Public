@@ -56,4 +56,8 @@ public class DetailedPropertyPostDto {
     private Long commentCounts;
 
     private Boolean isUserLiked;
+
+    private List<String> keywords;
+
+    private Boolean isCommentAllowed;
 }

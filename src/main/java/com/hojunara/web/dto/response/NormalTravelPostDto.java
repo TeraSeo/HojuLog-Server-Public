@@ -18,11 +18,17 @@ public class NormalTravelPostDto {
 
     private String description;
 
-    private double rate;
-
     private Timestamp createdAt;
 
     private Long viewCounts;
 
     private String location;
+
+    private Boolean isPublic;
+
+    private Long likeCounts;
+
+    private Long commentCounts;
+
+    private Boolean isCommentAllowed;
 }

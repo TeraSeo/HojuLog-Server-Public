@@ -1,6 +1,7 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.TravelPostDto;
+import com.hojunara.web.dto.request.UpdateTravelPostDto;
 import com.hojunara.web.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,5 @@ public interface TravelPostService {
     TravelPost getPostById(Long id);
 
     Post createPost(TravelPostDto travelPostDto, MultipartFile[] images);
+    Post updatePost(UpdateTravelPostDto updateTravelPostDto, MultipartFile[] images);
 }

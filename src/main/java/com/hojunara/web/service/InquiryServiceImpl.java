@@ -8,11 +8,14 @@ import com.hojunara.web.exception.InquiryException;
 import com.hojunara.web.repository.InquiryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,6 +50,31 @@ public class InquiryServiceImpl implements InquiryService {
             throw e;
         }
     }
+
+    @Override
+    public List<Inquiry> getWholeInquiries() {
+        try {
+            List<Inquiry> inquiries = inquiryRepository.findAll();
+            log.info("Successfully fot whole inquiries");
+            return  inquiries;
+        } catch (Exception e) {
+            log.error("Failed to get whole inquiries", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<Inquiry> getCreatedAtDescInquiriesByPage(Long userId, Pageable pageable) {
+        try {
+            Page<Inquiry> posts = inquiryRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+            log.info("Successfully got pageable Inquiry order by createdAt Desc");
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Inquiry order by createdAt Desc", e);
+            throw e;
+        }
+    }
+
 
     @Override
     public Inquiry createInquiry(InquiryDto inquiryDto, MultipartFile[] images) {

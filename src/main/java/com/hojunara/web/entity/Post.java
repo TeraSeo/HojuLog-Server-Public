@@ -18,7 +18,6 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 public abstract class Post extends PostBaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
@@ -40,9 +39,16 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private PostType postType;
 
+    @Column(nullable = false)
+    private Boolean isCommentAllowed;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ViewedUser> viewedUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Keyword> keywords = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -61,6 +67,6 @@ public abstract class Post extends PostBaseEntity {
     private List<PostBookmark> bookmarks = new ArrayList<>();
 
     public SummarizedPostDto convertToSummarizedPostDto() {
-        return SummarizedPostDto.builder().id(id).title(title).category(category).viewCounts((long) viewedUsers.size()).createdAt(getCreatedAt()).build();
+        return SummarizedPostDto.builder().id(id).title(title).category(category).subCategory(subCategory).viewCounts((long) viewedUsers.size()).createdAt(getCreatedAt()).build();
     }
 }

@@ -41,4 +41,8 @@ public class TransactionPostDto {
     private Long price;
 
     private Suburb suburb;
+
+    private List<String> selectedKeywords;
+
+    private Boolean isCommentAllowed;
 }

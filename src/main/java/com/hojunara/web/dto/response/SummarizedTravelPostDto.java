@@ -19,5 +19,5 @@ public class SummarizedTravelPostDto {
 
     private Timestamp createdAt;
 
-    private double rate;
+    private Boolean isPublic;
 }

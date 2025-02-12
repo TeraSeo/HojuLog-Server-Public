@@ -1,6 +1,7 @@
 package com.hojunara.web.dto.response;
 
 import com.hojunara.web.entity.Category;
+import com.hojunara.web.entity.SubCategory;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -17,6 +18,7 @@ public class SummarizedPostDto {
     private String title;
 
     private Category category;
+    private SubCategory subCategory;
 
     private Long viewCounts;
 

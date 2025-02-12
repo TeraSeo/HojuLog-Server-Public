@@ -1,6 +1,8 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.SocietyPostDto;
+import com.hojunara.web.dto.request.UpdateSocietyPostDto;
+import com.hojunara.web.dto.request.UpdateStudyPostDto;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.SocietyPost;
 import com.hojunara.web.entity.SubCategory;
@@ -23,4 +25,6 @@ public interface SocietyPostService {
     SocietyPost getPostById(Long id);
 
     Post createPost(SocietyPostDto societyPostDto, MultipartFile[] images);
+
+    Post updatePost(UpdateSocietyPostDto updateSocietyPostDto, MultipartFile[] images);
 }

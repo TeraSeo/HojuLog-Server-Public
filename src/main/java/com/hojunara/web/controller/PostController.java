@@ -76,6 +76,15 @@ public class PostController {
         return ResponseEntity.ok(post != null);
     }
 
+    @PutMapping("update/society")
+    public ResponseEntity<Boolean> updateSocietyPost(
+            @Valid @RequestPart UpdateSocietyPostDto updateSocietyPostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = societyPostService.updatePost(updateSocietyPostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
     @PostMapping("create/travel")
     public ResponseEntity<Boolean> createTravelPost(
             @Valid @RequestPart TravelPostDto travelPostDto,
@@ -85,12 +94,30 @@ public class PostController {
         return ResponseEntity.ok(post != null);
     }
 
+    @PutMapping("update/travel")
+    public ResponseEntity<Boolean> updateTravelPost(
+            @Valid @RequestPart UpdateTravelPostDto updateTravelPostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = travelPostService.updatePost(updateTravelPostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
     @PostMapping("create/study")
     public ResponseEntity<Boolean> createStudyPost(
             @Valid @RequestPart StudyPostDto studyPostDto,
             @RequestPart(required = false) MultipartFile[] images
     ) {
         Post post = studyPostService.createPost(studyPostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
+    @PutMapping("update/study")
+    public ResponseEntity<Boolean> updateStudyPost(
+            @Valid @RequestPart UpdateStudyPostDto updateStudyPostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = studyPostService.updatePost(updateStudyPostDto, images);
         return ResponseEntity.ok(post != null);
     }
 
@@ -387,7 +414,29 @@ public class PostController {
         if (userId != "" && userId != null) {
             postService.addViewCount(postId, userId);
         }
+
         return ResponseEntity.ok(detailedTravelPostDto);
+    }
+
+    @GetMapping("get/update/travelDto")
+    public ResponseEntity<UpdateTravelPostDto> getUpdateTravelPostDto(@RequestParam Long postId) {
+        TravelPost travelPost = travelPostService.getPostById(postId);
+        UpdateTravelPostDto travelPostDto = travelPost.convertToUpdateTravelPostDto();
+        return ResponseEntity.ok(travelPostDto);
+    }
+
+    @GetMapping("get/update/studyDto")
+    public ResponseEntity<UpdateStudyPostDto> getUpdateStudyPostDto(@RequestParam Long postId) {
+        StudyPost studyPost = studyPostService.getPostById(postId);
+        UpdateStudyPostDto studyPostDto = studyPost.convertToUpdateStudyPostDto();
+        return ResponseEntity.ok(studyPostDto);
+    }
+
+    @GetMapping("get/update/societyDto")
+    public ResponseEntity<UpdateSocietyPostDto> getUpdateSocietyPostDto(@RequestParam Long postId) {
+        SocietyPost societyPost = societyPostService.getPostById(postId);
+        UpdateSocietyPostDto societyPostDto = societyPost.convertToUpdateSocietyPostDto();
+        return ResponseEntity.ok(societyPostDto);
     }
 
     @GetMapping("get/specific/study")

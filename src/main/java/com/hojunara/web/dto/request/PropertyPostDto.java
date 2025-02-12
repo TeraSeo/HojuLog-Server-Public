@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -49,4 +51,8 @@ public class PropertyPostDto {
     private Boolean isParkable;
 
     private Boolean isBillIncluded;
+
+    private List<String> selectedKeywords;
+
+    private Boolean isCommentAllowed;
 }

@@ -29,9 +29,11 @@ public class StudyPostDto {
 
     private String school;
 
-    private String major;
-
-    private double rate;
-
     private List<Map<String, String>> blogContents;
+
+    private List<String> selectedKeywords;
+
+    private Boolean isPublic;
+
+    private Boolean isCommentAllowed;
 }
