@@ -1,5 +1,6 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.request.*;
 import com.hojunara.web.dto.response.DetailedJobPostDto;
 import com.hojunara.web.dto.response.NormalJobPostDto;
 import com.hojunara.web.dto.response.SummarizedJobPostDto;
@@ -35,6 +36,16 @@ public class JobPost extends NormalPost {
 
     public NormalJobPostDto convertPostToNormalJobPostDto() {
         return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
+    }
+
+    public UpdateJobPostDto convertToUpdateJobPostDto() {
+        List<String> imageUrls = getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+        List<String> keywords = getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+
+        UpdateJobMainInfoPostDto updateJobMainInfoPostDto = UpdateJobMainInfoPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).description(getDescription()).contact(getContact()).email(getEmail()).suburb(getSuburb()).jobType(getJobType()).location(getLocation()).selectedKeywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        UpdateJobMediaInfoPostDto updateJobMediaInfoPostDto = UpdateJobMediaInfoPostDto.builder().existingImages(imageUrls).build();
+
+        return UpdateJobPostDto.builder().updateJobMainInfoPostDto(updateJobMainInfoPostDto).updateJobMediaInfoPostDto(updateJobMediaInfoPostDto).build();
     }
 
     public DetailedJobPostDto convertPostToDetailedJobPostDto(String userId) {

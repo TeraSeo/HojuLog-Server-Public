@@ -49,6 +49,15 @@ public class PostController {
         return ResponseEntity.ok(post != null);
     }
 
+    @PutMapping("update/property")
+    public ResponseEntity<Boolean> updatePropertyPost(
+            @Valid @RequestPart UpdatePropertyPostDto updatePropertyPostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = propertyPostService.updatePost(updatePropertyPostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
     @PostMapping("create/job")
     public ResponseEntity<Boolean> createJobPost(
             @Valid @RequestPart JobPostDto jobPostDto,
@@ -58,12 +67,30 @@ public class PostController {
         return ResponseEntity.ok(post != null);
     }
 
+    @PutMapping("update/job")
+    public ResponseEntity<Boolean> updateJobPost(
+            @Valid @RequestPart UpdateJobPostDto updateJobPostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = jobPostService.updatePost(updateJobPostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
     @PostMapping("create/transaction")
     public ResponseEntity<Boolean> createTransactionPost(
             @Valid @RequestPart TransactionPostDto transactionPostDto,
             @RequestPart(required = false) MultipartFile[] images
     ) {
         Post post = transactionPostService.createPost(transactionPostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
+    @PutMapping("update/transaction")
+    public ResponseEntity<Boolean> updateTransactionPost(
+            @Valid @RequestPart UpdateTransactionPostDto updateTransactionPostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = transactionPostService.updatePost(updateTransactionPostDto, images);
         return ResponseEntity.ok(post != null);
     }
 
@@ -416,6 +443,27 @@ public class PostController {
         }
 
         return ResponseEntity.ok(detailedTravelPostDto);
+    }
+
+    @GetMapping("get/update/propertyDto")
+    public ResponseEntity<UpdatePropertyPostDto> getUpdatePropertyPostDto(@RequestParam Long postId) {
+        PropertyPost propertyPost = propertyPostService.getPostById(postId);
+        UpdatePropertyPostDto updateTravelPostDto = propertyPost.convertToUpdatePropertyPostDto();
+        return ResponseEntity.ok(updateTravelPostDto);
+    }
+
+    @GetMapping("get/update/jobDto")
+    public ResponseEntity<UpdateJobPostDto> getUpdateJobPostDto(@RequestParam Long postId) {
+        JobPost jobPost = jobPostService.getPostById(postId);
+        UpdateJobPostDto updateJobPostDto = jobPost.convertToUpdateJobPostDto();
+        return ResponseEntity.ok(updateJobPostDto);
+    }
+
+    @GetMapping("get/update/transactionDto")
+    public ResponseEntity<UpdateTransactionPostDto> getUpdateTransactionPostDto(@RequestParam Long postId) {
+        TransactionPost transactionPost = transactionPostService.getPostById(postId);
+        UpdateTransactionPostDto updateTransactionPostDto = transactionPost.convertToUpdateTransactionPostDto();
+        return ResponseEntity.ok(updateTransactionPostDto);
     }
 
     @GetMapping("get/update/travelDto")

@@ -1,6 +1,7 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.PropertyPostDto;
+import com.hojunara.web.dto.request.UpdatePropertyPostDto;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.PropertyPost;
 import com.hojunara.web.entity.SubCategory;
@@ -22,4 +23,6 @@ public interface PropertyPostService {
     PropertyPost getPostById(Long id);
 
     Post createPost(PropertyPostDto propertyPostDto, MultipartFile[] images);
+
+    Post updatePost(UpdatePropertyPostDto updatePropertyPostDto, MultipartFile[] images);
 }

@@ -2,6 +2,9 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.JobPostDto;
+import com.hojunara.web.dto.request.UpdateJobMainInfoPostDto;
+import com.hojunara.web.dto.request.UpdateJobPostDto;
+import com.hojunara.web.dto.request.UpdatePropertyMainInfoPostDto;
 import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.JobPostNotFoundException;
 import com.hojunara.web.repository.JobPostRepository;
@@ -15,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -138,6 +143,107 @@ public class JobPostServiceImpl implements JobPostService {
             return createdPost;
         } catch (Exception e) {
             log.error("Failed to create job post", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Post updatePost(UpdateJobPostDto updateJobPostDto, MultipartFile[] images) {
+        UpdateJobMainInfoPostDto updateJobMainInfoPostDto = updateJobPostDto.getUpdateJobMainInfoPostDto();
+        User user = userService.getUserById(updateJobMainInfoPostDto.getUserId());
+        try {
+            JobPost jobPost = getPostById(updateJobMainInfoPostDto.getPostId());
+
+            boolean isUpdated = false;
+
+            if (!jobPost.getTitle().equals(updateJobMainInfoPostDto.getTitle())) {
+                jobPost.setTitle(updateJobMainInfoPostDto.getTitle());
+                isUpdated = true;
+            }
+            if (!Objects.equals(jobPost.getDescription(), updateJobMainInfoPostDto.getDescription())) {
+                jobPost.setDescription(updateJobMainInfoPostDto.getDescription());
+                isUpdated = true;
+            }
+            if (!Objects.equals(jobPost.getContact(), updateJobMainInfoPostDto.getContact())) {
+                jobPost.setContact(updateJobMainInfoPostDto.getContact());
+                isUpdated = true;
+            }
+            if (!Objects.equals(jobPost.getEmail(), updateJobMainInfoPostDto.getEmail())) {
+                jobPost.setEmail(updateJobMainInfoPostDto.getEmail());
+                isUpdated = true;
+            }
+            if (!Objects.equals(jobPost.getSuburb(), updateJobMainInfoPostDto.getSuburb())) {
+                jobPost.setSuburb(updateJobMainInfoPostDto.getSuburb());
+                isUpdated = true;
+            }
+            if (!Objects.equals(jobPost.getJobType(), updateJobMainInfoPostDto.getJobType())) {
+                jobPost.setJobType(updateJobMainInfoPostDto.getJobType());
+                isUpdated = true;
+            }
+            if (!Objects.equals(jobPost.getLocation(), updateJobMainInfoPostDto.getLocation())) {
+                jobPost.setLocation(updateJobMainInfoPostDto.getLocation());
+                isUpdated = true;
+            }
+            if (!jobPost.getIsCommentAllowed().equals(updateJobMainInfoPostDto.getIsCommentAllowed())) {
+                jobPost.setIsCommentAllowed(updateJobMainInfoPostDto.getIsCommentAllowed());
+                isUpdated = true;
+            }
+
+            List<String> imageUrls = jobPost.getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+            List<String> updatedExistingImageUrls = updateJobPostDto.getUpdateJobMediaInfoPostDto().getExistingImages();
+            if (!imageUrls.equals(updatedExistingImageUrls)) {
+                List<String> removedImageUrls = imageUrls.stream()
+                        .filter(imageUrl -> !updatedExistingImageUrls.contains(imageUrl))
+                        .collect(Collectors.toList());
+
+                if (!removedImageUrls.isEmpty()) {
+                    jobPost.getImages().removeIf(image -> removedImageUrls.contains(image.getUrl()));
+                }
+            }
+
+            // 키워드 업데이트
+            List<String> originalKeywords = jobPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+            List<String> updatedKeywords = updateJobMainInfoPostDto.getSelectedKeywords();
+            if (!originalKeywords.equals(updatedKeywords)) {
+                List<String> addedKeywords = updatedKeywords.stream()
+                        .filter(keyword -> !originalKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                List<String> removedKeywords = originalKeywords.stream()
+                        .filter(keyword -> !updatedKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                if (!addedKeywords.isEmpty()) {
+                    addedKeywords.forEach(keyword -> {
+                        keywordService.createKeyword(keyword, jobPost);
+                    });
+                }
+
+                if (!removedKeywords.isEmpty()) {
+                    jobPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
+                }
+
+                isUpdated = true;
+            }
+
+            if (isUpdated) {
+                jobPostRepository.save(jobPost);
+                jobPostRepository.flush(); // 업데이트 내용 반영
+            }
+
+            // save post images data
+            if (images != null) {
+                JobPost createdPost = getPostById(updateJobMainInfoPostDto.getPostId());
+                Arrays.stream(images)
+                        .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
+                        .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
+            }
+
+            log.info("Successfully updated job post");
+
+            return jobPost;
+        } catch (Exception e) {
+            log.error("Failed to update job post", e);
             return null;
         }
     }

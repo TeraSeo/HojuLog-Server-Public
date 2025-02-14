@@ -1,5 +1,6 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.request.*;
 import com.hojunara.web.dto.response.DetailedPropertyPostDto;
 import com.hojunara.web.dto.response.DetailedTransactionPostDto;
 import com.hojunara.web.dto.response.NormalTransactionPostDto;
@@ -47,6 +48,16 @@ public class TransactionPost extends NormalPost {
                 .findFirst()
                 .orElse(null);
         return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).build();
+    }
+
+    public UpdateTransactionPostDto convertToUpdateTransactionPostDto() {
+        List<String> imageUrls = getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+        List<String> keywords = getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+
+        UpdateTransactionMainInfoPostDto updateTransactionMainInfoPostDto = UpdateTransactionMainInfoPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).description(getDescription()).contact(getContact()).email(getEmail()).suburb(getSuburb()).transactionType(transactionType).priceType(priceType).price(price).selectedKeywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        UpdateTransactionMediaInfoPostDto updateTransactionMediaInfoPostDto = UpdateTransactionMediaInfoPostDto.builder().existingImages(imageUrls).build();
+
+        return UpdateTransactionPostDto.builder().updateTransactionMainInfoPostDto(updateTransactionMainInfoPostDto).updateTransactionMediaInfoPostDto(updateTransactionMediaInfoPostDto).build();
     }
 
     public DetailedTransactionPostDto convertPostToDetailedTransactionPostDto(String userId) {

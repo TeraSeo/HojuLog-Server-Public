@@ -2,6 +2,8 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.PropertyPostDto;
+import com.hojunara.web.dto.request.UpdatePropertyMainInfoPostDto;
+import com.hojunara.web.dto.request.UpdatePropertyPostDto;
 import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.PropertyPostNotFoundException;
 import com.hojunara.web.repository.PropertyPostRepository;
@@ -13,9 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -144,6 +145,131 @@ public class PropertyPostServiceImpl implements PropertyPostService {
             return createdPost;
         } catch (Exception e) {
             log.error("Failed to create property post", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Post updatePost(UpdatePropertyPostDto updatePropertyPostDto, MultipartFile[] images) {
+        UpdatePropertyMainInfoPostDto updatePropertyMainInfoPostDto = updatePropertyPostDto.getUpdatePropertyMainInfoPostDto();
+        User user = userService.getUserById(updatePropertyMainInfoPostDto.getUserId());
+        try {
+            PropertyPost propertyPost = getPostById(updatePropertyMainInfoPostDto.getPostId());
+
+            boolean isUpdated = false;
+
+            if (!propertyPost.getTitle().equals(updatePropertyMainInfoPostDto.getTitle())) {
+                propertyPost.setTitle(updatePropertyMainInfoPostDto.getTitle());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getDescription(), updatePropertyMainInfoPostDto.getDescription())) {
+                propertyPost.setDescription(updatePropertyMainInfoPostDto.getDescription());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getContact(), updatePropertyMainInfoPostDto.getContact())) {
+                propertyPost.setContact(updatePropertyMainInfoPostDto.getContact());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getEmail(), updatePropertyMainInfoPostDto.getEmail())) {
+                propertyPost.setEmail(updatePropertyMainInfoPostDto.getEmail());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getSuburb(), updatePropertyMainInfoPostDto.getSuburb())) {
+                propertyPost.setSuburb(updatePropertyMainInfoPostDto.getSuburb());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getPeriod(), updatePropertyMainInfoPostDto.getPeriod())) {
+                propertyPost.setPeriod(updatePropertyMainInfoPostDto.getPeriod());
+                isUpdated = true;
+            }
+            if (propertyPost.getPrice() != updatePropertyMainInfoPostDto.getPrice()) {
+                propertyPost.setPrice(updatePropertyMainInfoPostDto.getPrice());
+                isUpdated = true;
+            }
+            if (!propertyPost.getLocation().equals(updatePropertyMainInfoPostDto.getLocation())) {
+                propertyPost.setLocation(updatePropertyMainInfoPostDto.getLocation());
+                isUpdated = true;
+            }
+            if (!propertyPost.getAvailableTime().equals(updatePropertyMainInfoPostDto.getAvailableTime())) {
+                propertyPost.setAvailableTime(updatePropertyMainInfoPostDto.getAvailableTime());
+                isUpdated = true;
+            }
+            if (!propertyPost.getRoomCount().equals(updatePropertyMainInfoPostDto.getRoomCount())) {
+                propertyPost.setRoomCount(updatePropertyMainInfoPostDto.getRoomCount());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getBathroomType(), updatePropertyMainInfoPostDto.getBathroomType())) {
+                propertyPost.setBathroomType(updatePropertyMainInfoPostDto.getBathroomType());
+                isUpdated = true;
+            }
+            if (!propertyPost.getIsParkable().equals(updatePropertyMainInfoPostDto.getIsParkable())) {
+                propertyPost.setIsParkable(updatePropertyMainInfoPostDto.getIsParkable());
+                isUpdated = true;
+            }
+            if (!Objects.equals(propertyPost.getIsBillIncluded(), updatePropertyMainInfoPostDto.getIsBillIncluded())) {
+                propertyPost.setIsBillIncluded(updatePropertyMainInfoPostDto.getIsBillIncluded());
+                isUpdated = true;
+            }
+            if (!propertyPost.getIsCommentAllowed().equals(updatePropertyMainInfoPostDto.getIsCommentAllowed())) {
+                propertyPost.setIsCommentAllowed(updatePropertyMainInfoPostDto.getIsCommentAllowed());
+                isUpdated = true;
+            }
+
+            List<String> imageUrls = propertyPost.getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+            List<String> updatedExistingImageUrls = updatePropertyPostDto.getUpdatePropertyMediaInfoPostDto().getExistingImages();
+            if (!imageUrls.equals(updatedExistingImageUrls)) {
+                List<String> removedImageUrls = imageUrls.stream()
+                        .filter(imageUrl -> !updatedExistingImageUrls.contains(imageUrl))
+                        .collect(Collectors.toList());
+
+                if (!removedImageUrls.isEmpty()) {
+                    propertyPost.getImages().removeIf(image -> removedImageUrls.contains(image.getUrl()));
+                }
+            }
+
+            // 키워드 업데이트
+            List<String> originalKeywords = propertyPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+            List<String> updatedKeywords = updatePropertyMainInfoPostDto.getSelectedKeywords();
+            if (!originalKeywords.equals(updatedKeywords)) {
+                List<String> addedKeywords = updatedKeywords.stream()
+                        .filter(keyword -> !originalKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                List<String> removedKeywords = originalKeywords.stream()
+                        .filter(keyword -> !updatedKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                if (!addedKeywords.isEmpty()) {
+                    addedKeywords.forEach(keyword -> {
+                        keywordService.createKeyword(keyword, propertyPost);
+                    });
+                }
+
+                if (!removedKeywords.isEmpty()) {
+                    propertyPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
+                }
+
+                isUpdated = true;
+            }
+
+            if (isUpdated) {
+                propertyPostRepository.save(propertyPost);
+                propertyPostRepository.flush(); // 업데이트 내용 반영
+            }
+
+            // save post images data
+            if (images != null) {
+                PropertyPost createdPost = getPostById(updatePropertyMainInfoPostDto.getPostId());
+                Arrays.stream(images)
+                        .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
+                        .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
+            }
+
+            log.info("Successfully updated property post");
+
+            return propertyPost;
+        } catch (Exception e) {
+            log.error("Failed to update property post", e);
             return null;
         }
     }

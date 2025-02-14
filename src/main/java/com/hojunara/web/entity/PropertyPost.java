@@ -1,5 +1,8 @@
 package com.hojunara.web.entity;
 
+import com.hojunara.web.dto.request.UpdatePropertyMainInfoPostDto;
+import com.hojunara.web.dto.request.UpdatePropertyMediaInfoPostDto;
+import com.hojunara.web.dto.request.UpdatePropertyPostDto;
 import com.hojunara.web.dto.response.DetailedPropertyPostDto;
 import com.hojunara.web.dto.response.NormalPropertyPostDto;
 import com.hojunara.web.dto.response.SummarizedPropertyPostDto;
@@ -58,6 +61,16 @@ public class PropertyPost extends NormalPost {
                 .findFirst()
                 .orElse(null);
         return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getCreatedAt()).isBillIncluded(isBillIncluded).build();
+    }
+
+    public UpdatePropertyPostDto convertToUpdatePropertyPostDto() {
+        List<String> imageUrls = getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+        List<String> keywords = getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+
+        UpdatePropertyMainInfoPostDto updatePropertyMainInfoPostDto = UpdatePropertyMainInfoPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).description(getDescription()).contact(getContact()).email(getEmail()).suburb(getSuburb()).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).selectedKeywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        UpdatePropertyMediaInfoPostDto updatePropertyMediaInfoPostDto = UpdatePropertyMediaInfoPostDto.builder().existingImages(imageUrls).build();
+
+        return UpdatePropertyPostDto.builder().updatePropertyMainInfoPostDto(updatePropertyMainInfoPostDto).updatePropertyMediaInfoPostDto(updatePropertyMediaInfoPostDto).build();
     }
 
     public DetailedPropertyPostDto convertPostToDetailedPropertyPostDto(String userId) {

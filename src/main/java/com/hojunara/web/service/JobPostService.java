@@ -1,6 +1,7 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.JobPostDto;
+import com.hojunara.web.dto.request.UpdateJobPostDto;
 import com.hojunara.web.entity.JobPost;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.SubCategory;
@@ -22,4 +23,6 @@ public interface JobPostService {
     JobPost getPostById(Long id);
 
     Post createPost(JobPostDto jobPostDto, MultipartFile[] images);
+
+    Post updatePost(UpdateJobPostDto updateJobPostDto, MultipartFile[] images);
 }

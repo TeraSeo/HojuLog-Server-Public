@@ -1,6 +1,7 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.TransactionPostDto;
+import com.hojunara.web.dto.request.UpdateTransactionPostDto;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.SubCategory;
 import com.hojunara.web.entity.TransactionPost;
@@ -22,4 +23,6 @@ public interface TransactionPostService {
     TransactionPost getPostById(Long id);
 
     Post createPost(TransactionPostDto transactionPostDto, MultipartFile[] images);
+
+    Post updatePost(UpdateTransactionPostDto updateTransactionPostDto, MultipartFile[] images);
 }

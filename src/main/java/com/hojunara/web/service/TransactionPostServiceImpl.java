@@ -2,6 +2,8 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.TransactionPostDto;
+import com.hojunara.web.dto.request.UpdateTransactionMainInfoPostDto;
+import com.hojunara.web.dto.request.UpdateTransactionPostDto;
 import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.TransactionPostNotFoundException;
 import com.hojunara.web.repository.TransactionPostRepository;
@@ -15,7 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -140,6 +144,111 @@ public class TransactionPostServiceImpl implements TransactionPostService {
             return createdPost;
         } catch (Exception e) {
             log.error("Failed to create transaction post", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Post updatePost(UpdateTransactionPostDto updateTransactionPostDto, MultipartFile[] images) {
+        UpdateTransactionMainInfoPostDto updateTransactionMainInfoPostDto = updateTransactionPostDto.getUpdateTransactionMainInfoPostDto();
+        User user = userService.getUserById(updateTransactionMainInfoPostDto.getUserId());
+        try {
+            TransactionPost transactionPost = getPostById(updateTransactionMainInfoPostDto.getPostId());
+
+            boolean isUpdated = false;
+
+            if (!transactionPost.getTitle().equals(updateTransactionMainInfoPostDto.getTitle())) {
+                transactionPost.setTitle(updateTransactionMainInfoPostDto.getTitle());
+                isUpdated = true;
+            }
+            if (!Objects.equals(transactionPost.getDescription(), updateTransactionMainInfoPostDto.getDescription())) {
+                transactionPost.setDescription(updateTransactionMainInfoPostDto.getDescription());
+                isUpdated = true;
+            }
+            if (!Objects.equals(transactionPost.getContact(), updateTransactionMainInfoPostDto.getContact())) {
+                transactionPost.setContact(updateTransactionMainInfoPostDto.getContact());
+                isUpdated = true;
+            }
+            if (!Objects.equals(transactionPost.getEmail(), updateTransactionMainInfoPostDto.getEmail())) {
+                transactionPost.setEmail(updateTransactionMainInfoPostDto.getEmail());
+                isUpdated = true;
+            }
+            if (!Objects.equals(transactionPost.getSuburb(), updateTransactionMainInfoPostDto.getSuburb())) {
+                transactionPost.setSuburb(updateTransactionMainInfoPostDto.getSuburb());
+                isUpdated = true;
+            }
+            if (!Objects.equals(transactionPost.getTransactionType(), updateTransactionMainInfoPostDto.getTransactionType())) {
+                transactionPost.setTransactionType(updateTransactionMainInfoPostDto.getTransactionType());
+                isUpdated = true;
+            }
+            if (!Objects.equals(transactionPost.getPriceType(), updateTransactionMainInfoPostDto.getPriceType())) {
+                transactionPost.setPriceType(updateTransactionMainInfoPostDto.getPriceType());
+                isUpdated = true;
+            }
+            if (transactionPost.getPrice() != updateTransactionMainInfoPostDto.getPrice()) {
+                transactionPost.setPrice(updateTransactionMainInfoPostDto.getPrice());
+                isUpdated = true;
+            }
+            if (!transactionPost.getIsCommentAllowed().equals(updateTransactionMainInfoPostDto.getIsCommentAllowed())) {
+                transactionPost.setIsCommentAllowed(updateTransactionMainInfoPostDto.getIsCommentAllowed());
+                isUpdated = true;
+            }
+
+            List<String> imageUrls = transactionPost.getImages().stream().map(Image::getUrl).collect(Collectors.toList());
+            List<String> updatedExistingImageUrls = updateTransactionPostDto.getUpdateTransactionMediaInfoPostDto().getExistingImages();
+            if (!imageUrls.equals(updatedExistingImageUrls)) {
+                List<String> removedImageUrls = imageUrls.stream()
+                        .filter(imageUrl -> !updatedExistingImageUrls.contains(imageUrl))
+                        .collect(Collectors.toList());
+
+                if (!removedImageUrls.isEmpty()) {
+                    transactionPost.getImages().removeIf(image -> removedImageUrls.contains(image.getUrl()));
+                }
+            }
+
+            // 키워드 업데이트
+            List<String> originalKeywords = transactionPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
+            List<String> updatedKeywords = updateTransactionMainInfoPostDto.getSelectedKeywords();
+            if (!originalKeywords.equals(updatedKeywords)) {
+                List<String> addedKeywords = updatedKeywords.stream()
+                        .filter(keyword -> !originalKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                List<String> removedKeywords = originalKeywords.stream()
+                        .filter(keyword -> !updatedKeywords.contains(keyword))
+                        .collect(Collectors.toList());
+
+                if (!addedKeywords.isEmpty()) {
+                    addedKeywords.forEach(keyword -> {
+                        keywordService.createKeyword(keyword, transactionPost);
+                    });
+                }
+
+                if (!removedKeywords.isEmpty()) {
+                    transactionPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
+                }
+
+                isUpdated = true;
+            }
+
+            if (isUpdated) {
+                transactionPostRepository.save(transactionPost);
+                transactionPostRepository.flush(); // 업데이트 내용 반영
+            }
+
+            // save post images data
+            if (images != null) {
+                TransactionPost createdPost = getPostById(updateTransactionMainInfoPostDto.getPostId());
+                Arrays.stream(images)
+                        .map(image -> awsFileService.uploadPostFile(image, user.getEmail()))
+                        .forEach(imageUrl -> imageService.createImage(imageUrl, createdPost));
+            }
+
+            log.info("Successfully updated transaction post");
+
+            return transactionPost;
+        } catch (Exception e) {
+            log.error("Failed to update transaction post", e);
             return null;
         }
     }
