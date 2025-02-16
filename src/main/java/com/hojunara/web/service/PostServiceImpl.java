@@ -153,4 +153,15 @@ public class PostServiceImpl implements PostService {
             throw e;
         }
     }
+
+    @Override
+    public Boolean removePost(Long postId) {
+        try {
+            postRepository.deleteById(postId);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to remove post with id: ", postId, e);
+            return false;
+        }
+    }
 }

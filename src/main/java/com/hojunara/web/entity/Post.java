@@ -62,10 +62,6 @@ public abstract class Post extends PostBaseEntity {
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<PostBookmark> bookmarks = new ArrayList<>();
-
     public SummarizedPostDto convertToSummarizedPostDto() {
         return SummarizedPostDto.builder().id(id).title(title).category(category).subCategory(subCategory).viewCounts((long) viewedUsers.size()).createdAt(getCreatedAt()).build();
     }

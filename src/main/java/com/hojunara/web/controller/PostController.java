@@ -503,4 +503,10 @@ public class PostController {
         SummarizedPostDto summarizedPostDto = post.convertToSummarizedPostDto();
         return ResponseEntity.ok(summarizedPostDto);
     }
+
+    @DeleteMapping("delete/post")
+    public ResponseEntity<Boolean> removePost(@RequestParam Long postId) {
+        Boolean isDeleted = postService.removePost(postId);
+        return ResponseEntity.ok(isDeleted);
+    }
 }
