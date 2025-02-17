@@ -20,7 +20,7 @@ public interface PostService {
 
     void addViewCount(Long postId, String userId);
 
-    Page<Post> getPostsAsPage(List<Post> posts, Pageable pageable);
+    Page<Post> convertPostsAsPage(List<Post> posts, Pageable pageable);
 
     Boolean removePost(Long postId);
 }

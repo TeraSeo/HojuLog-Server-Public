@@ -21,5 +21,18 @@ public interface TravelPostService {
     TravelPost getPostById(Long id);
 
     Post createPost(TravelPostDto travelPostDto, MultipartFile[] images);
+
     Post updatePost(UpdateTravelPostDto updateTravelPostDto, MultipartFile[] images);
+
+    List<TravelPost> searchTravelPost(String title, String subCategory, List<String> keywords);
+
+    List<TravelPost> searchByCategory();
+
+    List<TravelPost> searchByTitle(String title);
+
+    List<TravelPost> searchBySubCategory(SubCategory subCategory);
+
+    List<TravelPost> searchByTitleAndSubCategory(String title, SubCategory subCategory);
+
+    Page<TravelPost> convertPostsAsPage(List<TravelPost> posts, Pageable pageable);
 }

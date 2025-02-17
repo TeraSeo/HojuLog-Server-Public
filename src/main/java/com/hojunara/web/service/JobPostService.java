@@ -2,9 +2,7 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.JobPostDto;
 import com.hojunara.web.dto.request.UpdateJobPostDto;
-import com.hojunara.web.entity.JobPost;
-import com.hojunara.web.entity.Post;
-import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,4 +23,24 @@ public interface JobPostService {
     Post createPost(JobPostDto jobPostDto, MultipartFile[] images);
 
     Post updatePost(UpdateJobPostDto updateJobPostDto, MultipartFile[] images);
+
+    List<JobPost> searchJobPost(String title, String subCategory, String suburb, List<String> keywords);
+
+    List<JobPost> searchByCategory();
+
+    List<JobPost> searchByTitle(String title);
+
+    List<JobPost> searchBySubCategory(SubCategory subCategory);
+
+    List<JobPost> searchBySuburb(Suburb suburb);
+
+    List<JobPost> searchByTitleAndSubCategory(String title, SubCategory subCategory);
+
+    List<JobPost> searchByTitleAndSuburb(String title, Suburb suburb);
+
+    List<JobPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb);
+
+    List<JobPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb);
+
+    Page<JobPost> convertPostsAsPage(List<JobPost> posts, Pageable pageable);
 }

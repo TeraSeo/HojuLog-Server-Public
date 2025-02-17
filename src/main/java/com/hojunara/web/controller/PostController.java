@@ -504,6 +504,84 @@ public class PostController {
         return ResponseEntity.ok(summarizedPostDto);
     }
 
+    @GetMapping("get/property/by/search/option")
+    public ResponseEntity<PropertyPostPaginationResponse> searchProperty(@RequestParam String title, @RequestParam String subCategory, @RequestParam String suburb, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<PropertyPost> searchedPosts = propertyPostService.searchPropertyPost(title, subCategory, suburb, keywords);
+        Page<PropertyPost> posts = propertyPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalPropertyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalPropertyPostDto())
+                .collect(Collectors.toList());
+
+        PropertyPostPaginationResponse postPaginationResponse = PropertyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/job/by/search/option")
+    public ResponseEntity<JobPostPaginationResponse> searchJob(@RequestParam String title, @RequestParam String subCategory, @RequestParam String suburb, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<JobPost> searchedPosts = jobPostService.searchJobPost(title, subCategory, suburb, keywords);
+        Page<JobPost> posts = jobPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalJobPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalJobPostDto())
+                .collect(Collectors.toList());
+
+        JobPostPaginationResponse postPaginationResponse = JobPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/transaction/by/search/option")
+    public ResponseEntity<TransactionPostPaginationResponse> searchTransaction(@RequestParam String title, @RequestParam String subCategory, @RequestParam String suburb, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<TransactionPost> searchedPosts = transactionPostService.searchTransactionPost(title, subCategory, suburb, keywords);
+        Page<TransactionPost> posts = transactionPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalTransactionPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalTransactionPostDto())
+                .collect(Collectors.toList());
+
+        TransactionPostPaginationResponse postPaginationResponse = TransactionPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/society/by/search/option")
+    public ResponseEntity<SocietyPostPaginationResponse> searchSociety(@RequestParam String title, @RequestParam String subCategory, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<SocietyPost> searchedPosts = societyPostService.searchSocietyPost(title, subCategory, keywords);
+        Page<SocietyPost> posts = societyPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalSocietyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalSocietyPostDto())
+                .collect(Collectors.toList());
+
+        SocietyPostPaginationResponse postPaginationResponse = SocietyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/travel/by/search/option")
+    public ResponseEntity<TravelPostPaginationResponse> searchTravel(@RequestParam String title, @RequestParam String subCategory, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<TravelPost> searchedPosts = travelPostService.searchTravelPost(title, subCategory, keywords);
+        Page<TravelPost> posts = travelPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalTravelPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalTravelPostDto())
+                .collect(Collectors.toList());
+
+        TravelPostPaginationResponse postPaginationResponse = TravelPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/study/by/search/option")
+    public ResponseEntity<StudyPostPaginationResponse> searchStudy(@RequestParam String title, @RequestParam String subCategory, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<StudyPost> searchedPosts = studyPostService.searchStudyPost(title, subCategory, keywords);
+        Page<StudyPost> posts = studyPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalStudyPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalStudyPostDto())
+                .collect(Collectors.toList());
+
+        StudyPostPaginationResponse postPaginationResponse = StudyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
     @DeleteMapping("delete/post")
     public ResponseEntity<Boolean> removePost(@RequestParam Long postId) {
         Boolean isDeleted = postService.removePost(postId);

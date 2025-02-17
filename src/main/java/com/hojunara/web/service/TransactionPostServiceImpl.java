@@ -10,6 +10,7 @@ import com.hojunara.web.repository.TransactionPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -250,6 +251,109 @@ public class TransactionPostServiceImpl implements TransactionPostService {
         } catch (Exception e) {
             log.error("Failed to update transaction post", e);
             return null;
+        }
+    }
+
+    @Override
+    public List<TransactionPost> searchTransactionPost(String title, String subCategory, String suburb, List<String> keywords) {
+        boolean isTitleEmpty = title == null || title.equals("");
+        boolean isSubCategoryEmpty = subCategory == null || subCategory.equals("");
+        boolean isSuburbEmpty = suburb == null || suburb.equals("");
+
+        List<TransactionPost> transactionPostList;
+        if (isTitleEmpty && isSubCategoryEmpty && isSuburbEmpty) transactionPostList = searchByCategory();
+        else if (isSubCategoryEmpty && isSuburbEmpty) transactionPostList = searchByTitle(title);
+        else if (isTitleEmpty && isSuburbEmpty) transactionPostList = searchBySubCategory(SubCategory.valueOf(subCategory));
+        else if (isTitleEmpty && isSubCategoryEmpty) transactionPostList = searchBySuburb(Suburb.valueOf(suburb));
+        else if (isSuburbEmpty) transactionPostList = searchByTitleAndSubCategory(title, SubCategory.valueOf(subCategory));
+        else if (isTitleEmpty) transactionPostList = searchBySubCategoryAndSuburb(SubCategory.valueOf(subCategory), Suburb.valueOf(suburb));
+        else if (isSubCategoryEmpty) transactionPostList = searchByTitleAndSuburb(title, Suburb.valueOf(suburb));
+        else transactionPostList = searchByTitleAndSubCategoryAndSuburb(title, SubCategory.valueOf(subCategory), Suburb.valueOf(suburb));
+
+        if (keywords != null && !keywords.isEmpty()) {
+            transactionPostList = transactionPostList.stream()
+                    .filter(post -> {
+                        List<String> postKeywords = post.getKeywords().stream()
+                                .map(Keyword::getKeyWord)
+                                .toList();
+
+                        // 맞는 키워드 개수 체크
+                        long matchCount = keywords.stream()
+                                .filter(postKeywords::contains)
+                                .count();
+
+                        // 최소 필요한 키워드 개수 정하기
+                        int totalSearchedKeywords = keywords.size();
+                        long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+                        if (totalSearchedKeywords >= 7) {
+                            return inCorrectKeywordsCount <= 3;
+                        }
+                        if (totalSearchedKeywords >= 5) {
+                            return inCorrectKeywordsCount <= 2;
+                        }
+                        else if (totalSearchedKeywords >= 2) {
+                            return inCorrectKeywordsCount <= 1;
+                        }
+                        return inCorrectKeywordsCount <= 0;
+                    })
+                    .toList();
+        }
+
+        return transactionPostList;
+    }
+
+    @Override
+    public List<TransactionPost> searchByCategory() {
+        return transactionPostRepository.findAll();
+    }
+
+    @Override
+    public List<TransactionPost> searchByTitle(String title) {
+        return transactionPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+    }
+
+    @Override
+    public List<TransactionPost> searchBySubCategory(SubCategory subCategory) {
+        return transactionPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+    }
+
+    @Override
+    public List<TransactionPost> searchBySuburb(Suburb suburb) {
+        return transactionPostRepository.findBySuburbOrderByCreatedAtDesc(suburb);
+    }
+
+    @Override
+    public List<TransactionPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
+        return transactionPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+    }
+
+    @Override
+    public List<TransactionPost> searchByTitleAndSuburb(String title, Suburb suburb) {
+        return transactionPostRepository.findByTitleContainingAndSuburbOrderByCreatedAtDesc(title, suburb);
+    }
+
+    @Override
+    public List<TransactionPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb) {
+        return transactionPostRepository.findBySubCategoryAndSuburbOrderByCreatedAtDesc(subCategory, suburb);
+    }
+
+    @Override
+    public List<TransactionPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb) {
+        return transactionPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(title, subCategory, suburb);
+    }
+
+    @Override
+    public Page<TransactionPost> convertPostsAsPage(List<TransactionPost> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<TransactionPost> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }

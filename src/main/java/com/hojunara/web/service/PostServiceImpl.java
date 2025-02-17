@@ -77,7 +77,7 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = user.getPosts();
         try {
             log.info("Successfully found own posts with paging and user id : {}", userId);
-            return getPostsAsPage(posts, pageable);
+            return convertPostsAsPage(posts, pageable);
         } catch (Exception e) {
             log.error("Failed to find own posts with paging and user id: {}", userId, e);
             throw e;
@@ -90,7 +90,7 @@ public class PostServiceImpl implements PostService {
         List<Post> userLikedPosts = user.getPostLikes().stream().map(PostLike::getPost).collect(Collectors.toList());
         try {
             log.info("Successfully found liked posts with paging and user id : {}", userId);
-            return getPostsAsPage(userLikedPosts, pageable);
+            return convertPostsAsPage(userLikedPosts, pageable);
         } catch (Exception e) {
             log.error("Failed to find liked posts with paging and user id: {}", userId, e);
             throw e;
@@ -140,7 +140,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> getPostsAsPage(List<Post> posts, Pageable pageable) {
+    public Page<Post> convertPostsAsPage(List<Post> posts, Pageable pageable) {
         try {
             int start = (int) pageable.getOffset();
             int end = Math.min(start + pageable.getPageSize(), posts.size());

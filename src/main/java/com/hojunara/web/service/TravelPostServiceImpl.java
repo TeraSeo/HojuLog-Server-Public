@@ -8,6 +8,7 @@ import com.hojunara.web.repository.TravelPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -304,6 +305,84 @@ public class TravelPostServiceImpl implements TravelPostService {
         } catch (Exception e) {
             log.error("Failed to update travel post", e);
             return null;
+        }
+    }
+
+    @Override
+    public List<TravelPost> searchTravelPost(String title, String subCategory, List<String> keywords) {
+        boolean isTitleEmpty = title == null || title.equals("");
+        boolean isSubCategoryEmpty = subCategory == null || subCategory.equals("");
+
+        List<TravelPost> travelPostList;
+        if (isTitleEmpty && isSubCategoryEmpty) travelPostList = searchByCategory();
+        else if (isSubCategoryEmpty) travelPostList = searchByTitle(title);
+        else if (isTitleEmpty) travelPostList = searchBySubCategory(SubCategory.valueOf(subCategory));
+        else travelPostList = searchByTitleAndSubCategory(title, SubCategory.valueOf(subCategory));
+
+        if (keywords != null && !keywords.isEmpty()) {
+            travelPostList = travelPostList.stream()
+                    .filter(post -> {
+                        List<String> postKeywords = post.getKeywords().stream()
+                                .map(Keyword::getKeyWord)
+                                .toList();
+
+                        // 맞는 키워드 개수 체크
+                        long matchCount = keywords.stream()
+                                .filter(postKeywords::contains)
+                                .count();
+
+                        // 최소 필요한 키워드 개수 정하기
+                        int totalSearchedKeywords = keywords.size();
+                        long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+                        if (totalSearchedKeywords >= 7) {
+                            return inCorrectKeywordsCount <= 3;
+                        }
+                        if (totalSearchedKeywords >= 5) {
+                            return inCorrectKeywordsCount <= 2;
+                        }
+                        else if (totalSearchedKeywords >= 2) {
+                            return inCorrectKeywordsCount <= 1;
+                        }
+                        return inCorrectKeywordsCount <= 0;
+                    })
+                    .toList();
+        }
+
+        return travelPostList;
+    }
+
+    @Override
+    public List<TravelPost> searchByCategory() {
+        return travelPostRepository.findAll();
+    }
+
+    @Override
+    public List<TravelPost> searchByTitle(String title) {
+        return travelPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+    }
+
+    @Override
+    public List<TravelPost> searchBySubCategory(SubCategory subCategory) {
+        return travelPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+    }
+
+    @Override
+    public List<TravelPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
+        return travelPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+    }
+
+    @Override
+    public Page<TravelPost> convertPostsAsPage(List<TravelPost> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<TravelPost> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }

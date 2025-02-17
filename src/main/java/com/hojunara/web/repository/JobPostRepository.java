@@ -1,7 +1,6 @@
 package com.hojunara.web.repository;
 
-import com.hojunara.web.entity.JobPost;
-import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +15,18 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long> {
     Page<JobPost> findAllBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory, Pageable pageable);
 
     List<JobPost> findTop5ByOrderByCreatedAtDesc();
+
+    List<JobPost> findByTitleContainingOrderByCreatedAtDesc(String title);
+
+    List<JobPost> findBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory);
+
+    List<JobPost> findBySuburbOrderByCreatedAtDesc(Suburb suburb);
+
+    List<JobPost> findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(String title, SubCategory subCategory);
+
+    List<JobPost> findByTitleContainingAndSuburbOrderByCreatedAtDesc(String title, Suburb suburb);
+
+    List<JobPost> findBySubCategoryAndSuburbOrderByCreatedAtDesc(SubCategory subCategory, Suburb suburb);
+
+    List<JobPost> findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(String title, SubCategory subCategory, Suburb suburb);
 }

@@ -10,6 +10,7 @@ import com.hojunara.web.repository.PropertyPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -271,6 +272,109 @@ public class PropertyPostServiceImpl implements PropertyPostService {
         } catch (Exception e) {
             log.error("Failed to update property post", e);
             return null;
+        }
+    }
+
+    @Override
+    public List<PropertyPost> searchPropertyPost(String title, String subCategory, String suburb, List<String> keywords) {
+        boolean isTitleEmpty = title == null || title.equals("");
+        boolean isSubCategoryEmpty = subCategory == null || subCategory.equals("");
+        boolean isSuburbEmpty = suburb == null || suburb.equals("");
+
+        List<PropertyPost> propertyPostList;
+        if (isTitleEmpty && isSubCategoryEmpty && isSuburbEmpty) propertyPostList = searchByCategory();
+        else if (isSubCategoryEmpty && isSuburbEmpty) propertyPostList = searchByTitle(title);
+        else if (isTitleEmpty && isSuburbEmpty) propertyPostList = searchBySubCategory(SubCategory.valueOf(subCategory));
+        else if (isTitleEmpty && isSubCategoryEmpty) propertyPostList = searchBySuburb(Suburb.valueOf(suburb));
+        else if (isSuburbEmpty) propertyPostList = searchByTitleAndSubCategory(title, SubCategory.valueOf(subCategory));
+        else if (isTitleEmpty) propertyPostList = searchBySubCategoryAndSuburb(SubCategory.valueOf(subCategory), Suburb.valueOf(suburb));
+        else if (isSubCategoryEmpty) propertyPostList = searchByTitleAndSuburb(title, Suburb.valueOf(suburb));
+        else propertyPostList = searchByTitleAndSubCategoryAndSuburb(title, SubCategory.valueOf(subCategory), Suburb.valueOf(suburb));
+
+        if (keywords != null && !keywords.isEmpty()) {
+            propertyPostList = propertyPostList.stream()
+                    .filter(post -> {
+                        List<String> postKeywords = post.getKeywords().stream()
+                                .map(Keyword::getKeyWord)
+                                .toList();
+
+                        // 맞는 키워드 개수 체크
+                        long matchCount = keywords.stream()
+                                .filter(postKeywords::contains)
+                                .count();
+
+                        // 최소 필요한 키워드 개수 정하기
+                        int totalSearchedKeywords = keywords.size();
+                        long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+                        if (totalSearchedKeywords >= 7) {
+                            return inCorrectKeywordsCount <= 3;
+                        }
+                        if (totalSearchedKeywords >= 5) {
+                            return inCorrectKeywordsCount <= 2;
+                        }
+                        else if (totalSearchedKeywords >= 2) {
+                            return inCorrectKeywordsCount <= 1;
+                        }
+                        return inCorrectKeywordsCount <= 0;
+                    })
+                    .toList();
+        }
+
+        return propertyPostList;
+    }
+
+    @Override
+    public List<PropertyPost> searchByCategory() {
+        return propertyPostRepository.findAll();
+    }
+
+    @Override
+    public List<PropertyPost> searchByTitle(String title) {
+        return propertyPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+    }
+
+    @Override
+    public List<PropertyPost> searchBySubCategory(SubCategory subCategory) {
+        return propertyPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+    }
+
+    @Override
+    public List<PropertyPost> searchBySuburb(Suburb suburb) {
+        return propertyPostRepository.findBySuburbOrderByCreatedAtDesc(suburb);
+    }
+
+    @Override
+    public List<PropertyPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
+        return propertyPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+    }
+
+    @Override
+    public List<PropertyPost> searchByTitleAndSuburb(String title, Suburb suburb) {
+        return propertyPostRepository.findByTitleContainingAndSuburbOrderByCreatedAtDesc(title, suburb);
+    }
+
+    @Override
+    public List<PropertyPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb) {
+        return propertyPostRepository.findBySubCategoryAndSuburbOrderByCreatedAtDesc(subCategory, suburb);
+    }
+
+    @Override
+    public List<PropertyPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb) {
+        return propertyPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(title, subCategory, suburb);
+    }
+
+    @Override
+    public Page<PropertyPost> convertPostsAsPage(List<PropertyPost> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<PropertyPost> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }

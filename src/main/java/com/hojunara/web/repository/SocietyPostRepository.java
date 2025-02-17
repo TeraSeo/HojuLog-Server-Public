@@ -1,8 +1,6 @@
 package com.hojunara.web.repository;
 
-import com.hojunara.web.entity.PropertyPost;
-import com.hojunara.web.entity.SocietyPost;
-import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +15,10 @@ public interface SocietyPostRepository extends JpaRepository<SocietyPost, Long> 
     Page<SocietyPost> findAllBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory, Pageable pageable);
 
     List<SocietyPost> findTop5ByOrderByCreatedAtDesc();
+
+    List<SocietyPost> findByTitleContainingOrderByCreatedAtDesc(String title);
+
+    List<SocietyPost> findBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory);
+
+    List<SocietyPost> findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(String title, SubCategory subCategory);
 }

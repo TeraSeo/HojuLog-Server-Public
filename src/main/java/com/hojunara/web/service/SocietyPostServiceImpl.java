@@ -9,6 +9,7 @@ import com.hojunara.web.repository.SocietyPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -295,6 +296,84 @@ public class SocietyPostServiceImpl implements SocietyPostService {
         } catch (Exception e) {
             log.error("Failed to update society post", e);
             return null;
+        }
+    }
+
+    @Override
+    public List<SocietyPost> searchSocietyPost(String title, String subCategory, List<String> keywords) {
+        boolean isTitleEmpty = title == null || title.equals("");
+        boolean isSubCategoryEmpty = subCategory == null || subCategory.equals("");
+
+        List<SocietyPost> societyPostList;
+        if (isTitleEmpty && isSubCategoryEmpty) societyPostList = searchByCategory();
+        else if (isSubCategoryEmpty) societyPostList = searchByTitle(title);
+        else if (isTitleEmpty) societyPostList = searchBySubCategory(SubCategory.valueOf(subCategory));
+        else societyPostList = searchByTitleAndSubCategory(title, SubCategory.valueOf(subCategory));
+
+        if (keywords != null && !keywords.isEmpty()) {
+            societyPostList = societyPostList.stream()
+                    .filter(post -> {
+                        List<String> postKeywords = post.getKeywords().stream()
+                                .map(Keyword::getKeyWord)
+                                .toList();
+
+                        // 맞는 키워드 개수 체크
+                        long matchCount = keywords.stream()
+                                .filter(postKeywords::contains)
+                                .count();
+
+                        // 최소 필요한 키워드 개수 정하기
+                        int totalSearchedKeywords = keywords.size();
+                        long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+                        if (totalSearchedKeywords >= 7) {
+                            return inCorrectKeywordsCount <= 3;
+                        }
+                        if (totalSearchedKeywords >= 5) {
+                            return inCorrectKeywordsCount <= 2;
+                        }
+                        else if (totalSearchedKeywords >= 2) {
+                            return inCorrectKeywordsCount <= 1;
+                        }
+                        return inCorrectKeywordsCount <= 0;
+                    })
+                    .toList();
+        }
+
+        return societyPostList;
+    }
+
+    @Override
+    public List<SocietyPost> searchByCategory() {
+        return societyPostRepository.findAll();
+    }
+
+    @Override
+    public List<SocietyPost> searchByTitle(String title) {
+        return societyPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+    }
+
+    @Override
+    public List<SocietyPost> searchBySubCategory(SubCategory subCategory) {
+        return societyPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+    }
+
+    @Override
+    public List<SocietyPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
+        return societyPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+    }
+
+    @Override
+    public Page<SocietyPost> convertPostsAsPage(List<SocietyPost> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<SocietyPost> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }

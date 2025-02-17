@@ -2,9 +2,7 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.TransactionPostDto;
 import com.hojunara.web.dto.request.UpdateTransactionPostDto;
-import com.hojunara.web.entity.Post;
-import com.hojunara.web.entity.SubCategory;
-import com.hojunara.web.entity.TransactionPost;
+import com.hojunara.web.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,4 +23,24 @@ public interface TransactionPostService {
     Post createPost(TransactionPostDto transactionPostDto, MultipartFile[] images);
 
     Post updatePost(UpdateTransactionPostDto updateTransactionPostDto, MultipartFile[] images);
+
+    List<TransactionPost> searchTransactionPost(String title, String subCategory, String suburb, List<String> keywords);
+
+    List<TransactionPost> searchByCategory();
+
+    List<TransactionPost> searchByTitle(String title);
+
+    List<TransactionPost> searchBySubCategory(SubCategory subCategory);
+
+    List<TransactionPost> searchBySuburb(Suburb suburb);
+
+    List<TransactionPost> searchByTitleAndSubCategory(String title, SubCategory subCategory);
+
+    List<TransactionPost> searchByTitleAndSuburb(String title, Suburb suburb);
+
+    List<TransactionPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb);
+
+    List<TransactionPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb);
+
+    Page<TransactionPost> convertPostsAsPage(List<TransactionPost> posts, Pageable pageable);
 }

@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        boolean isOwnAuthRequired = path.contains("own") || (path.contains("update") && path.contains("post")) || (path.contains("delete") && path.contains("post"));
+        boolean isOwnAuthRequired = path.contains("own") || path.contains("/post/update") || path.contains("/post/get/update") || path.contains("/post/delete");
         if (StringUtils.isNotBlank(accessToken) && jwtTokenProvider.validateToken(accessToken)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);

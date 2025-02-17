@@ -9,6 +9,7 @@ import com.hojunara.web.repository.StudyPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -300,6 +301,84 @@ public class StudyPostServiceImpl implements StudyPostService {
         } catch (Exception e) {
             log.error("Failed to update study post", e);
             return null;
+        }
+    }
+
+    @Override
+    public List<StudyPost> searchStudyPost(String title, String subCategory, List<String> keywords) {
+        boolean isTitleEmpty = title == null || title.equals("");
+        boolean isSubCategoryEmpty = subCategory == null || subCategory.equals("");
+
+        List<StudyPost> studyPostList;
+        if (isTitleEmpty && isSubCategoryEmpty) studyPostList = searchByCategory();
+        else if (isSubCategoryEmpty) studyPostList = searchByTitle(title);
+        else if (isTitleEmpty) studyPostList = searchBySubCategory(SubCategory.valueOf(subCategory));
+        else studyPostList = searchByTitleAndSubCategory(title, SubCategory.valueOf(subCategory));
+
+        if (keywords != null && !keywords.isEmpty()) {
+            studyPostList = studyPostList.stream()
+                    .filter(post -> {
+                        List<String> postKeywords = post.getKeywords().stream()
+                                .map(Keyword::getKeyWord)
+                                .toList();
+
+                        // 맞는 키워드 개수 체크
+                        long matchCount = keywords.stream()
+                                .filter(postKeywords::contains)
+                                .count();
+
+                        // 최소 필요한 키워드 개수 정하기
+                        int totalSearchedKeywords = keywords.size();
+                        long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+                        if (totalSearchedKeywords >= 7) {
+                            return inCorrectKeywordsCount <= 3;
+                        }
+                        if (totalSearchedKeywords >= 5) {
+                            return inCorrectKeywordsCount <= 2;
+                        }
+                        else if (totalSearchedKeywords >= 2) {
+                            return inCorrectKeywordsCount <= 1;
+                        }
+                        return inCorrectKeywordsCount <= 0;
+                    })
+                    .toList();
+        }
+
+        return studyPostList;
+    }
+
+    @Override
+    public List<StudyPost> searchByCategory() {
+        return studyPostRepository.findAll();
+    }
+
+    @Override
+    public List<StudyPost> searchByTitle(String title) {
+        return studyPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+    }
+
+    @Override
+    public List<StudyPost> searchBySubCategory(SubCategory subCategory) {
+        return studyPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+    }
+
+    @Override
+    public List<StudyPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
+        return studyPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+    }
+
+    @Override
+    public Page<StudyPost> convertPostsAsPage(List<StudyPost> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<StudyPost> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }

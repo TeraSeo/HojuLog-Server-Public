@@ -4,13 +4,13 @@ import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.JobPostDto;
 import com.hojunara.web.dto.request.UpdateJobMainInfoPostDto;
 import com.hojunara.web.dto.request.UpdateJobPostDto;
-import com.hojunara.web.dto.request.UpdatePropertyMainInfoPostDto;
 import com.hojunara.web.entity.*;
 import com.hojunara.web.exception.JobPostNotFoundException;
 import com.hojunara.web.repository.JobPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -245,6 +245,109 @@ public class JobPostServiceImpl implements JobPostService {
         } catch (Exception e) {
             log.error("Failed to update job post", e);
             return null;
+        }
+    }
+
+    @Override
+    public List<JobPost> searchJobPost(String title, String subCategory, String suburb, List<String> keywords) {
+        boolean isTitleEmpty = title == null || title.equals("");
+        boolean isSubCategoryEmpty = subCategory == null || subCategory.equals("");
+        boolean isSuburbEmpty = suburb == null || suburb.equals("");
+
+        List<JobPost> jobPostList;
+        if (isTitleEmpty && isSubCategoryEmpty && isSuburbEmpty) jobPostList = searchByCategory();
+        else if (isSubCategoryEmpty && isSuburbEmpty) jobPostList = searchByTitle(title);
+        else if (isTitleEmpty && isSuburbEmpty) jobPostList = searchBySubCategory(SubCategory.valueOf(subCategory));
+        else if (isTitleEmpty && isSubCategoryEmpty) jobPostList = searchBySuburb(Suburb.valueOf(suburb));
+        else if (isSuburbEmpty) jobPostList = searchByTitleAndSubCategory(title, SubCategory.valueOf(subCategory));
+        else if (isTitleEmpty) jobPostList = searchBySubCategoryAndSuburb(SubCategory.valueOf(subCategory), Suburb.valueOf(suburb));
+        else if (isSubCategoryEmpty) jobPostList = searchByTitleAndSuburb(title, Suburb.valueOf(suburb));
+        else jobPostList = searchByTitleAndSubCategoryAndSuburb(title, SubCategory.valueOf(subCategory), Suburb.valueOf(suburb));
+
+        if (keywords != null && !keywords.isEmpty()) {
+            jobPostList = jobPostList.stream()
+                    .filter(post -> {
+                        List<String> postKeywords = post.getKeywords().stream()
+                                .map(Keyword::getKeyWord)
+                                .toList();
+
+                        // 맞는 키워드 개수 체크
+                        long matchCount = keywords.stream()
+                                .filter(postKeywords::contains)
+                                .count();
+
+                        // 최소 필요한 키워드 개수 정하기
+                        int totalSearchedKeywords = keywords.size();
+                        long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+                        if (totalSearchedKeywords >= 7) {
+                            return inCorrectKeywordsCount <= 3;
+                        }
+                        if (totalSearchedKeywords >= 5) {
+                            return inCorrectKeywordsCount <= 2;
+                        }
+                        else if (totalSearchedKeywords >= 2) {
+                            return inCorrectKeywordsCount <= 1;
+                        }
+                        return inCorrectKeywordsCount <= 0;
+                    })
+                    .toList();
+        }
+
+        return jobPostList;
+    }
+
+    @Override
+    public List<JobPost> searchByCategory() {
+        return jobPostRepository.findAll();
+    }
+
+    @Override
+    public List<JobPost> searchByTitle(String title) {
+        return jobPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+    }
+
+    @Override
+    public List<JobPost> searchBySubCategory(SubCategory subCategory) {
+        return jobPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+    }
+
+    @Override
+    public List<JobPost> searchBySuburb(Suburb suburb) {
+        return jobPostRepository.findBySuburbOrderByCreatedAtDesc(suburb);
+    }
+
+    @Override
+    public List<JobPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
+        return jobPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+    }
+
+    @Override
+    public List<JobPost> searchByTitleAndSuburb(String title, Suburb suburb) {
+        return jobPostRepository.findByTitleContainingAndSuburbOrderByCreatedAtDesc(title, suburb);
+    }
+
+    @Override
+    public List<JobPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb) {
+        return jobPostRepository.findBySubCategoryAndSuburbOrderByCreatedAtDesc(subCategory, suburb);
+    }
+
+    @Override
+    public List<JobPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb) {
+        return jobPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(title, subCategory, suburb);
+    }
+
+    @Override
+    public Page<JobPost> convertPostsAsPage(List<JobPost> posts, Pageable pageable) {
+        try {
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), posts.size());
+
+            List<JobPost> paginatedPosts = posts.subList(start, end);
+
+            return new PageImpl<>(paginatedPosts, pageable, posts.size());
+        } catch (Exception e) {
+            log.error("Failed to convert Post as Page");
+            throw e;
         }
     }
 }
