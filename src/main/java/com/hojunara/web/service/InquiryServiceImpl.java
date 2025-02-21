@@ -1,6 +1,7 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
+import com.hojunara.web.dto.request.AdminUpdateInquiryDto;
 import com.hojunara.web.dto.request.InquiryDto;
 import com.hojunara.web.entity.Inquiry;
 import com.hojunara.web.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -93,6 +95,41 @@ public class InquiryServiceImpl implements InquiryService {
             return inquiry;
         } catch (Exception e) {
             log.error("Failed to create inquiry");
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<Inquiry> getWholeInquiriesByPage(Pageable pageable) {
+        try {
+            Page<Inquiry> inquiries = inquiryRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got whole inquiries by page");
+            return inquiries;
+        } catch (Exception e) {
+            log.error("Failed to get whole inquiries by page", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Boolean updateInquiry(AdminUpdateInquiryDto adminUpdateInquiryDto) {
+        Long inquiryId = adminUpdateInquiryDto.getInquiryId();
+        Inquiry existingInquiry = getInquiryById(inquiryId);
+        try {
+            Boolean isUpdated = false;
+            if (!Objects.equals(existingInquiry.getReply(), adminUpdateInquiryDto.getResponse())) {
+                existingInquiry.setReply(adminUpdateInquiryDto.getResponse());
+                existingInquiry.setIsSolved(true);
+                isUpdated = true;
+            }
+
+            if (isUpdated) inquiryRepository.save(existingInquiry);
+
+            log.info("Successfully updated inquiry with id: {}", inquiryId);
+
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to update inquiry with id: {}", inquiryId, e);
             throw e;
         }
     }

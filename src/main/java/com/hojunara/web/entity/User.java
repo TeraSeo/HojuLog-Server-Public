@@ -1,9 +1,6 @@
 package com.hojunara.web.entity;
 
-import com.hojunara.web.dto.response.DetailedOwnUserDto;
-import com.hojunara.web.dto.response.DetailedUserDto;
-import com.hojunara.web.dto.response.SummarizedUserDto;
-import com.hojunara.web.dto.response.SummarizedUserProfileDto;
+import com.hojunara.web.dto.response.*;
 import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
@@ -39,6 +36,12 @@ public class User extends BaseEntity {
     private String profilePicture;
 
     private String description;
+
+    @Column(nullable = false)
+    private Long log;
+
+    @Column(nullable = false)
+    private Long likeCountThisWeek;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -91,6 +94,10 @@ public class User extends BaseEntity {
 
     public SummarizedUserDto convertToSummarisedUserDto() {
         return SummarizedUserDto.builder().id(id).username(username).email(email).description(description).profilePicture(profilePicture).build();
+    }
+
+    public NormalUserDto convertToNormalUserDto() {
+        return NormalUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(likeCountThisWeek).role(role).isLocked(isLocked).build();
     }
 
     public DetailedUserDto convertToDetailedUserDto() {

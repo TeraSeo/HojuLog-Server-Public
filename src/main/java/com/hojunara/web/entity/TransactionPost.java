@@ -39,7 +39,7 @@ public class TransactionPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return SummarizedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).imageUrl(imageUrl).price(price).createdAt(getCreatedAt()).build();
+        return SummarizedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).imageUrl(imageUrl).price(price).priceType(priceType).createdAt(getCreatedAt()).build();
     }
 
     public NormalTransactionPostDto convertPostToNormalTransactionPostDto() {

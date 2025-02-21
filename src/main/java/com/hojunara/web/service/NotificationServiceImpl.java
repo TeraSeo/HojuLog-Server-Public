@@ -58,9 +58,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void createNotification(String type, String message, User user) {
+    public void createNotification(String message, User user) {
         try {
-            Notification notification = Notification.builder().type(NotificationType.valueOf(type)).message(message).user(user).isRead(false).createdAt(new Timestamp(System.currentTimeMillis())).build();
+            Notification notification = Notification.builder().message(message).user(user).isRead(false).createdAt(new Timestamp(System.currentTimeMillis())).build();
 
             user.getNotifications().add(notification);
             notificationRepository.save(notification);

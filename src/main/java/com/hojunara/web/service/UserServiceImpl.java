@@ -1,6 +1,8 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
+import com.hojunara.web.dto.request.AdminUpdateUserDto;
+import com.hojunara.web.dto.request.UpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
 import com.hojunara.web.entity.RegistrationMethod;
 import com.hojunara.web.entity.User;
@@ -9,12 +11,15 @@ import com.hojunara.web.exception.UserNotFoundException;
 import com.hojunara.web.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -96,6 +101,8 @@ public class UserServiceImpl implements UserService {
                 .email(userDto.getEmail())
                 .password(encodedPassword)
                 .registrationMethod(RegistrationMethod.Otp)
+                .log(0L)
+                .likeCountThisWeek(0L)
                 .build();
         userRepository.save(user);
         log.info("Successfully created user");
@@ -147,6 +154,52 @@ public class UserServiceImpl implements UserService {
         else {
             log.info("Authentication failed");
             return false;
+        }
+    }
+
+    @Override
+    public Page<User> getWholeUserByPage(Pageable pageable) {
+        try {
+            Page<User> users = userRepository.findAllByOrderByCreatedAtDesc(pageable);
+            log.info("Successfully got whole users by page");
+            return users;
+        } catch (Exception e) {
+            log.error("Failed to get whole users by page", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Boolean updateUserByAdmin(AdminUpdateUserDto adminUpdateUserDto) {
+        Long userId = adminUpdateUserDto.getUserId();
+        User existingUser = getUserById(userId);
+        try {
+            Boolean isUpdated = false;
+            if (!Objects.equals(existingUser.getLog(), adminUpdateUserDto.getLog())) {
+                existingUser.setLog(adminUpdateUserDto.getLog());
+                isUpdated = true;
+            }
+            if (!Objects.equals(existingUser.getLikeCountThisWeek(), adminUpdateUserDto.getLikeCountThisWeek())) {
+                existingUser.setLikeCountThisWeek(adminUpdateUserDto.getLikeCountThisWeek());
+                isUpdated = true;
+            }
+            if (!Objects.equals(existingUser.getRole(), adminUpdateUserDto.getRole())) {
+                existingUser.setRole(adminUpdateUserDto.getRole());
+                isUpdated = true;
+            }
+            if (!Objects.equals(existingUser.getIsLocked(), adminUpdateUserDto.getIsLocked())) {
+                existingUser.setIsLocked(adminUpdateUserDto.getIsLocked());
+                isUpdated = true;
+            }
+
+            if (isUpdated) userRepository.save(existingUser);
+
+            log.info("Successfully updated user with id: {}", userId);
+
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to update user with id: {}", userId, e);
+            throw e;
         }
     }
 }

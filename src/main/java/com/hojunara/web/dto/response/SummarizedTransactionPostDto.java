@@ -1,5 +1,6 @@
 package com.hojunara.web.dto.response;
 
+import com.hojunara.web.entity.PriceType;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -22,4 +23,6 @@ public class SummarizedTransactionPostDto {
     private Timestamp createdAt;
 
     private Long price;
+
+    private PriceType priceType;
 }

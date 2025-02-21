@@ -11,7 +11,7 @@ public interface NotificationService {
 
     Notification getNotificationById(Long id);
 
-    void createNotification(String type, String message, User user);
+    void createNotification(String message, User user);
 
     void deleteNotificationById(Long id);
 }

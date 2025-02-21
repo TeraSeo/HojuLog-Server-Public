@@ -1,8 +1,11 @@
 package com.hojunara.web.service;
 
+import com.hojunara.web.dto.request.AdminUpdateUserDto;
 import com.hojunara.web.dto.request.UpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
 import com.hojunara.web.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,4 +24,8 @@ public interface UserService {
     void deleteUserById(Long id);
 
     Boolean authenticateUser(String email, String password);
+
+    Page<User> getWholeUserByPage(Pageable pageable);
+
+    Boolean updateUserByAdmin(AdminUpdateUserDto adminUpdateUserDto);
 }

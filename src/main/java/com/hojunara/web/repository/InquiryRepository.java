@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     Page<Inquiry> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+
+    Page<Inquiry> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
