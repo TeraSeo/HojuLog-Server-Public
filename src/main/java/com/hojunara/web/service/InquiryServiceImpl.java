@@ -9,6 +9,7 @@ import com.hojunara.web.exception.InquiryException;
 import com.hojunara.web.repository.InquiryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,13 +30,15 @@ public class InquiryServiceImpl implements InquiryService {
     private final UserService userService;
     private final AwsFileService awsFileService;
     private final InquiryImageService inquiryImageService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public InquiryServiceImpl(InquiryRepository inquiryRepository, UserService userService, AwsFileService awsFileService, InquiryImageService inquiryImageService) {
+    public InquiryServiceImpl(InquiryRepository inquiryRepository, UserService userService, AwsFileService awsFileService, InquiryImageService inquiryImageService, NotificationService notificationService) {
         this.inquiryRepository = inquiryRepository;
         this.userService = userService;
         this.awsFileService = awsFileService;
         this.inquiryImageService = inquiryImageService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -120,6 +123,9 @@ public class InquiryServiceImpl implements InquiryService {
             if (!Objects.equals(existingInquiry.getReply(), adminUpdateInquiryDto.getResponse())) {
                 existingInquiry.setReply(adminUpdateInquiryDto.getResponse());
                 existingInquiry.setIsSolved(true);
+
+                String message = String.format("'%s' 문의가 해결됐습니다!", existingInquiry.getTitle());
+                notificationService.createNotification("문의 알림", message, existingInquiry.getUser());
                 isUpdated = true;
             }
 

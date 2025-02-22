@@ -1,7 +1,6 @@
 package com.hojunara.web.service;
 
 import com.hojunara.web.entity.Notification;
-import com.hojunara.web.entity.NotificationType;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.exception.NotificationNotFoundException;
 import com.hojunara.web.repository.NotificationRepository;
@@ -58,9 +57,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void createNotification(String message, User user) {
+    public void createNotification(String title, String message, User user) {
         try {
-            Notification notification = Notification.builder().message(message).user(user).isRead(false).createdAt(new Timestamp(System.currentTimeMillis())).build();
+            Notification notification = Notification.builder().title(title).message(message).user(user).isRead(false).createdAt(new Timestamp(System.currentTimeMillis())).build();
 
             user.getNotifications().add(notification);
             notificationRepository.save(notification);
@@ -80,5 +79,19 @@ public class NotificationServiceImpl implements NotificationService {
             log.error("Failed to delete notification with id: {}", id, e);
             throw e;
         }
+    }
+
+    @Override
+    public Boolean updateNotificationAsRead(Long notificationId) {
+        Notification notification = getNotificationById(notificationId);
+        try {
+            notification.setIsRead(true);
+            notificationRepository.save(notification);
+            log.info("Successfully updated notification as read with id: {}", notificationId);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to update notification as read with id: {}", notificationId, e);
+        }
+        return null;
     }
 }

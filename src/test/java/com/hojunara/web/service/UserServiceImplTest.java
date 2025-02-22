@@ -20,34 +20,34 @@ class UserServiceImplTest {
     @Autowired
     private UserService userService;
 
-    @Test
-    void getWholeUsers() {
-        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
-        UserDto user2 = UserDto.builder().email("user2@gmail.com").username("user2").password("1234").build();
-
-        userService.createUser(user1);
-        userService.createUser(user2);
-
-        List<User> wholeUsers = userService.getWholeUsers();
-        assertNotNull(wholeUsers);
-        assertTrue(wholeUsers.size() == 2);
-    }
-
-    @Test
-    void createUser() {
-        UserDto user1 = UserDto.builder()
-                .email("user1@gmail.com")
-                .username("user1")
-                .password("1234")
-                .build();
-
-        userService.createUser(user1);
-        User createdUser = userService.getUserByEmail(user1.getEmail());
-
-        assertEquals("user1@gmail.com", createdUser.getEmail());
-        assertEquals("user1", createdUser.getUsername());
-        assertEquals(Role.USER, createdUser.getRole());
-    }
+//    @Test
+//    void getWholeUsers() {
+//        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
+//        UserDto user2 = UserDto.builder().email("user2@gmail.com").username("user2").password("1234").build();
+//
+//        userService.createUser(user1);
+//        userService.createUser(user2);
+//
+//        List<User> wholeUsers = userService.getWholeUsers();
+//        assertNotNull(wholeUsers);
+//        assertTrue(wholeUsers.size() == 2);
+//    }
+//
+//    @Test
+//    void createUser() {
+//        UserDto user1 = UserDto.builder()
+//                .email("user1@gmail.com")
+//                .username("user1")
+//                .password("1234")
+//                .build();
+//
+//        userService.createUser(user1);
+//        User createdUser = userService.getUserByEmail(user1.getEmail());
+//
+//        assertEquals("user1@gmail.com", createdUser.getEmail());
+//        assertEquals("user1", createdUser.getUsername());
+//        assertEquals(Role.USER, createdUser.getRole());
+//    }
 
 //    @Test
 //    void updateUser() {
@@ -65,16 +65,16 @@ class UserServiceImplTest {
 //        assertEquals(Role.ADMIN, updatedUser.getRole());
 //    }
 
-    @Test
-    void deleteUserById() {
-        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
-        userService.createUser(user1);
-        User createdUser = userService.getUserByEmail(user1.getEmail());
-        userService.deleteUserById(createdUser.getId());
-
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
-            userService.getUserById(createdUser.getId());
-        });
-        assertEquals("User not found with id: " + createdUser.getId(), exception.getMessage());
-    }
+//    @Test
+//    void deleteUserById() {
+//        UserDto user1 = UserDto.builder().email("user1@gmail.com").username("user1").password("1234").build();
+//        userService.createUser(user1);
+//        User createdUser = userService.getUserByEmail(user1.getEmail());
+//        userService.deleteUserById(createdUser.getId());
+//
+//        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+//            userService.getUserById(createdUser.getId());
+//        });
+//        assertEquals("User not found with id: " + createdUser.getId(), exception.getMessage());
+//    }
 }

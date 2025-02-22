@@ -2,7 +2,6 @@ package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.request.AdminUpdateInquiryDto;
 import com.hojunara.web.dto.request.AdminUpdateUserDto;
-import com.hojunara.web.dto.request.UpdateUserDto;
 import com.hojunara.web.dto.response.*;
 import com.hojunara.web.entity.Inquiry;
 import com.hojunara.web.entity.Role;
@@ -134,5 +133,12 @@ public class AdminController {
     public ResponseEntity<Boolean> updateInquiryData(@RequestBody AdminUpdateInquiryDto adminUpdateInquiryDto) {
         Boolean isUpdated = inquiryService.updateInquiry(adminUpdateInquiryDto);
         return ResponseEntity.ok(isUpdated);
+    }
+
+    @PutMapping("provide/logs/this-week")
+    public ResponseEntity<Boolean> provideLogsThisWeek() {
+        List<User> users = userService.getTop10UsersByLikesThisWeek();
+        Boolean isProvided = userService.provideLogThisWeek(users);
+        return ResponseEntity.ok(isProvided);
     }
 }

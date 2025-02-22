@@ -22,11 +22,13 @@ public class PostLikeServiceImpl implements PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
     private final PostService postService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public PostLikeServiceImpl(PostLikeRepository postLikeRepository, PostService postService) {
+    public PostLikeServiceImpl(PostLikeRepository postLikeRepository, PostService postService, NotificationService notificationService) {
         this.postLikeRepository = postLikeRepository;
         this.postService = postService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -69,6 +71,9 @@ public class PostLikeServiceImpl implements PostLikeService {
             post.getLikes().add(postLike);
             user.getPostLikes().add(postLike);
             postLikeRepository.save(postLike);
+
+            String message = String.format("'%s' 님이 '%s' 게시물에 좋아요를 눌렀습니다!", user.getUsername(), post.getTitle());
+            notificationService.createNotification("좋아요 알림", message, post.getUser());
 
             log.info("Successfully created post like with post id: {}, user id: {}", post.getId(), user.getId());
             return Long.valueOf(post.getLikes().size());

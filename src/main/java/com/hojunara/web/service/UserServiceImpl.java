@@ -2,7 +2,6 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.AdminUpdateUserDto;
-import com.hojunara.web.dto.request.UpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
 import com.hojunara.web.entity.RegistrationMethod;
 import com.hojunara.web.entity.User;
@@ -11,6 +10,7 @@ import com.hojunara.web.exception.UserNotFoundException;
 import com.hojunara.web.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -30,12 +32,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AwsFileService awsFileService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final NotificationService notificationService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, AwsFileService awsFileService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, AwsFileService awsFileService, BCryptPasswordEncoder bCryptPasswordEncoder, @Lazy NotificationService notificationService) {
         this.userRepository = userRepository;
         this.awsFileService = awsFileService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -199,6 +203,53 @@ public class UserServiceImpl implements UserService {
             return true;
         } catch (Exception e) {
             log.error("Failed to update user with id: {}", userId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<User> getTop10UsersByLikesThisWeek() {
+        try {
+            List<User> top10Users = userRepository.findTop10ByOrderByLikeCountThisWeekDesc();
+            log.info("Successfully get top 10 users by likes this week");
+            return top10Users;
+        } catch (Exception e) {
+            log.error("Failed to get top 10 users by likes this week");
+            throw e;
+        }
+    }
+
+    @Override
+    public Boolean provideLogThisWeek(List<User> users) {
+        try {
+            Map<Integer, Long> logRewards = Map.of(
+                    1, 100L,
+                    2, 90L,
+                    3, 80L,
+                    8, 30L,
+                    9, 20L
+            );
+
+            log.info("user counts: " + users.size() + "!!!!!!!!!!!!!!!!!!!");
+
+            AtomicInteger index = new AtomicInteger(1);
+            users.forEach(user -> {
+                int i = index.getAndIncrement();
+
+                Long reward = logRewards.getOrDefault(i, 10L);
+                user.setLog(user.getLog() + reward);
+
+                user.setLikeCountThisWeek(0L);
+
+                String message = String.format("축하드립니다! 🏆 이주에 %d위를 하셔서 %s로그가 지급 됐습니다!", i, reward);
+                notificationService.createNotification("이주의 순위", message, user);
+            });
+
+            userRepository.saveAll(users);
+            log.info("Successfully provided log this week");
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to provide log this week", e);
             throw e;
         }
     }
