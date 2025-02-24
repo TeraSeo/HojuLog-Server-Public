@@ -3,6 +3,7 @@ package com.hojunara.web.service;
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.AdminUpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
+import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.RegistrationMethod;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.exception.UserAlreadyExistsException;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -106,7 +108,6 @@ public class UserServiceImpl implements UserService {
                 .password(encodedPassword)
                 .registrationMethod(RegistrationMethod.Otp)
                 .log(0L)
-                .likeCountThisWeek(0L)
                 .build();
         userRepository.save(user);
         log.info("Successfully created user");
@@ -183,10 +184,6 @@ public class UserServiceImpl implements UserService {
                 existingUser.setLog(adminUpdateUserDto.getLog());
                 isUpdated = true;
             }
-            if (!Objects.equals(existingUser.getLikeCountThisWeek(), adminUpdateUserDto.getLikeCountThisWeek())) {
-                existingUser.setLikeCountThisWeek(adminUpdateUserDto.getLikeCountThisWeek());
-                isUpdated = true;
-            }
             if (!Objects.equals(existingUser.getRole(), adminUpdateUserDto.getRole())) {
                 existingUser.setRole(adminUpdateUserDto.getRole());
                 isUpdated = true;
@@ -210,7 +207,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getTop10UsersByLikesThisWeek() {
         try {
-            List<User> top10Users = userRepository.findTop10ByOrderByLikeCountThisWeekDesc();
+            List<User> top10Users = userRepository.findTop10ByThisWeekLikedPosts();
             log.info("Successfully get top 10 users by likes this week");
             return top10Users;
         } catch (Exception e) {
@@ -230,8 +227,6 @@ public class UserServiceImpl implements UserService {
                     9, 20L
             );
 
-            log.info("user counts: " + users.size() + "!!!!!!!!!!!!!!!!!!!");
-
             AtomicInteger index = new AtomicInteger(1);
             users.forEach(user -> {
                 int i = index.getAndIncrement();
@@ -239,7 +234,7 @@ public class UserServiceImpl implements UserService {
                 Long reward = logRewards.getOrDefault(i, 10L);
                 user.setLog(user.getLog() + reward);
 
-                user.setLikeCountThisWeek(0L);
+//                user.setLikeCountThisWeek(0L);
 
                 String message = String.format("축하드립니다! 🏆 이주에 %d위를 하셔서 %s로그가 지급 됐습니다!", i, reward);
                 notificationService.createNotification("이주의 순위", message, user);
@@ -251,6 +246,82 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             log.error("Failed to provide log this week", e);
             throw e;
+        }
+    }
+
+    @Override
+    public Boolean viewSecretPost(Long viewerId, Post post) {
+        User viewer = getUserById(viewerId);
+        User owner = post.getUser();
+        try {
+            if (viewer.getLog() >= 10) {
+                viewer.setLog(viewer.getLog() - 10);
+                owner.setLog(owner.getLog() + 5);
+                viewer.getPaidPosts().add(post);
+
+                String message = String.format("%s님이 '%s' 글을 조회 하셨습니다.", viewer.getUsername(), post.getTitle());
+                notificationService.createNotification("비밀글 조회", message, owner);
+
+                userRepository.save(viewer);
+                userRepository.save(owner);
+
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Failed to view secret post", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Boolean checkIsUserPaid(Long viewerId, Post post) {
+        User viewer = getUserById(viewerId);
+        try {
+            List<Post> paidPosts = viewer.getPaidPosts();
+            List<Long> paidPostIds = paidPosts.stream().map(Post::getId).collect(Collectors.toList());
+            if (paidPostIds.contains(post.getId())) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Failed to check is user paid", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void addLikeCountThisWeek(User user, Post post) {
+        try {
+            boolean alreadyLiked = user.getThisWeekLikedPosts().stream()
+                    .anyMatch(existingPost -> existingPost.getId().equals(post.getId()));
+            if (!alreadyLiked) {
+                user.getThisWeekLikedPosts().add(post);
+                userRepository.save(user);
+                log.info("Successfully added like count this week");
+            } else {
+                log.info("User {} already liked Post {} this week", user.getId(), post.getId());
+            }
+        } catch (Exception e) {
+            log.error("Failed to add like count this week");
+        }
+    }
+
+    @Override
+    public void removeLikeCountThisWeek(User user, Post post) {
+        try {
+            boolean removed = user.getThisWeekLikedPosts().removeIf(
+                    existingPost -> existingPost.getId().equals(post.getId())
+            );
+
+            if (removed) {
+                userRepository.save(user);
+                log.info("Removed like for Post {} by User {}", post.getId(), user.getId());
+            } else {
+                log.info("Post {} was not liked by User {}", post.getId(), user.getId());
+            }
+        } catch (Exception e) {
+            log.error("Failed to remove like count this week", e);
         }
     }
 }

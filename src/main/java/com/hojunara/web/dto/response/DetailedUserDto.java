@@ -21,4 +21,8 @@ public class DetailedUserDto {
     private String profilePicture;
 
     private List<Long> uploadedPostIds;
+
+    private Long log;
+
+    private Long likeCountThisWeek;
 }

@@ -11,8 +11,6 @@ public class AdminUpdateUserDto {
 
     private Long log;
 
-    private Long likeCountThisWeek;
-
     private Role role;
 
     private Boolean isLocked;

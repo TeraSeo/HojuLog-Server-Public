@@ -38,8 +38,7 @@ public class NotificationController {
 
     @GetMapping("get/recent/notifications")
     public ResponseEntity<List<NotificationDto>> getRecentNotifications(@RequestParam Long userId) {
-        User user = userService.getUserById(userId);
-        List<Notification> notifications = user.getNotifications().stream().limit(20).collect(Collectors.toList());
+        List<Notification> notifications = notificationService.get20RecentNotificationsByUserId(userId);
         List<NotificationDto> notificationDtoList = notifications.stream().map(Notification::convertToNotificationDto).collect(Collectors.toList());
         return ResponseEntity.ok(notificationDtoList);
     }

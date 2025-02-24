@@ -2,8 +2,7 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.entity.Post;
 import java.util.List;
-
-import com.hojunara.web.entity.SubCategory;
+import com.hojunara.web.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,4 +22,6 @@ public interface PostService {
     Page<Post> convertPostsAsPage(List<Post> posts, Pageable pageable);
 
     Boolean removePost(Long postId);
+
+    Long calculateLikeCountThisWeek(Long userId);
 }

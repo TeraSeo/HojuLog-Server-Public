@@ -4,6 +4,7 @@ import com.hojunara.web.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,5 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    List<User> findTop10ByOrderByLikeCountThisWeekDesc();
+    @Query("SELECT u FROM User u LEFT JOIN u.thisWeekLikedPosts p GROUP BY u ORDER BY COUNT(p) DESC")
+    List<User> findTop10ByThisWeekLikedPosts();
 }

@@ -40,9 +40,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Long log;
 
-    @Column(nullable = false)
-    private Long likeCountThisWeek;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RegistrationMethod registrationMethod;
@@ -84,25 +81,35 @@ public class User extends BaseEntity {
     @Builder.Default
     private List<Notification> notifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(
+            name = "user_paid_posts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
     @Builder.Default
-    private List<Follow> followers = new ArrayList<>();
+    private List<Post> paidPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(
+            name = "user_this_week_liked_posts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
     @Builder.Default
-    private List<Follow> followees = new ArrayList<>();
+    private List<Post> thisWeekLikedPosts = new ArrayList<>();
 
     public SummarizedUserDto convertToSummarisedUserDto() {
         return SummarizedUserDto.builder().id(id).username(username).email(email).description(description).profilePicture(profilePicture).build();
     }
 
     public NormalUserDto convertToNormalUserDto() {
-        return NormalUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(likeCountThisWeek).role(role).isLocked(isLocked).build();
+        return NormalUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(0L).role(role).isLocked(isLocked).build();
     }
 
     public DetailedUserDto convertToDetailedUserDto() {
         List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
-        return DetailedUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).build();
+        return DetailedUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(0L).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).build();
     }
 
     public SummarizedUserProfileDto convertToSummarizedUserProfileDto() {
@@ -113,6 +120,6 @@ public class User extends BaseEntity {
         List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
         List<Long> likedPostIds = postLikes.stream().map(PostLike::getPost).limit(5).map(Post::getId).collect(Collectors.toList());
         List<Long> requestedIds = inquiries.stream().map(Inquiry::getId).limit(5).collect(Collectors.toList());
-        return DetailedOwnUserDto.builder().id(id).username(username).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).role(role).build();
+        return DetailedOwnUserDto.builder().id(id).username(username).description(description).log(log).likeCountThisWeek(0L).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).role(role).build();
     }
 }

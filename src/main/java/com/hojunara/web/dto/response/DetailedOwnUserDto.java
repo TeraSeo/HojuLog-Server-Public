@@ -28,4 +28,8 @@ public class DetailedOwnUserDto {
     private List<Long> requestedIds;
 
     private Role role;
+
+    private Long log;
+
+    private Long likeCountThisWeek;
 }

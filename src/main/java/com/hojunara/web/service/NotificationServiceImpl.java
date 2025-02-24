@@ -30,7 +30,6 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public List<Notification> getWholeNotificationsByUserId(Long id) {
         User user = userService.getUserById(id);
-
         try {
             List<Notification> notifications = user.getNotifications();
             log.info("Successfully got whole notifications with user id: {}", id);
@@ -93,5 +92,17 @@ public class NotificationServiceImpl implements NotificationService {
             log.error("Failed to update notification as read with id: {}", notificationId, e);
         }
         return null;
+    }
+
+    @Override
+    public List<Notification> get20RecentNotificationsByUserId(Long userId) {
+        try {
+            List<Notification> notifications = notificationRepository.findTop20ByUserIdOrderByCreatedAtDesc(userId);
+            log.info("Successfully found recent 20 notifications by user id: {}", userId);
+            return notifications;
+        } catch (Exception e) {
+            log.error("Failed to get recent 20 notifications by user id : {}", userId, e);
+            throw e;
+        }
     }
 }

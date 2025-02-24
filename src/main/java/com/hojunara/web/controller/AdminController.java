@@ -8,6 +8,7 @@ import com.hojunara.web.entity.Role;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.security.provider.JwtTokenProvider;
 import com.hojunara.web.service.InquiryService;
+import com.hojunara.web.service.PostService;
 import com.hojunara.web.service.UserService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,12 +31,14 @@ public class AdminController {
     private final UserService userService;
     private final InquiryService inquiryService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PostService postService;
 
     @Autowired
-    public AdminController(UserService userService, InquiryService inquiryService, JwtTokenProvider jwtTokenProvider) {
+    public AdminController(UserService userService, InquiryService inquiryService, JwtTokenProvider jwtTokenProvider, PostService postService) {
         this.userService = userService;
         this.inquiryService = inquiryService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.postService = postService;
     }
 
 
@@ -83,7 +86,9 @@ public class AdminController {
     @GetMapping("get/user")
     public ResponseEntity<NormalUserDto> getUserInfo(@RequestParam Long userId) {
         User user = userService.getUserById(userId);
+        Long likeCountThisWeek = postService.calculateLikeCountThisWeek(userId);
         NormalUserDto normalUserDto = user.convertToNormalUserDto();
+        normalUserDto.setLikeCountThisWeek(likeCountThisWeek);
         return ResponseEntity.ok(normalUserDto);
     }
 
@@ -92,8 +97,14 @@ public class AdminController {
         Page<User> users = userService.getWholeUserByPage(PageRequest.of(page - 1, size));
         List<NormalUserDto> userDtoList = users.getContent()
                 .stream()
-                .map(user -> user.convertToNormalUserDto())
+                .map(user -> {
+                    NormalUserDto dto = user.convertToNormalUserDto();
+                    Long likeCountThisWeek = postService.calculateLikeCountThisWeek(user.getId());
+                    dto.setLikeCountThisWeek(likeCountThisWeek);
+                    return dto;
+                })
                 .collect(Collectors.toList());
+
         UserPaginationResponseData userPaginationResponseData = UserPaginationResponseData.builder().pageSize(users.getTotalPages()).currentPagePostsCount(users.getNumberOfElements()).currentPage(page).users(userDtoList).build();
         return ResponseEntity.ok(userPaginationResponseData);
     }

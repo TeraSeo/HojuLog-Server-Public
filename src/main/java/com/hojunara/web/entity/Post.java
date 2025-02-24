@@ -62,6 +62,14 @@ public abstract class Post extends PostBaseEntity {
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "paidPosts")
+    @Builder.Default
+    private List<User> paidByUsers = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "thisWeekLikedPosts")
+    @Builder.Default
+    private List<User> likedByUsersThisWeek = new ArrayList<>();
+
     public SummarizedPostDto convertToSummarizedPostDto() {
         return SummarizedPostDto.builder().id(id).title(title).category(category).subCategory(subCategory).viewCounts((long) viewedUsers.size()).createdAt(getCreatedAt()).build();
     }

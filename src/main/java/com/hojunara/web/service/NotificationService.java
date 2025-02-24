@@ -16,4 +16,6 @@ public interface NotificationService {
     void deleteNotificationById(Long id);
 
     Boolean updateNotificationAsRead(Long notificationId);
+
+    List<Notification> get20RecentNotificationsByUserId(Long userId);
 }

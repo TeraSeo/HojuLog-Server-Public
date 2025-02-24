@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -162,6 +161,16 @@ public class PostServiceImpl implements PostService {
         } catch (Exception e) {
             log.error("Failed to remove post with id: ", postId, e);
             return false;
+        }
+    }
+
+    @Override
+    public Long calculateLikeCountThisWeek(Long userId) {
+        try {
+            return postRepository.countLikesThisWeekByUserId(userId);
+        } catch (Exception e) {
+            log.error("Failed to calculate like count this week");
+            throw e;
         }
     }
 }
