@@ -587,4 +587,10 @@ public class PostController {
         Boolean isDeleted = postService.removePost(postId);
         return ResponseEntity.ok(isDeleted);
     }
+
+    @PutMapping("pin/post")
+    public ResponseEntity<Boolean> pinPost(@RequestParam Long postId, @RequestParam Long userId) {
+        Boolean isPinned = postService.updatePinStatus(postId, userId);
+        return ResponseEntity.ok(isPinned);
+    }
 }

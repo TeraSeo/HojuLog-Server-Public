@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,8 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private Boolean isCommentAllowed;
 
+    private Timestamp pinnedAdExpiry;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ViewedUser> viewedUsers = new ArrayList<>();
@@ -61,10 +65,6 @@ public abstract class Post extends PostBaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "paidPosts")
-    @Builder.Default
-    private List<User> paidByUsers = new ArrayList<>();
 
     @ManyToMany(mappedBy = "thisWeekLikedPosts")
     @Builder.Default

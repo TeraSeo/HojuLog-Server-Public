@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 @Slf4j
@@ -29,6 +28,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Autowired
     public OAuth2SuccessHandler(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
+//        setDefaultTargetUrl("http://hojulog-client.duckdns.org/oauth2/redirect");
         setDefaultTargetUrl("http://localhost:3000/oauth2/redirect");
     }
 
@@ -38,13 +38,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         clearAuthenticationAttributes(request, response);
 
         log.info("authentication succeeded and redirect");
+        log.info("redirect url: {}", targetUrl);
+
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        Optional<String> cookie = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
-        String targetUrl = cookie.orElse(getDefaultTargetUrl());
+//        Optional<String> cookie = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+//                .map(Cookie::getValue);
+        String targetUrl = "http://localhost:3000/oauth2/redirect";
 
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
         String accessToken = jwtToken.getAccessToken();

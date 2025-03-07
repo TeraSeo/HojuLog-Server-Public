@@ -33,7 +33,7 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = {"http://3.25.33.230/", "http://hojulog-client.duckdns.org", "http://localhost:3000"})
     @PostMapping("register")
     public ResponseEntity<ApiResponse> register(@RequestBody UserDto userDto) {
         try {
@@ -46,7 +46,7 @@ public class AuthController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = {"http://3.25.33.230/", "http://hojulog-client.duckdns.org", "http://localhost:3000"})
     @PostMapping("send/otp")
     public ResponseEntity<Boolean> sendOtp(@RequestParam String email) {
         try {
@@ -57,7 +57,7 @@ public class AuthController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = {"http://3.25.33.230/", "http://hojulog-client.duckdns.org", "http://localhost:3000"})
     @PostMapping("validate/token")
     public ResponseEntity<?> validateToken(@RequestHeader(required = false) String accessToken,
                                            @RequestHeader(required = false) String refreshToken,

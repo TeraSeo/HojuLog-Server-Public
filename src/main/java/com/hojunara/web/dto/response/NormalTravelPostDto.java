@@ -1,6 +1,5 @@
 package com.hojunara.web.dto.response;
 
-import com.hojunara.web.entity.Suburb;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -18,6 +17,8 @@ public class NormalTravelPostDto {
 
     private String description;
 
+    private String country;
+
     private Timestamp createdAt;
 
     private Long viewCounts;
@@ -31,4 +32,6 @@ public class NormalTravelPostDto {
     private Long commentCounts;
 
     private Boolean isCommentAllowed;
+
+    private Timestamp pinnedAdExpiry;
 }

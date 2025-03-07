@@ -1,8 +1,8 @@
 package com.hojunara.web.security.handler;
 
+import com.hojunara.web.exception.UserAlreadyExistsException;
 import com.hojunara.web.security.CookieUtils;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +22,13 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String targetUrl = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue).orElse("/");
-
-        targetUrl = UriComponentsBuilder.fromHttpUrl(targetUrl)
-                .queryParam("error", exception.getLocalizedMessage())
-                .toUriString();
+//        String targetUrl = "http://hojulog-client.duckdns.org/register/failed";
+        String targetUrl = "http://localhost:3000/register/failed";
+        if (exception instanceof UserAlreadyExistsException) {
+            targetUrl = UriComponentsBuilder.fromHttpUrl(targetUrl)
+                    .queryParam("error", "존재하는 계정이 있습니다")
+                    .toUriString();
+        }
 
         removeAuthorizationRequestCookies(request, response);
 

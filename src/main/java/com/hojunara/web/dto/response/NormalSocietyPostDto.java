@@ -29,4 +29,6 @@ public class NormalSocietyPostDto {
     private Long commentCounts;
 
     private Boolean isCommentAllowed;
+
+    private Timestamp pinnedAdExpiry;
 }

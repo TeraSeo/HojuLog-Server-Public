@@ -40,7 +40,7 @@ public class StudyPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateStudyPostDto convertToUpdateStudyPostDto() {

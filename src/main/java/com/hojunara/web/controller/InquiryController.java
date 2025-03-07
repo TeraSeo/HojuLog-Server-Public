@@ -1,6 +1,7 @@
 package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.request.InquiryDto;
+import com.hojunara.web.dto.response.DetailedInquiryDto;
 import com.hojunara.web.dto.response.SummarizedInquiryDto;
 import com.hojunara.web.dto.response.WholeInquiryPaginationResponse;
 import com.hojunara.web.entity.Inquiry;
@@ -31,6 +32,13 @@ public class InquiryController {
         Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
         SummarizedInquiryDto summarizedInquiryDto = inquiry.convertToSummarizedInquiryDto();
         return ResponseEntity.ok(summarizedInquiryDto);
+    }
+
+    @GetMapping("get/detailed")
+    public ResponseEntity<DetailedInquiryDto> getDetailedInquiry(@RequestParam Long inquiryId) {
+        Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
+        DetailedInquiryDto detailedInquiryDto = inquiry.convertToDetailedInquiryDto();
+        return ResponseEntity.ok(detailedInquiryDto);
     }
 
     @PostMapping("create")

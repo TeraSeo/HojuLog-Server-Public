@@ -29,4 +29,6 @@ public class NormalJobPostDto {
     private Long viewCounts;
 
     private SubCategory subCategory;
+
+    private Timestamp pinnedAdExpiry;
 }

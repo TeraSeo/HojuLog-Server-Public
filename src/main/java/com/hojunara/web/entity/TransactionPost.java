@@ -47,7 +47,7 @@ public class TransactionPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).build();
+        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateTransactionPostDto convertToUpdateTransactionPostDto() {

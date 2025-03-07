@@ -42,4 +42,6 @@ public class NormalPropertyPostDto {
     private Boolean isParkable;
 
     private Boolean isBillIncluded;
+
+    private Timestamp pinnedAdExpiry;
 }

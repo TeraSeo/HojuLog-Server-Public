@@ -5,10 +5,26 @@ spring:
         registration:
           google:
             client-id: 619211091396-pc5ik8gqfmsg047ld407vmc14irvalhm.apps.googleusercontent.com
-            client-secret: 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
+            client-secret: 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
             scope:
               - profile
               - email
+          kakao:
+            client-id: a4777e04b7c3483aa16f9b46a5960d48
+            client-secret: UZ3kKo8M7vhJWwfGWgRRmTm3l41kwgSx
+            client-name: Kakao
+            client-authentication-method: client_secret_post
+            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          kakao:
+            authorizationUri: https://kauth.kakao.com/oauth/authorize
+            tokenUri: https://kauth.kakao.com/oauth/token
+            userInfoUri: https://kapi.kakao.com/v2/user/me
+            userNameAttribute: id
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

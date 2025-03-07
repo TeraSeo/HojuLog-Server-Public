@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Pageable;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -155,8 +158,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Boolean removePost(Long postId) {
+        Post existingPost = getPostById(postId);
         try {
-            postRepository.deleteById(postId);
+            userService.removeLikedPostContaining(existingPost);
+            userService.removePaidPostContaining(existingPost);
+            postRepository.delete(existingPost);
             return true;
         } catch (Exception e) {
             log.error("Failed to remove post with id: ", postId, e);
@@ -170,6 +176,29 @@ public class PostServiceImpl implements PostService {
             return postRepository.countLikesThisWeekByUserId(userId);
         } catch (Exception e) {
             log.error("Failed to calculate like count this week");
+            throw e;
+        }
+    }
+
+    @Override
+    public Boolean updatePinStatus(Long postId, Long userId) {
+        Post existingPost = getPostById(postId);
+        User user = userService.getUserById(userId);
+        try {
+            if (user.getLog() >= 50) {
+                Timestamp expiryDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1));
+                existingPost.setPinnedAdExpiry(expiryDate);
+
+                postRepository.save(existingPost);
+                userService.updateUserLog(user, user.getLog() - 50);
+
+                log.info("Successfully pinned post with post id: {}", postId);
+                return true;
+            }
+            log.info("More log is needed to be pinned with user id : {}", userId);
+            return false;
+        } catch (Exception e) {
+            log.error("Failed to pin post with post id: {}", postId, e);
             throw e;
         }
     }

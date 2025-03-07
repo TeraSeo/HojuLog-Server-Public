@@ -37,7 +37,6 @@ public class User extends BaseEntity {
 
     private String description;
 
-    @Column(nullable = false)
     private Long log;
 
     @Enumerated(EnumType.STRING)
@@ -88,7 +87,7 @@ public class User extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "post_id")
     )
     @Builder.Default
-    private List<Post> paidPosts = new ArrayList<>();
+    private List<BlogPost> paidPosts = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -121,5 +120,9 @@ public class User extends BaseEntity {
         List<Long> likedPostIds = postLikes.stream().map(PostLike::getPost).limit(5).map(Post::getId).collect(Collectors.toList());
         List<Long> requestedIds = inquiries.stream().map(Inquiry::getId).limit(5).collect(Collectors.toList());
         return DetailedOwnUserDto.builder().id(id).username(username).description(description).log(log).likeCountThisWeek(0L).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).role(role).build();
+    }
+
+    public UserRankDto convertToUserRankDto() {
+        return UserRankDto.builder().userId(id).username(username).likeCountThisWeek(0L).profileUrl(profilePicture).build();
     }
 }

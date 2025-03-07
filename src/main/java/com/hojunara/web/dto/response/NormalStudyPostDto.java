@@ -29,4 +29,6 @@ public class NormalStudyPostDto {
     private Long commentCounts;
 
     private Boolean isCommentAllowed;
+
+    private Timestamp pinnedAdExpiry;
 }

@@ -33,4 +33,6 @@ public class NormalTransactionPostDto {
     private Long viewCounts;
 
     private Long commentCounts;
+
+    private Timestamp pinnedAdExpiry;
 }

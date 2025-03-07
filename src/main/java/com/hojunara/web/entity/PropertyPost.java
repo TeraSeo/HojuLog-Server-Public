@@ -60,7 +60,7 @@ public class PropertyPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getCreatedAt()).isBillIncluded(isBillIncluded).build();
+        return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getCreatedAt()).isBillIncluded(isBillIncluded).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdatePropertyPostDto convertToUpdatePropertyPostDto() {

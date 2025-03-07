@@ -2,7 +2,6 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.entity.Post;
 import java.util.List;
-import com.hojunara.web.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +23,6 @@ public interface PostService {
     Boolean removePost(Long postId);
 
     Long calculateLikeCountThisWeek(Long userId);
+
+    Boolean updatePinStatus(Long postId, Long userId);
 }

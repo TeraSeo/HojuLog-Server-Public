@@ -2,6 +2,7 @@ package com.hojunara.web.service;
 
 import com.hojunara.web.dto.request.AdminUpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
+import com.hojunara.web.entity.BlogPost;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.User;
 import org.springframework.data.domain.Page;
@@ -33,11 +34,17 @@ public interface UserService {
     
     Boolean provideLogThisWeek(List<User> users);
 
-    Boolean viewSecretPost(Long viewerId, Post post);
+    Boolean viewSecretPost(Long viewerId, BlogPost post);
 
     Boolean checkIsUserPaid(Long viewerId, Post post);
 
     void addLikeCountThisWeek(User user, Post post);
 
     void removeLikeCountThisWeek(User user, Post post);
+
+    void removeLikedPostContaining(Post post);
+
+    void removePaidPostContaining(Post post);
+
+    void updateUserLog(User user, Long logCount);
 }

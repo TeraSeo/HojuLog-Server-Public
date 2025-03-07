@@ -35,7 +35,7 @@ public class JobPost extends NormalPost {
     }
 
     public NormalJobPostDto convertPostToNormalJobPostDto() {
-        return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getCreatedAt()).build();
+        return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getCreatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateJobPostDto convertToUpdateJobPostDto() {

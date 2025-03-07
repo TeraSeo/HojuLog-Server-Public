@@ -1,6 +1,8 @@
 package com.hojunara.web.exception;
 
-public class UserAlreadyExistsException extends RuntimeException {
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+
+public class UserAlreadyExistsException extends OAuth2AuthenticationException {
     public UserAlreadyExistsException(String message) {
         super(message);
     }

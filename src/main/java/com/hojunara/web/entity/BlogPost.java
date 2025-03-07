@@ -20,4 +20,8 @@ public abstract class BlogPost extends Post {
     @OrderBy("orderIndex ASC")
     @Builder.Default
     private List<BlogContent> blogContents = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "paidPosts")
+    @Builder.Default
+    private List<User> paidByUsers = new ArrayList<>();
 }

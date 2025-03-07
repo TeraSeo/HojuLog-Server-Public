@@ -2,6 +2,9 @@ package com.hojunara.web.entity;
 
 public enum SubCategory {
 
+    // 이상형 월드컵
+    월드컵2강, 월드컵4강, 월드컵8강, 월드컵16강,
+
     // 부동산
     쉐어, 렌트, 매매,
 

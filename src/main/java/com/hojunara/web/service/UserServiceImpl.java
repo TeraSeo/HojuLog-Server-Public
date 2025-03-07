@@ -3,6 +3,7 @@ package com.hojunara.web.service;
 import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.AdminUpdateUserDto;
 import com.hojunara.web.dto.request.UserDto;
+import com.hojunara.web.entity.BlogPost;
 import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.RegistrationMethod;
 import com.hojunara.web.entity.User;
@@ -223,8 +224,13 @@ public class UserServiceImpl implements UserService {
                     1, 100L,
                     2, 90L,
                     3, 80L,
+                    4, 30L,
+                    5, 30L,
+                    6, 30L,
+                    7, 30L,
                     8, 30L,
-                    9, 20L
+                    9, 20L,
+                    10, 10L
             );
 
             AtomicInteger index = new AtomicInteger(1);
@@ -250,7 +256,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean viewSecretPost(Long viewerId, Post post) {
+    public Boolean viewSecretPost(Long viewerId, BlogPost post) {
         User viewer = getUserById(viewerId);
         User owner = post.getUser();
         try {
@@ -278,7 +284,7 @@ public class UserServiceImpl implements UserService {
     public Boolean checkIsUserPaid(Long viewerId, Post post) {
         User viewer = getUserById(viewerId);
         try {
-            List<Post> paidPosts = viewer.getPaidPosts();
+            List<BlogPost> paidPosts = viewer.getPaidPosts();
             List<Long> paidPostIds = paidPosts.stream().map(Post::getId).collect(Collectors.toList());
             if (paidPostIds.contains(post.getId())) {
                 return true;
@@ -324,4 +330,57 @@ public class UserServiceImpl implements UserService {
             log.error("Failed to remove like count this week", e);
         }
     }
+
+    @Override
+    public void removeLikedPostContaining(Post post) {
+        try {
+            List<User> users = userRepository.findAllByThisWeekLikedPostsContaining(post.getId());
+            for (User user : users) {
+                user.getThisWeekLikedPosts().remove(post);
+                userRepository.save(user);
+            }
+            log.info("Successfully removed liked post containing");
+        } catch (Exception e) {
+            log.error("Failed to remove liked post containing", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void removePaidPostContaining(Post post) {
+        try {
+            List<User> users = userRepository.findAllByPaidPostsContaining(post.getId());
+            for (User user : users) {
+                user.getPaidPosts().remove(post);
+                userRepository.save(user);
+            }
+            log.info("Successfully removed paid post containing");
+        } catch (Exception e) {
+            log.error("Failed to remove paid post containing", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void updateUserLog(User user, Long logCount) {
+        if (user == null) {
+            log.error("Cannot update log count: User is null");
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        if (logCount == null || logCount < 0) {
+            log.error("Invalid log count provided: {}", logCount);
+            throw new IllegalArgumentException("Log count must be non-negative");
+        }
+
+        try {
+            user.setLog(logCount);
+            userRepository.save(user);
+            log.info("Successfully updated log count for user ID {} to {}", user.getId(), logCount);
+        } catch (Exception e) {
+            log.error("Failed to update log count for user ID {} with log count {}", user.getId(), logCount, e);
+            throw e;
+        }
+    }
+
 }

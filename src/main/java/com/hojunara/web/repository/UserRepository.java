@@ -1,10 +1,12 @@
 package com.hojunara.web.repository;
 
+import com.hojunara.web.entity.Post;
 import com.hojunara.web.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +22,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u LEFT JOIN u.thisWeekLikedPosts p GROUP BY u ORDER BY COUNT(p) DESC")
     List<User> findTop10ByThisWeekLikedPosts();
+
+    @Query("SELECT u FROM User u JOIN u.thisWeekLikedPosts p WHERE p.id = :postId")
+    List<User> findAllByThisWeekLikedPostsContaining(@Param("postId") Long postId);
+
+    @Query("SELECT u FROM User u JOIN u.paidPosts p WHERE p.id = :postId")
+    List<User> findAllByPaidPostsContaining(@Param("postId") Long postId);
 }

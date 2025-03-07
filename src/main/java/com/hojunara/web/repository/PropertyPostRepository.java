@@ -1,12 +1,10 @@
 package com.hojunara.web.repository;
 
-import com.hojunara.web.entity.Category;
-import com.hojunara.web.entity.PropertyPost;
-import com.hojunara.web.entity.SubCategory;
-import com.hojunara.web.entity.Suburb;
+import com.hojunara.web.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,4 +30,13 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
     List<PropertyPost> findBySubCategoryAndSuburbOrderByCreatedAtDesc(SubCategory subCategory, Suburb suburb);
 
     List<PropertyPost> findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(String title, SubCategory subCategory, Suburb suburb);
+
+    @Query("SELECT p FROM Post p WHERE p.pinnedAdExpiry < CURRENT_TIMESTAMP")
+    List<PropertyPost> findExpiredPinnedAds();
+
+    @Query("SELECT p FROM PropertyPost p " +
+            "ORDER BY " +
+            "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
+            "p.createdAt DESC")
+    Page<PropertyPost> findAllWithPinnedFirst(Pageable pageable);
 }

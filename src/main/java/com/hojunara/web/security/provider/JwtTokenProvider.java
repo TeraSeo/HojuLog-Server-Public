@@ -22,6 +22,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -73,7 +74,13 @@ public class JwtTokenProvider {
     public String createAccessToken(Authentication authentication, String authority) {
         String email;
         if (authentication.getPrincipal() instanceof OAuth2User) {
-            email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            Map<String, Object> attributes = oAuth2User.getAttributes();
+            if (attributes.containsKey("kakao_account")) {
+                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+                email = (String) kakaoAccount.get("email");
+            }
+            else email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
         }
         else {
             email = authentication.getName();
@@ -93,7 +100,13 @@ public class JwtTokenProvider {
     public String createRefreshToken(Authentication authentication, String authorities) {
         String email;
         if (authentication.getPrincipal() instanceof OAuth2User) {
-            email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            Map<String, Object> attributes = oAuth2User.getAttributes();
+            if (attributes.containsKey("kakao_account")) {
+                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+                email = (String) kakaoAccount.get("email");
+            }
+            else email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
         }
         else {
             email = authentication.getName();

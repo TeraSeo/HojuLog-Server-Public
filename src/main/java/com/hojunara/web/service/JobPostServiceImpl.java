@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +54,7 @@ public class JobPostServiceImpl implements JobPostService {
     @Override
     public Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable) {
         try {
-            Page<JobPost> posts = jobPostRepository.findAllByOrderByCreatedAtDesc(pageable);
+            Page<JobPost> posts = jobPostRepository.findAllWithPinnedFirst(pageable);
             log.info("Successfully got pageable Job Posts order by createdAt Desc");
             return posts;
         } catch (Exception e) {
@@ -266,30 +263,34 @@ public class JobPostServiceImpl implements JobPostService {
 
         if (keywords != null && !keywords.isEmpty()) {
             jobPostList = jobPostList.stream()
-                    .filter(post -> {
+                    .map(post -> {
                         List<String> postKeywords = post.getKeywords().stream()
                                 .map(Keyword::getKeyWord)
                                 .toList();
 
-                        // 맞는 키워드 개수 체크
                         long matchCount = keywords.stream()
                                 .filter(postKeywords::contains)
                                 .count();
 
-                        // 최소 필요한 키워드 개수 정하기
+                        return new AbstractMap.SimpleEntry<>(post, matchCount);
+                    })
+                    .filter(entry -> {
+                        long matchCount = entry.getValue();
                         int totalSearchedKeywords = keywords.size();
                         long inCorrectKeywordsCount = totalSearchedKeywords - matchCount;
+
                         if (totalSearchedKeywords >= 7) {
                             return inCorrectKeywordsCount <= 3;
                         }
                         if (totalSearchedKeywords >= 5) {
                             return inCorrectKeywordsCount <= 2;
-                        }
-                        else if (totalSearchedKeywords >= 2) {
+                        } else if (totalSearchedKeywords >= 2) {
                             return inCorrectKeywordsCount <= 1;
                         }
                         return inCorrectKeywordsCount <= 0;
                     })
+                    .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue())) // Sort by matchCount descending
+                    .map(Map.Entry::getKey) // Extract the original post
                     .toList();
         }
 

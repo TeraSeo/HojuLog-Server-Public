@@ -44,7 +44,7 @@ public class TravelPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).location(location).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).country(country).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).location(location).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateTravelPostDto convertToUpdateTravelPostDto() {

@@ -40,7 +40,7 @@ public class SocietyPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalSocietyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return NormalSocietyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateSocietyPostDto convertToUpdateSocietyPostDto() {
