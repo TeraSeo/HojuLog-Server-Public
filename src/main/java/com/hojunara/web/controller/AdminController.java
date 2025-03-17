@@ -86,9 +86,7 @@ public class AdminController {
     @GetMapping("get/user")
     public ResponseEntity<NormalUserDto> getUserInfo(@RequestParam Long userId) {
         User user = userService.getUserById(userId);
-        Long likeCountThisWeek = postService.calculateLikeCountThisWeek(userId);
         NormalUserDto normalUserDto = user.convertToNormalUserDto();
-        normalUserDto.setLikeCountThisWeek(likeCountThisWeek);
         return ResponseEntity.ok(normalUserDto);
     }
 
@@ -99,8 +97,6 @@ public class AdminController {
                 .stream()
                 .map(user -> {
                     NormalUserDto dto = user.convertToNormalUserDto();
-                    Long likeCountThisWeek = postService.calculateLikeCountThisWeek(user.getId());
-                    dto.setLikeCountThisWeek(likeCountThisWeek);
                     return dto;
                 })
                 .collect(Collectors.toList());

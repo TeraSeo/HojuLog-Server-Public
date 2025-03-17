@@ -11,17 +11,17 @@ import java.util.List;
 
 @Repository
 public interface SocietyPostRepository extends JpaRepository<SocietyPost, Long> {
-    Page<SocietyPost> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    List<SocietyPost> findAllByOrderByUpdatedAtDesc();
 
-    Page<SocietyPost> findAllBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory, Pageable pageable);
+    Page<SocietyPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
 
-    List<SocietyPost> findTop5ByOrderByCreatedAtDesc();
+    List<SocietyPost> findTop5ByOrderByUpdatedAtDesc();
 
-    List<SocietyPost> findByTitleContainingOrderByCreatedAtDesc(String title);
+    List<SocietyPost> findByTitleContainingOrderByUpdatedAtDesc(String title);
 
-    List<SocietyPost> findBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory);
+    List<SocietyPost> findBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory);
 
-    List<SocietyPost> findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(String title, SubCategory subCategory);
+    List<SocietyPost> findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(String title, SubCategory subCategory);
 
     @Query("SELECT p FROM Post p WHERE p.pinnedAdExpiry < CURRENT_TIMESTAMP")
     List<SocietyPost> findExpiredPinnedAds();
@@ -29,6 +29,6 @@ public interface SocietyPostRepository extends JpaRepository<SocietyPost, Long> 
     @Query("SELECT p FROM SocietyPost p " +
             "ORDER BY " +
             "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
-            "p.createdAt DESC")
+            "p.updatedAt DESC")
     Page<SocietyPost> findAllWithPinnedFirst(Pageable pageable);
 }

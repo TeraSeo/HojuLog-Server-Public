@@ -11,25 +11,25 @@ import java.util.List;
 
 @Repository
 public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long> {
-    Page<PropertyPost> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    List<PropertyPost> findAllByOrderByUpdatedAtDesc();
 
-    Page<PropertyPost> findAllBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory, Pageable pageable);
+    Page<PropertyPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
 
-    List<PropertyPost> findTop5ByOrderByCreatedAtDesc();
+    List<PropertyPost> findTop5ByOrderByUpdatedAtDesc();
 
-    List<PropertyPost> findByTitleContainingOrderByCreatedAtDesc(String title);
+    List<PropertyPost> findByTitleContainingOrderByUpdatedAtDesc(String title);
 
-    List<PropertyPost> findBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory);
+    List<PropertyPost> findBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory);
 
-    List<PropertyPost> findBySuburbOrderByCreatedAtDesc(Suburb suburb);
+    List<PropertyPost> findBySuburbOrderByUpdatedAtDesc(Suburb suburb);
 
-    List<PropertyPost> findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(String title, SubCategory subCategory);
+    List<PropertyPost> findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(String title, SubCategory subCategory);
 
-    List<PropertyPost> findByTitleContainingAndSuburbOrderByCreatedAtDesc(String title, Suburb suburb);
+    List<PropertyPost> findByTitleContainingAndSuburbOrderByUpdatedAtDesc(String title, Suburb suburb);
 
-    List<PropertyPost> findBySubCategoryAndSuburbOrderByCreatedAtDesc(SubCategory subCategory, Suburb suburb);
+    List<PropertyPost> findBySubCategoryAndSuburbOrderByUpdatedAtDesc(SubCategory subCategory, Suburb suburb);
 
-    List<PropertyPost> findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(String title, SubCategory subCategory, Suburb suburb);
+    List<PropertyPost> findByTitleContainingAndSubCategoryAndSuburbOrderByUpdatedAtDesc(String title, SubCategory subCategory, Suburb suburb);
 
     @Query("SELECT p FROM Post p WHERE p.pinnedAdExpiry < CURRENT_TIMESTAMP")
     List<PropertyPost> findExpiredPinnedAds();
@@ -37,6 +37,6 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
     @Query("SELECT p FROM PropertyPost p " +
             "ORDER BY " +
             "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
-            "p.createdAt DESC")
+            "p.updatedAt DESC")
     Page<PropertyPost> findAllWithPinnedFirst(Pageable pageable);
 }

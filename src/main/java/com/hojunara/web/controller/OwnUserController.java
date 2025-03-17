@@ -26,9 +26,7 @@ public class OwnUserController {
     @GetMapping("get/specific")
     public ResponseEntity<DetailedOwnUserDto> getSpecificOwnUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
-        Long likeCountThisWeek = postService.calculateLikeCountThisWeek(userId);
         DetailedOwnUserDto detailedOwnUserDto = user.convertToDetailedOwnUserDto();
-        detailedOwnUserDto.setLikeCountThisWeek(likeCountThisWeek);
         return ResponseEntity.ok(detailedOwnUserDto);
     }
 
@@ -39,5 +37,11 @@ public class OwnUserController {
                                               @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         Boolean isUpdated = userService.updateUser(userId, username, description, profilePicture);
         return ResponseEntity.ok(isUpdated);
+    }
+
+    @PutMapping("update/attendance")
+    public ResponseEntity<Boolean> updateAttendance(@RequestHeader("userId") Long userId) {
+        Boolean isAttended = userService.updateAttendance(userId);
+        return ResponseEntity.ok(isAttended);
     }
 }

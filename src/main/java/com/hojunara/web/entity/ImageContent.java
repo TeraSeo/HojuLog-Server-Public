@@ -12,5 +12,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class ImageContent extends BlogContent {
+    @Column(length = 1000)
     private String imageUrl;
 }

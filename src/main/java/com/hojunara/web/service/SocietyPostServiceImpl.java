@@ -1,6 +1,5 @@
 package com.hojunara.web.service;
 
-import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.SocietyPostDto;
 import com.hojunara.web.dto.request.UpdateSocietyPostDto;
 import com.hojunara.web.entity.*;
@@ -15,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,7 +65,7 @@ public class SocietyPostServiceImpl implements SocietyPostService {
     @Override
     public Page<SocietyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
-            Page<SocietyPost> posts = societyPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            Page<SocietyPost> posts = societyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
             log.info("Successfully got pageable Society Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -75,7 +77,7 @@ public class SocietyPostServiceImpl implements SocietyPostService {
     @Override
     public List<SocietyPost> getRecent5Posts() {
         try {
-            List<SocietyPost> posts = societyPostRepository.findTop5ByOrderByCreatedAtDesc();
+            List<SocietyPost> posts = societyPostRepository.findTop5ByOrderByUpdatedAtDesc();
             log.info("Successfully got Recent 5 Society Posts");
             return posts;
         } catch (Exception e) {
@@ -107,7 +109,7 @@ public class SocietyPostServiceImpl implements SocietyPostService {
                     .title(societyPostDto.getTitle())
                     .category(Category.생활)
                     .subCategory(societyPostDto.getSubCategory())
-                    .postType(PostType.NORMAL)
+                    .postType(PostType.BLOG)
                     .isPublic(societyPostDto.getIsPublic())
                     .isCommentAllowed(societyPostDto.getIsCommentAllowed())
                     .build();
@@ -140,21 +142,16 @@ public class SocietyPostServiceImpl implements SocietyPostService {
         User user = userService.getUserById(updateSocietyPostDto.getUserId());
         try {
             SocietyPost societyPost = getPostById(updateSocietyPostDto.getPostId());
-
-            boolean isUpdated = false;
             boolean isBlogUpdated = false;
 
             if (!societyPost.getTitle().equals(updateSocietyPostDto.getTitle())) {
                 societyPost.setTitle(updateSocietyPostDto.getTitle());
-                isUpdated = true;
             }
             if (!societyPost.getIsPublic().equals(updateSocietyPostDto.getIsPublic())) {
                 societyPost.setIsPublic(updateSocietyPostDto.getIsPublic());
-                isUpdated = true;
             }
             if (!societyPost.getIsCommentAllowed().equals(updateSocietyPostDto.getIsCommentAllowed())) {
                 societyPost.setIsCommentAllowed(updateSocietyPostDto.getIsCommentAllowed());
-                isUpdated = true;
             }
 
             // 블로그 contents 업데이트
@@ -207,34 +204,12 @@ public class SocietyPostServiceImpl implements SocietyPostService {
             }
 
             // 키워드 업데이트
-            List<String> originalKeywords = societyPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
             List<String> updatedKeywords = updateSocietyPostDto.getSelectedKeywords();
-            if (!originalKeywords.equals(updatedKeywords)) {
-                List<String> addedKeywords = updatedKeywords.stream()
-                        .filter(keyword -> !originalKeywords.contains(keyword))
-                        .collect(Collectors.toList());
+            keywordService.updateKeyword(societyPost, updatedKeywords);
 
-                List<String> removedKeywords = originalKeywords.stream()
-                        .filter(keyword -> !updatedKeywords.contains(keyword))
-                        .collect(Collectors.toList());
-
-                if (!addedKeywords.isEmpty()) {
-                    addedKeywords.forEach(keyword -> {
-                        keywordService.createKeyword(keyword, societyPost);
-                    });
-                }
-
-                if (!removedKeywords.isEmpty()) {
-                    societyPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
-                }
-
-                isUpdated = true;
-            }
-
-            if (isUpdated || isBlogUpdated) {
-                societyPostRepository.save(societyPost);
-                societyPostRepository.flush(); // 업데이트 내용 반영
-            }
+            societyPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            societyPostRepository.save(societyPost);
+            societyPostRepository.flush(); // 업데이트 내용 반영
 
             // contents 순서 알맞게 변경
             if (isBlogUpdated) {
@@ -348,22 +323,22 @@ public class SocietyPostServiceImpl implements SocietyPostService {
 
     @Override
     public List<SocietyPost> searchByCategory() {
-        return societyPostRepository.findAll();
+        return societyPostRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
     public List<SocietyPost> searchByTitle(String title) {
-        return societyPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+        return societyPostRepository.findByTitleContainingOrderByUpdatedAtDesc(title);
     }
 
     @Override
     public List<SocietyPost> searchBySubCategory(SubCategory subCategory) {
-        return societyPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+        return societyPostRepository.findBySubCategoryOrderByUpdatedAtDesc(subCategory);
     }
 
     @Override
     public List<SocietyPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
-        return societyPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+        return societyPostRepository.findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(title, subCategory);
     }
 
     @Override

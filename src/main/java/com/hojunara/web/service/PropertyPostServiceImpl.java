@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,7 +69,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     @Override
     public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
             log.info("Successfully got pageable Property Posts order by createdAt Desc and subCategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -78,7 +81,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     @Override
     public List<PropertyPost> getRecent5Posts() {
         try {
-            List<PropertyPost> posts = propertyPostRepository.findTop5ByOrderByCreatedAtDesc();
+            List<PropertyPost> posts = propertyPostRepository.findTop5ByOrderByUpdatedAtDesc();
             log.info("Successfully got Recent 5 Property Posts");
             return posts;
         } catch (Exception e) {
@@ -154,66 +157,49 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     public Post updatePost(UpdatePropertyPostDto updatePropertyPostDto, MultipartFile[] images) {
         UpdatePropertyMainInfoPostDto updatePropertyMainInfoPostDto = updatePropertyPostDto.getUpdatePropertyMainInfoPostDto();
         User user = userService.getUserById(updatePropertyMainInfoPostDto.getUserId());
+        PropertyPost propertyPost = getPostById(updatePropertyMainInfoPostDto.getPostId());
         try {
-            PropertyPost propertyPost = getPostById(updatePropertyMainInfoPostDto.getPostId());
-
-            boolean isUpdated = false;
-
             if (!propertyPost.getTitle().equals(updatePropertyMainInfoPostDto.getTitle())) {
                 propertyPost.setTitle(updatePropertyMainInfoPostDto.getTitle());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getDescription(), updatePropertyMainInfoPostDto.getDescription())) {
                 propertyPost.setDescription(updatePropertyMainInfoPostDto.getDescription());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getContact(), updatePropertyMainInfoPostDto.getContact())) {
                 propertyPost.setContact(updatePropertyMainInfoPostDto.getContact());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getEmail(), updatePropertyMainInfoPostDto.getEmail())) {
                 propertyPost.setEmail(updatePropertyMainInfoPostDto.getEmail());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getSuburb(), updatePropertyMainInfoPostDto.getSuburb())) {
                 propertyPost.setSuburb(updatePropertyMainInfoPostDto.getSuburb());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getPeriod(), updatePropertyMainInfoPostDto.getPeriod())) {
                 propertyPost.setPeriod(updatePropertyMainInfoPostDto.getPeriod());
-                isUpdated = true;
             }
             if (propertyPost.getPrice() != updatePropertyMainInfoPostDto.getPrice()) {
                 propertyPost.setPrice(updatePropertyMainInfoPostDto.getPrice());
-                isUpdated = true;
             }
             if (!propertyPost.getLocation().equals(updatePropertyMainInfoPostDto.getLocation())) {
                 propertyPost.setLocation(updatePropertyMainInfoPostDto.getLocation());
-                isUpdated = true;
             }
             if (!propertyPost.getAvailableTime().equals(updatePropertyMainInfoPostDto.getAvailableTime())) {
                 propertyPost.setAvailableTime(updatePropertyMainInfoPostDto.getAvailableTime());
-                isUpdated = true;
             }
             if (!propertyPost.getRoomCount().equals(updatePropertyMainInfoPostDto.getRoomCount())) {
                 propertyPost.setRoomCount(updatePropertyMainInfoPostDto.getRoomCount());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getBathroomType(), updatePropertyMainInfoPostDto.getBathroomType())) {
                 propertyPost.setBathroomType(updatePropertyMainInfoPostDto.getBathroomType());
-                isUpdated = true;
             }
             if (!propertyPost.getIsParkable().equals(updatePropertyMainInfoPostDto.getIsParkable())) {
                 propertyPost.setIsParkable(updatePropertyMainInfoPostDto.getIsParkable());
-                isUpdated = true;
             }
             if (!Objects.equals(propertyPost.getIsBillIncluded(), updatePropertyMainInfoPostDto.getIsBillIncluded())) {
                 propertyPost.setIsBillIncluded(updatePropertyMainInfoPostDto.getIsBillIncluded());
-                isUpdated = true;
             }
             if (!propertyPost.getIsCommentAllowed().equals(updatePropertyMainInfoPostDto.getIsCommentAllowed())) {
                 propertyPost.setIsCommentAllowed(updatePropertyMainInfoPostDto.getIsCommentAllowed());
-                isUpdated = true;
             }
 
             List<String> imageUrls = propertyPost.getImages().stream().map(Image::getUrl).collect(Collectors.toList());
@@ -229,34 +215,12 @@ public class PropertyPostServiceImpl implements PropertyPostService {
             }
 
             // 키워드 업데이트
-            List<String> originalKeywords = propertyPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
             List<String> updatedKeywords = updatePropertyMainInfoPostDto.getSelectedKeywords();
-            if (!originalKeywords.equals(updatedKeywords)) {
-                List<String> addedKeywords = updatedKeywords.stream()
-                        .filter(keyword -> !originalKeywords.contains(keyword))
-                        .collect(Collectors.toList());
+            keywordService.updateKeyword(propertyPost, updatedKeywords);
 
-                List<String> removedKeywords = originalKeywords.stream()
-                        .filter(keyword -> !updatedKeywords.contains(keyword))
-                        .collect(Collectors.toList());
-
-                if (!addedKeywords.isEmpty()) {
-                    addedKeywords.forEach(keyword -> {
-                        keywordService.createKeyword(keyword, propertyPost);
-                    });
-                }
-
-                if (!removedKeywords.isEmpty()) {
-                    propertyPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
-                }
-
-                isUpdated = true;
-            }
-
-            if (isUpdated) {
-                propertyPostRepository.save(propertyPost);
-                propertyPostRepository.flush(); // 업데이트 내용 반영
-            }
+            propertyPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            propertyPostRepository.save(propertyPost);
+            propertyPostRepository.flush(); // 업데이트 내용 반영
 
             // save post images data
             if (images != null) {
@@ -329,42 +293,42 @@ public class PropertyPostServiceImpl implements PropertyPostService {
 
     @Override
     public List<PropertyPost> searchByCategory() {
-        return propertyPostRepository.findAll();
+        return propertyPostRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
     public List<PropertyPost> searchByTitle(String title) {
-        return propertyPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+        return propertyPostRepository.findByTitleContainingOrderByUpdatedAtDesc(title);
     }
 
     @Override
     public List<PropertyPost> searchBySubCategory(SubCategory subCategory) {
-        return propertyPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+        return propertyPostRepository.findBySubCategoryOrderByUpdatedAtDesc(subCategory);
     }
 
     @Override
     public List<PropertyPost> searchBySuburb(Suburb suburb) {
-        return propertyPostRepository.findBySuburbOrderByCreatedAtDesc(suburb);
+        return propertyPostRepository.findBySuburbOrderByUpdatedAtDesc(suburb);
     }
 
     @Override
     public List<PropertyPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
-        return propertyPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+        return propertyPostRepository.findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(title, subCategory);
     }
 
     @Override
     public List<PropertyPost> searchByTitleAndSuburb(String title, Suburb suburb) {
-        return propertyPostRepository.findByTitleContainingAndSuburbOrderByCreatedAtDesc(title, suburb);
+        return propertyPostRepository.findByTitleContainingAndSuburbOrderByUpdatedAtDesc(title, suburb);
     }
 
     @Override
     public List<PropertyPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb) {
-        return propertyPostRepository.findBySubCategoryAndSuburbOrderByCreatedAtDesc(subCategory, suburb);
+        return propertyPostRepository.findBySubCategoryAndSuburbOrderByUpdatedAtDesc(subCategory, suburb);
     }
 
     @Override
     public List<PropertyPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb) {
-        return propertyPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(title, subCategory, suburb);
+        return propertyPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByUpdatedAtDesc(title, subCategory, suburb);
     }
 
     @Override

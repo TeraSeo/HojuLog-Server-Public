@@ -4,7 +4,6 @@ import com.hojunara.web.entity.JwtToken;
 import com.hojunara.web.security.CookieUtils;
 import com.hojunara.web.security.provider.JwtTokenProvider;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +27,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Autowired
     public OAuth2SuccessHandler(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-//        setDefaultTargetUrl("http://hojulog-client.duckdns.org/oauth2/redirect");
-        setDefaultTargetUrl("http://localhost:3000/oauth2/redirect");
+        setDefaultTargetUrl("http://www.hojulog.com/oauth2/redirect");
     }
 
     @Override
@@ -46,7 +44,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 //        Optional<String> cookie = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
 //                .map(Cookie::getValue);
-        String targetUrl = "http://localhost:3000/oauth2/redirect";
+        String targetUrl = "http://www.hojulog.com/oauth2/redirect";
 
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
         String accessToken = jwtToken.getAccessToken();

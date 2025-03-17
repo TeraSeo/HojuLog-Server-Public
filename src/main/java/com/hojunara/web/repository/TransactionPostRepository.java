@@ -11,25 +11,25 @@ import java.util.List;
 
 @Repository
 public interface TransactionPostRepository extends JpaRepository<TransactionPost, Long> {
-    Page<TransactionPost> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    List<TransactionPost> findAllByOrderByUpdatedAtDesc();
 
-    List<TransactionPost> findTop5ByOrderByCreatedAtDesc();
+    List<TransactionPost> findTop5ByOrderByUpdatedAtDesc();
 
-    Page<TransactionPost> findAllBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory, Pageable pageable);
+    Page<TransactionPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
 
-    List<TransactionPost> findByTitleContainingOrderByCreatedAtDesc(String title);
+    List<TransactionPost> findByTitleContainingOrderByUpdatedAtDesc(String title);
 
-    List<TransactionPost> findBySubCategoryOrderByCreatedAtDesc(SubCategory subCategory);
+    List<TransactionPost> findBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory);
 
-    List<TransactionPost> findBySuburbOrderByCreatedAtDesc(Suburb suburb);
+    List<TransactionPost> findBySuburbOrderByUpdatedAtDesc(Suburb suburb);
 
-    List<TransactionPost> findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(String title, SubCategory subCategory);
+    List<TransactionPost> findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(String title, SubCategory subCategory);
 
-    List<TransactionPost> findByTitleContainingAndSuburbOrderByCreatedAtDesc(String title, Suburb suburb);
+    List<TransactionPost> findByTitleContainingAndSuburbOrderByUpdatedAtDesc(String title, Suburb suburb);
 
-    List<TransactionPost> findBySubCategoryAndSuburbOrderByCreatedAtDesc(SubCategory subCategory, Suburb suburb);
+    List<TransactionPost> findBySubCategoryAndSuburbOrderByUpdatedAtDesc(SubCategory subCategory, Suburb suburb);
 
-    List<TransactionPost> findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(String title, SubCategory subCategory, Suburb suburb);
+    List<TransactionPost> findByTitleContainingAndSubCategoryAndSuburbOrderByUpdatedAtDesc(String title, SubCategory subCategory, Suburb suburb);
 
     @Query("SELECT p FROM Post p WHERE p.pinnedAdExpiry < CURRENT_TIMESTAMP")
     List<TransactionPost> findExpiredPinnedAds();
@@ -37,6 +37,6 @@ public interface TransactionPostRepository extends JpaRepository<TransactionPost
     @Query("SELECT p FROM TransactionPost p " +
             "ORDER BY " +
             "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
-            "p.createdAt DESC")
+            "p.updatedAt DESC")
     Page<TransactionPost> findAllWithPinnedFirst(Pageable pageable);
 }

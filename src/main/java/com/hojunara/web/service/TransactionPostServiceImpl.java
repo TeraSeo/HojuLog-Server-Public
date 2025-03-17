@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,7 +69,7 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     @Override
     public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
             log.info("Successfully got pageable Transaction Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -78,7 +81,7 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     @Override
     public List<TransactionPost> getRecent5Posts() {
         try {
-            List<TransactionPost> posts = transactionPostRepository.findTop5ByOrderByCreatedAtDesc();
+            List<TransactionPost> posts = transactionPostRepository.findTop5ByOrderByUpdatedAtDesc();
             log.info("Successfully got Recent 5 Transaction Posts");
             return posts;
         } catch (Exception e) {
@@ -150,46 +153,34 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     public Post updatePost(UpdateTransactionPostDto updateTransactionPostDto, MultipartFile[] images) {
         UpdateTransactionMainInfoPostDto updateTransactionMainInfoPostDto = updateTransactionPostDto.getUpdateTransactionMainInfoPostDto();
         User user = userService.getUserById(updateTransactionMainInfoPostDto.getUserId());
+        TransactionPost transactionPost = getPostById(updateTransactionMainInfoPostDto.getPostId());
         try {
-            TransactionPost transactionPost = getPostById(updateTransactionMainInfoPostDto.getPostId());
-
-            boolean isUpdated = false;
-
             if (!transactionPost.getTitle().equals(updateTransactionMainInfoPostDto.getTitle())) {
                 transactionPost.setTitle(updateTransactionMainInfoPostDto.getTitle());
-                isUpdated = true;
             }
             if (!Objects.equals(transactionPost.getDescription(), updateTransactionMainInfoPostDto.getDescription())) {
                 transactionPost.setDescription(updateTransactionMainInfoPostDto.getDescription());
-                isUpdated = true;
             }
             if (!Objects.equals(transactionPost.getContact(), updateTransactionMainInfoPostDto.getContact())) {
                 transactionPost.setContact(updateTransactionMainInfoPostDto.getContact());
-                isUpdated = true;
             }
             if (!Objects.equals(transactionPost.getEmail(), updateTransactionMainInfoPostDto.getEmail())) {
                 transactionPost.setEmail(updateTransactionMainInfoPostDto.getEmail());
-                isUpdated = true;
             }
             if (!Objects.equals(transactionPost.getSuburb(), updateTransactionMainInfoPostDto.getSuburb())) {
                 transactionPost.setSuburb(updateTransactionMainInfoPostDto.getSuburb());
-                isUpdated = true;
             }
             if (!Objects.equals(transactionPost.getTransactionType(), updateTransactionMainInfoPostDto.getTransactionType())) {
                 transactionPost.setTransactionType(updateTransactionMainInfoPostDto.getTransactionType());
-                isUpdated = true;
             }
             if (!Objects.equals(transactionPost.getPriceType(), updateTransactionMainInfoPostDto.getPriceType())) {
                 transactionPost.setPriceType(updateTransactionMainInfoPostDto.getPriceType());
-                isUpdated = true;
             }
             if (transactionPost.getPrice() != updateTransactionMainInfoPostDto.getPrice()) {
                 transactionPost.setPrice(updateTransactionMainInfoPostDto.getPrice());
-                isUpdated = true;
             }
             if (!transactionPost.getIsCommentAllowed().equals(updateTransactionMainInfoPostDto.getIsCommentAllowed())) {
                 transactionPost.setIsCommentAllowed(updateTransactionMainInfoPostDto.getIsCommentAllowed());
-                isUpdated = true;
             }
 
             List<String> imageUrls = transactionPost.getImages().stream().map(Image::getUrl).collect(Collectors.toList());
@@ -205,34 +196,12 @@ public class TransactionPostServiceImpl implements TransactionPostService {
             }
 
             // 키워드 업데이트
-            List<String> originalKeywords = transactionPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
             List<String> updatedKeywords = updateTransactionMainInfoPostDto.getSelectedKeywords();
-            if (!originalKeywords.equals(updatedKeywords)) {
-                List<String> addedKeywords = updatedKeywords.stream()
-                        .filter(keyword -> !originalKeywords.contains(keyword))
-                        .collect(Collectors.toList());
+            keywordService.updateKeyword(transactionPost, updatedKeywords);
 
-                List<String> removedKeywords = originalKeywords.stream()
-                        .filter(keyword -> !updatedKeywords.contains(keyword))
-                        .collect(Collectors.toList());
-
-                if (!addedKeywords.isEmpty()) {
-                    addedKeywords.forEach(keyword -> {
-                        keywordService.createKeyword(keyword, transactionPost);
-                    });
-                }
-
-                if (!removedKeywords.isEmpty()) {
-                    transactionPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
-                }
-
-                isUpdated = true;
-            }
-
-            if (isUpdated) {
-                transactionPostRepository.save(transactionPost);
-                transactionPostRepository.flush(); // 업데이트 내용 반영
-            }
+            transactionPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            transactionPostRepository.save(transactionPost);
+            transactionPostRepository.flush(); // 업데이트 내용 반영
 
             // save post images data
             if (images != null) {
@@ -305,42 +274,42 @@ public class TransactionPostServiceImpl implements TransactionPostService {
 
     @Override
     public List<TransactionPost> searchByCategory() {
-        return transactionPostRepository.findAll();
+        return transactionPostRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
     public List<TransactionPost> searchByTitle(String title) {
-        return transactionPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+        return transactionPostRepository.findByTitleContainingOrderByUpdatedAtDesc(title);
     }
 
     @Override
     public List<TransactionPost> searchBySubCategory(SubCategory subCategory) {
-        return transactionPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+        return transactionPostRepository.findBySubCategoryOrderByUpdatedAtDesc(subCategory);
     }
 
     @Override
     public List<TransactionPost> searchBySuburb(Suburb suburb) {
-        return transactionPostRepository.findBySuburbOrderByCreatedAtDesc(suburb);
+        return transactionPostRepository.findBySuburbOrderByUpdatedAtDesc(suburb);
     }
 
     @Override
     public List<TransactionPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
-        return transactionPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+        return transactionPostRepository.findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(title, subCategory);
     }
 
     @Override
     public List<TransactionPost> searchByTitleAndSuburb(String title, Suburb suburb) {
-        return transactionPostRepository.findByTitleContainingAndSuburbOrderByCreatedAtDesc(title, suburb);
+        return transactionPostRepository.findByTitleContainingAndSuburbOrderByUpdatedAtDesc(title, suburb);
     }
 
     @Override
     public List<TransactionPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb) {
-        return transactionPostRepository.findBySubCategoryAndSuburbOrderByCreatedAtDesc(subCategory, suburb);
+        return transactionPostRepository.findBySubCategoryAndSuburbOrderByUpdatedAtDesc(subCategory, suburb);
     }
 
     @Override
     public List<TransactionPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb) {
-        return transactionPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(title, subCategory, suburb);
+        return transactionPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByUpdatedAtDesc(title, subCategory, suburb);
     }
 
     @Override

@@ -74,7 +74,7 @@ public class PostLikeServiceImpl implements PostLikeService {
             user.getPostLikes().add(postLike);
             postLikeRepository.save(postLike);
 
-            userService.addLikeCountThisWeek(user, post); // 좋아요 한 유저와, 좋아요 받은 게시물 추가
+            userService.addLikeCountThisWeek(post); // 좋아요 한 유저와, 좋아요 받은 게시물 추가
 
             String message = String.format("'%s' 님이 '%s' 게시물에 좋아요를 눌렀습니다!", user.getUsername(), post.getTitle());
             notificationService.createNotification("좋아요 알림", message, post.getUser());
@@ -102,7 +102,7 @@ public class PostLikeServiceImpl implements PostLikeService {
 
                 postLikeRepository.deleteById(postLike.getId());
 
-                userService.removeLikeCountThisWeek(user, post); // 좋아요 한 유저와, 좋아요 받은 게시물 추가
+                userService.removeLikeCountThisWeek(post); // 좋아요 한 유저와, 좋아요 받은 게시물 추가
 
                 log.info("Successfully deleted post like with id: {}", postLike.getId());
 

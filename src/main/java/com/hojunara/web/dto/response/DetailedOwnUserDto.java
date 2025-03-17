@@ -3,6 +3,7 @@ package com.hojunara.web.dto.response;
 import com.hojunara.web.entity.Role;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -32,4 +33,6 @@ public class DetailedOwnUserDto {
     private Long log;
 
     private Long likeCountThisWeek;
+
+    private Timestamp lastAttendanceTime;
 }

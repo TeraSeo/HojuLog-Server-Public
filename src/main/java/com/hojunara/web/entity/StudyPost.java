@@ -28,7 +28,7 @@ public class StudyPost extends BlogPost {
     private String school;
 
     public SummarizedStudyPostDto convertPostToSummarizedStudyPostDto() {
-        return SummarizedStudyPostDto.builder().postId(getId()).title(getTitle()).createdAt(getCreatedAt()).isPublic(getIsPublic()).build();
+        return SummarizedStudyPostDto.builder().postId(getId()).title(getTitle()).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalStudyPostDto convertPostToNormalStudyPostDto() {
@@ -40,7 +40,7 @@ public class StudyPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getUpdatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateStudyPostDto convertToUpdateStudyPostDto() {
@@ -66,6 +66,6 @@ public class StudyPost extends BlogPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).school(school).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedStudyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).school(school).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

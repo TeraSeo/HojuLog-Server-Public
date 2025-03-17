@@ -41,9 +41,7 @@ public class UserController {
     @GetMapping("get/specific")
     public ResponseEntity<DetailedUserDto> getSpecificDetailedUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
-        Long likeCountThisWeek = postService.calculateLikeCountThisWeek(userId);
         DetailedUserDto detailedUserDto = user.convertToDetailedUserDto();
-        detailedUserDto.setLikeCountThisWeek(likeCountThisWeek);
         return ResponseEntity.ok(detailedUserDto);
     }
 
@@ -75,8 +73,6 @@ public class UserController {
                 .stream()
                 .map(user -> {
                     UserRankDto userRankDto = user.convertToUserRankDto();
-                    Long likeCountThisWeek = postService.calculateLikeCountThisWeek(user.getId());
-                    userRankDto.setLikeCountThisWeek(likeCountThisWeek);
                     return userRankDto;
                 })
                 .collect(Collectors.toList());

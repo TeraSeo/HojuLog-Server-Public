@@ -16,12 +16,12 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<Post> findAllByOrderByUpdatedAtDesc(Pageable pageable);
 
-    Page<Post> findAllByOrderByCreatedAtAsc(Pageable pageable);
+    Page<Post> findAllByOrderByUpdatedAtAsc(Pageable pageable);
 
-    @Query("SELECT COUNT(u) FROM Post p JOIN p.likedByUsersThisWeek u WHERE p.user.id = :userId")
-    Long countLikesThisWeekByUserId(@Param("userId") Long userId);
+//    @Query("SELECT COUNT(u) FROM Post p JOIN p.likedByUsersThisWeek u WHERE p.user.id = :userId")
+//    Long countLikesThisWeekByUserId(@Param("userId") Long userId);
 
 //    Page<Post> findAllByOrderByLikesCountDesc(Pageable pageable);
 //

@@ -32,7 +32,7 @@ public class TravelPost extends BlogPost {
     private String location;
 
     public SummarizedTravelPostDto convertPostToSummarizedTravelPostDto() {
-        return SummarizedTravelPostDto.builder().postId(getId()).title(getTitle()).location(location).createdAt(getCreatedAt()).isPublic(getIsPublic()).build();
+        return SummarizedTravelPostDto.builder().postId(getId()).title(getTitle()).location(location).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalTravelPostDto convertPostToNormalTravelPostDto() {
@@ -44,7 +44,7 @@ public class TravelPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).country(country).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).location(location).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).country(country).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).location(location).createdAt(getUpdatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateTravelPostDto convertToUpdateTravelPostDto() {
@@ -70,6 +70,6 @@ public class TravelPost extends BlogPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).location(location).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).location(location).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

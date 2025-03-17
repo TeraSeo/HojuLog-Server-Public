@@ -52,7 +52,7 @@ public class PropertyPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return SummarizedPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).createdAt(getCreatedAt()).subCategory(getSubCategory()).period(period).price(price).suburb(getSuburb()).build();
+        return SummarizedPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).createdAt(getUpdatedAt()).subCategory(getSubCategory()).period(period).price(price).suburb(getSuburb()).build();
     }
 
     public NormalPropertyPostDto convertPostToNormalPropertyPostDto() {
@@ -60,7 +60,7 @@ public class PropertyPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getCreatedAt()).isBillIncluded(isBillIncluded).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalPropertyPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).period(period).subCategory(getSubCategory()).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).createdAt(getUpdatedAt()).isBillIncluded(isBillIncluded).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdatePropertyPostDto convertToUpdatePropertyPostDto() {
@@ -91,6 +91,6 @@ public class PropertyPost extends NormalPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedPropertyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedPropertyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).period(period).price(price).location(location).availableTime(availableTime).roomCount(roomCount).bathroomType(bathroomType).isParkable(isParkable).isBillIncluded(isBillIncluded).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

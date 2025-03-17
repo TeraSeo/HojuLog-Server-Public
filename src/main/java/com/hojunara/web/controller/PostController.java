@@ -28,9 +28,12 @@ public class PostController {
     private final SocietyPostService societyPostService;
     private final TravelPostService travelPostService;
     private final StudyPostService studyPostService;
+    private final PinnablePostService pinnablePostService;
+    private final WorldCupPostService worldCupPostService;
+    private final CandidateService candidateService;
 
     @Autowired
-    public PostController(PostService postService, PropertyPostService propertyPostService, JobPostService jobPostService, TransactionPostService transactionPostService, SocietyPostService societyPostService, TravelPostService travelPostService, StudyPostService studyPostService) {
+    public PostController(PostService postService, PropertyPostService propertyPostService, JobPostService jobPostService, TransactionPostService transactionPostService, SocietyPostService societyPostService, TravelPostService travelPostService, StudyPostService studyPostService, PinnablePostService pinnablePostService, WorldCupPostService worldCupPostService, CandidateService candidateService) {
         this.postService = postService;
         this.propertyPostService = propertyPostService;
         this.jobPostService = jobPostService;
@@ -38,6 +41,9 @@ public class PostController {
         this.societyPostService = societyPostService;
         this.travelPostService = travelPostService;
         this.studyPostService = studyPostService;
+        this.pinnablePostService = pinnablePostService;
+        this.worldCupPostService = worldCupPostService;
+        this.candidateService = candidateService;
     }
 
     @PostMapping("create/property")
@@ -103,6 +109,26 @@ public class PostController {
         return ResponseEntity.ok(post != null);
     }
 
+    @PutMapping("update/worldcup")
+    public ResponseEntity<Boolean> updateWorldCupPost(
+            @Valid @RequestPart UpdateWorldCupPostDto updateWorldCupPostDto,
+            @RequestPart(required = false) MultipartFile[] images,
+            @RequestPart(required = false) MultipartFile coverImage
+    ) {
+        Post post = worldCupPostService.updatePost(updateWorldCupPostDto, images, coverImage);
+        return ResponseEntity.ok(post != null);
+    }
+
+    @PostMapping("create/worldcup")
+    public ResponseEntity<Boolean> createWorldCupPost(
+            @Valid @RequestPart WorldCupPostDto worldCupPostDto,
+            @RequestPart(required = false) MultipartFile[] images,
+            @RequestPart(required = false) MultipartFile coverImage
+    ) {
+        WorldCupPost post = worldCupPostService.createWorldCupPost(worldCupPostDto, images, coverImage);
+        return ResponseEntity.ok(post != null);
+    }
+
     @PutMapping("update/society")
     public ResponseEntity<Boolean> updateSocietyPost(
             @Valid @RequestPart UpdateSocietyPostDto updateSocietyPostDto,
@@ -146,6 +172,18 @@ public class PostController {
     ) {
         Post post = studyPostService.updatePost(updateStudyPostDto, images);
         return ResponseEntity.ok(post != null);
+    }
+
+    @GetMapping("get/pageable/recent/worldcup")
+    public ResponseEntity<WorldCupPostPaginationResponse> getRecentPageableWorldCupPosts(@RequestParam int page, @RequestParam int size) {
+        Page<WorldCupPost> posts = worldCupPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalWorldCupPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalCupPostDto())
+                .collect(Collectors.toList());
+
+        WorldCupPostPaginationResponse postPaginationResponse = WorldCupPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
     }
 
     @GetMapping("get/pageable/recent/property")
@@ -217,6 +255,18 @@ public class PostController {
                 .collect(Collectors.toList());
 
         StudyPostPaginationResponse postPaginationResponse = StudyPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/worldcup/subcategory")
+    public ResponseEntity<WorldCupPostPaginationResponse> getRecentPageableWorldCupPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
+        Page<WorldCupPost> posts = worldCupPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        List<NormalWorldCupPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalCupPostDto())
+                .collect(Collectors.toList());
+
+        WorldCupPostPaginationResponse postPaginationResponse = WorldCupPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
         return ResponseEntity.ok(postPaginationResponse);
     }
 
@@ -328,6 +378,17 @@ public class PostController {
         return ResponseEntity.ok(postPaginationResponse);
     }
 
+    @GetMapping("get/recent-5/worldcup/post")
+    public ResponseEntity<List<SummarizedWorldCupPostDto>> getRecent5WorldCupPost() {
+        List<WorldCupPost> worldCupPostList = worldCupPostService.getRecent5Posts();
+        List<SummarizedWorldCupPostDto> summarizedWorldCupPostDtoList = worldCupPostList
+                .stream()
+                .map(post -> post.convertPostToSummarizedWorldCupPostDto())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(summarizedWorldCupPostDtoList);
+    }
+
     @GetMapping("get/recent-5/property/post")
     public ResponseEntity<List<SummarizedPropertyPostDto>> getRecent5PropertyPost() {
         List<PropertyPost> propertyPostList = propertyPostService.getRecent5Posts();
@@ -392,6 +453,31 @@ public class PostController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(summarizedStudyPostDtoList);
+    }
+
+    @GetMapping("get/specific/candidateDtoList")
+    public ResponseEntity<List<CandidateDto>> getSpecificCandidateDtoList(@RequestParam Long postId) {
+        WorldCupPost worldCupPost = worldCupPostService.getPostById(postId);
+        List<Candidate> candidates = worldCupPost.getCandidates();
+        List<CandidateDto> candidateDtoList = candidates.stream().map(candidate -> candidate.convertToCandidateDto()).collect(Collectors.toList());
+        return ResponseEntity.ok(candidateDtoList);
+    }
+
+    @GetMapping("get/specific/worldcup")
+    public ResponseEntity<DetailedWorldCupPostDto> getSpecificWorldCupPost(@RequestParam Long postId, @RequestHeader String userId) {
+        WorldCupPost worldCupPost = worldCupPostService.getPostById(postId);
+        DetailedWorldCupPostDto detailedPropertyPostDto = worldCupPost.convertPostToDetailedWorldCupPostDto(userId);
+        if (userId != "" && userId != null) {
+            postService.addViewCount(postId, userId);
+        }
+        return ResponseEntity.ok(detailedPropertyPostDto);
+    }
+
+    @GetMapping("get/specific/update/worldcup")
+    public ResponseEntity<UpdateDetailedWorldCupPostDto> getSpecificWorldCupPost(@RequestParam Long postId) {
+        WorldCupPost worldCupPost = worldCupPostService.getPostById(postId);
+        UpdateDetailedWorldCupPostDto updateDetailedWorldCupPostDto = worldCupPost.convertPostToUpdatePostDto();
+        return ResponseEntity.ok(updateDetailedWorldCupPostDto);
     }
 
     @GetMapping("get/specific/property")
@@ -499,9 +585,22 @@ public class PostController {
 
     @GetMapping("get/summarised/specific/post")
     public ResponseEntity<SummarizedPostDto> getSummarizedOwnPost(@RequestParam Long postId) {
-        Post post = postService.getPostById(postId);
+        PinnablePost post = pinnablePostService.getPostById(postId);
         SummarizedPostDto summarizedPostDto = post.convertToSummarizedPostDto();
         return ResponseEntity.ok(summarizedPostDto);
+    }
+
+    @GetMapping("get/worldcup/by/search/option")
+    public ResponseEntity<WorldCupPostPaginationResponse> searchWorldCup(@RequestParam String title, @RequestParam String subCategory, @RequestParam String suburb, @RequestParam(required = false) List<String> keywords, @RequestParam int page, @RequestParam int size) {
+        List<WorldCupPost> searchedPosts = worldCupPostService.searchWorldCupPost(title, subCategory, keywords);
+        Page<WorldCupPost> posts = worldCupPostService.convertPostsAsPage(searchedPosts, PageRequest.of(page - 1, size));
+        List<NormalWorldCupPostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalCupPostDto())
+                .collect(Collectors.toList());
+
+        WorldCupPostPaginationResponse postPaginationResponse = WorldCupPostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
     }
 
     @GetMapping("get/property/by/search/option")
@@ -590,7 +689,13 @@ public class PostController {
 
     @PutMapping("pin/post")
     public ResponseEntity<Boolean> pinPost(@RequestParam Long postId, @RequestParam Long userId) {
-        Boolean isPinned = postService.updatePinStatus(postId, userId);
+        Boolean isPinned = pinnablePostService.updatePinStatus(postId, userId);
         return ResponseEntity.ok(isPinned);
+    }
+
+    @PutMapping("add/victory")
+    public ResponseEntity<Boolean> updateVictory(@RequestParam Long candidateId) {
+        Boolean isUpdated = candidateService.updateVictory(candidateId);
+        return ResponseEntity.ok(isUpdated);
     }
 }

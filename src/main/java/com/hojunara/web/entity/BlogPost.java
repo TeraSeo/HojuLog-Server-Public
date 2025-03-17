@@ -3,6 +3,8 @@ package com.hojunara.web.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public abstract class BlogPost extends Post {
+public abstract class BlogPost extends PinnablePost {
     @Column(nullable = false)
     private Boolean isPublic;
 

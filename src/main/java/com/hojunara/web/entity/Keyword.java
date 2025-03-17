@@ -21,5 +21,5 @@ public class Keyword {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    private PinnablePost post;
 }

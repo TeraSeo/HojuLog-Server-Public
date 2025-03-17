@@ -53,7 +53,7 @@ public class SecurityConfig {
             .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
                     auth -> auth
-                            .requestMatchers("login", "/api/auth/**", "/api/oauth/**", "/api/post/get/**", "/api/user/get/**", "/api/comment/get/**").permitAll()
+                            .requestMatchers("login", "/api/auth/**", "/api/oauth/**", "/api/post/get/**", "/api/user/get/**", "/api/comment/get/**", "/api/post/add/victory").permitAll()
                             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                             .anyRequest().hasAnyAuthority("USER", "ADMIN")
             );
@@ -106,8 +106,8 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://3.25.33.230");  // Set allowed origin for client
-        config.addAllowedOrigin("http://hojulog-client.duckdns.org");
+        config.addAllowedOrigin("http://3.24.221.82");  // Set allowed origin for client
+        config.addAllowedOrigin("http://www.hojulog.com");
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedMethod("*");                      // Allow all HTTP methods
         config.addAllowedHeader("*");                      // Allow all headers

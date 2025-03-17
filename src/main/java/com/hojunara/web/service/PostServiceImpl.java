@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Pageable;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,10 +52,10 @@ public class PostServiceImpl implements PostService {
             switch (condition) {
                 case "Latest":
                     log.info("Successfully found latest post with pagination");
-                    return postRepository.findAllByOrderByCreatedAtDesc(pageable);
+                    return postRepository.findAllByOrderByUpdatedAtDesc(pageable);
                 case "Oldest":
                     log.info("Successfully found oldest post with pagination");
-                    return postRepository.findAllByOrderByCreatedAtAsc(pageable);
+                    return postRepository.findAllByOrderByUpdatedAtAsc(pageable);
 //                case "Popular":
 //                    log.info("Successfully found popular post with pagination");
 //                    return postRepository.findAllByOrderByLikesCountDesc(pageable);
@@ -160,7 +158,6 @@ public class PostServiceImpl implements PostService {
     public Boolean removePost(Long postId) {
         Post existingPost = getPostById(postId);
         try {
-            userService.removeLikedPostContaining(existingPost);
             userService.removePaidPostContaining(existingPost);
             postRepository.delete(existingPost);
             return true;
@@ -170,36 +167,13 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    @Override
-    public Long calculateLikeCountThisWeek(Long userId) {
-        try {
-            return postRepository.countLikesThisWeekByUserId(userId);
-        } catch (Exception e) {
-            log.error("Failed to calculate like count this week");
-            throw e;
-        }
-    }
-
-    @Override
-    public Boolean updatePinStatus(Long postId, Long userId) {
-        Post existingPost = getPostById(postId);
-        User user = userService.getUserById(userId);
-        try {
-            if (user.getLog() >= 50) {
-                Timestamp expiryDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1));
-                existingPost.setPinnedAdExpiry(expiryDate);
-
-                postRepository.save(existingPost);
-                userService.updateUserLog(user, user.getLog() - 50);
-
-                log.info("Successfully pinned post with post id: {}", postId);
-                return true;
-            }
-            log.info("More log is needed to be pinned with user id : {}", userId);
-            return false;
-        } catch (Exception e) {
-            log.error("Failed to pin post with post id: {}", postId, e);
-            throw e;
-        }
-    }
+//    @Override
+//    public Long calculateLikeCountThisWeek(Long userId) {
+//        try {
+//            return postRepository.countLikesThisWeekByUserId(userId);
+//        } catch (Exception e) {
+//            log.error("Failed to calculate like count this week");
+//            throw e;
+//        }
+//    }
 }

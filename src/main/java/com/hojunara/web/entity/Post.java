@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +24,6 @@ public abstract class Post extends PostBaseEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @Column(nullable = false)
-    @Size(max = 80)
-    private String title;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
@@ -37,6 +32,10 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private SubCategory subCategory;
 
+    @Column(nullable = false)
+    @Size(max = 80)
+    private String title;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PostType postType;
@@ -44,15 +43,9 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private Boolean isCommentAllowed;
 
-    private Timestamp pinnedAdExpiry;
-
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ViewedUser> viewedUsers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Keyword> keywords = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -66,11 +59,7 @@ public abstract class Post extends PostBaseEntity {
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "thisWeekLikedPosts")
-    @Builder.Default
-    private List<User> likedByUsersThisWeek = new ArrayList<>();
-
     public SummarizedPostDto convertToSummarizedPostDto() {
-        return SummarizedPostDto.builder().id(id).title(title).category(category).subCategory(subCategory).viewCounts((long) viewedUsers.size()).createdAt(getCreatedAt()).build();
+        return SummarizedPostDto.builder().id(getId()).title(getTitle()).category(category).subCategory(subCategory).viewCounts((long) getViewedUsers().size()).createdAt(getUpdatedAt()).build();
     }
 }

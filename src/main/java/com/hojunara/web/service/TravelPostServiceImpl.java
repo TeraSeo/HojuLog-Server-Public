@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +65,7 @@ public class TravelPostServiceImpl implements TravelPostService {
     @Override
     public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
-            Page<TravelPost> posts = travelPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            Page<TravelPost> posts = travelPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
             log.info("Successfully got pageable Travel Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -74,7 +77,7 @@ public class TravelPostServiceImpl implements TravelPostService {
     @Override
     public List<TravelPost> getRecent5Posts() {
         try {
-            List<TravelPost> posts = travelPostRepository.findTop5ByOrderByCreatedAtDesc();
+            List<TravelPost> posts = travelPostRepository.findTop5ByOrderByUpdatedAtDesc();
             log.info("Successfully got Recent 5 Travel Posts");
             return posts;
         } catch (Exception e) {
@@ -139,31 +142,24 @@ public class TravelPostServiceImpl implements TravelPostService {
     @Override
     public Post updatePost(UpdateTravelPostDto updateTravelPostDto, MultipartFile[] images) {
         User user = userService.getUserById(updateTravelPostDto.getUserId());
+        TravelPost travelPost = getPostById(updateTravelPostDto.getPostId());
         try {
-            TravelPost travelPost = getPostById(updateTravelPostDto.getPostId());
-
-            boolean isUpdated = false;
             boolean isBlogUpdated = false;
 
             if (!travelPost.getTitle().equals(updateTravelPostDto.getTitle())) {
                 travelPost.setTitle(updateTravelPostDto.getTitle());
-                isUpdated = true;
             }
             if (!travelPost.getCountry().equals(updateTravelPostDto.getCountry())) {
                 travelPost.setCountry(updateTravelPostDto.getCountry());
-                isUpdated = true;
             }
             if (!travelPost.getLocation().equals(updateTravelPostDto.getLocation())) {
                 travelPost.setLocation(updateTravelPostDto.getLocation());
-                isUpdated = true;
             }
             if (!travelPost.getIsPublic().equals(updateTravelPostDto.getIsPublic())) {
                 travelPost.setIsPublic(updateTravelPostDto.getIsPublic());
-                isUpdated = true;
             }
             if (!travelPost.getIsCommentAllowed().equals(updateTravelPostDto.getIsCommentAllowed())) {
                 travelPost.setIsCommentAllowed(updateTravelPostDto.getIsCommentAllowed());
-                isUpdated = true;
             }
 
             // 블로그 contents 업데이트
@@ -216,34 +212,12 @@ public class TravelPostServiceImpl implements TravelPostService {
             }
 
             // 키워드 업데이트
-            List<String> originalKeywords = travelPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
             List<String> updatedKeywords = updateTravelPostDto.getSelectedKeywords();
-            if (!originalKeywords.equals(updatedKeywords)) {
-                List<String> addedKeywords = updatedKeywords.stream()
-                        .filter(keyword -> !originalKeywords.contains(keyword))
-                        .collect(Collectors.toList());
+            keywordService.updateKeyword(travelPost, updatedKeywords);
 
-                List<String> removedKeywords = originalKeywords.stream()
-                        .filter(keyword -> !updatedKeywords.contains(keyword))
-                        .collect(Collectors.toList());
-
-                if (!addedKeywords.isEmpty()) {
-                    addedKeywords.forEach(keyword -> {
-                        keywordService.createKeyword(keyword, travelPost);
-                    });
-                }
-
-                if (!removedKeywords.isEmpty()) {
-                    travelPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
-                }
-
-                isUpdated = true;
-            }
-
-            if (isUpdated || isBlogUpdated) {
-                travelPostRepository.save(travelPost);
-                travelPostRepository.flush(); // 업데이트 내용 반영
-            }
+            travelPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            travelPostRepository.save(travelPost);
+            travelPostRepository.flush(); // 업데이트 내용 반영
 
             // contents 순서 알맞게 변경
             if (isBlogUpdated) {
@@ -357,22 +331,22 @@ public class TravelPostServiceImpl implements TravelPostService {
 
     @Override
     public List<TravelPost> searchByCategory() {
-        return travelPostRepository.findAll();
+        return travelPostRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
     public List<TravelPost> searchByTitle(String title) {
-        return travelPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+        return travelPostRepository.findByTitleContainingOrderByUpdatedAtDesc(title);
     }
 
     @Override
     public List<TravelPost> searchBySubCategory(SubCategory subCategory) {
-        return travelPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+        return travelPostRepository.findBySubCategoryOrderByUpdatedAtDesc(subCategory);
     }
 
     @Override
     public List<TravelPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
-        return travelPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+        return travelPostRepository.findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(title, subCategory);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class OtpServiceImpl implements OtpService {
         String code = createCode();
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("seotj0413@gmail.com");
+            message.setFrom("alogatoz0310@gmail.com");
             message.setTo(email);
             message.setSubject("Otp code");
             message.setText("The otp code is " + code);

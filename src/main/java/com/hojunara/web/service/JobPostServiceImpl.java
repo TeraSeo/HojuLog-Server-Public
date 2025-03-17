@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,7 +69,7 @@ public class JobPostServiceImpl implements JobPostService {
     @Override
     public Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
-            Page<JobPost> posts = jobPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            Page<JobPost> posts = jobPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
             log.info("Successfully got pageable Job Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -78,7 +81,7 @@ public class JobPostServiceImpl implements JobPostService {
     @Override
     public List<JobPost> getRecent5Posts() {
         try {
-            List<JobPost> posts = jobPostRepository.findTop5ByOrderByCreatedAtDesc();
+            List<JobPost> posts = jobPostRepository.findTop5ByOrderByUpdatedAtDesc();
             log.info("Successfully got Recent 5 Job Posts");
             return posts;
         } catch (Exception e) {
@@ -148,42 +151,31 @@ public class JobPostServiceImpl implements JobPostService {
     public Post updatePost(UpdateJobPostDto updateJobPostDto, MultipartFile[] images) {
         UpdateJobMainInfoPostDto updateJobMainInfoPostDto = updateJobPostDto.getUpdateJobMainInfoPostDto();
         User user = userService.getUserById(updateJobMainInfoPostDto.getUserId());
+        JobPost jobPost = getPostById(updateJobMainInfoPostDto.getPostId());
         try {
-            JobPost jobPost = getPostById(updateJobMainInfoPostDto.getPostId());
-
-            boolean isUpdated = false;
-
             if (!jobPost.getTitle().equals(updateJobMainInfoPostDto.getTitle())) {
                 jobPost.setTitle(updateJobMainInfoPostDto.getTitle());
-                isUpdated = true;
             }
             if (!Objects.equals(jobPost.getDescription(), updateJobMainInfoPostDto.getDescription())) {
                 jobPost.setDescription(updateJobMainInfoPostDto.getDescription());
-                isUpdated = true;
             }
             if (!Objects.equals(jobPost.getContact(), updateJobMainInfoPostDto.getContact())) {
                 jobPost.setContact(updateJobMainInfoPostDto.getContact());
-                isUpdated = true;
             }
             if (!Objects.equals(jobPost.getEmail(), updateJobMainInfoPostDto.getEmail())) {
                 jobPost.setEmail(updateJobMainInfoPostDto.getEmail());
-                isUpdated = true;
             }
             if (!Objects.equals(jobPost.getSuburb(), updateJobMainInfoPostDto.getSuburb())) {
                 jobPost.setSuburb(updateJobMainInfoPostDto.getSuburb());
-                isUpdated = true;
             }
             if (!Objects.equals(jobPost.getJobType(), updateJobMainInfoPostDto.getJobType())) {
                 jobPost.setJobType(updateJobMainInfoPostDto.getJobType());
-                isUpdated = true;
             }
             if (!Objects.equals(jobPost.getLocation(), updateJobMainInfoPostDto.getLocation())) {
                 jobPost.setLocation(updateJobMainInfoPostDto.getLocation());
-                isUpdated = true;
             }
             if (!jobPost.getIsCommentAllowed().equals(updateJobMainInfoPostDto.getIsCommentAllowed())) {
                 jobPost.setIsCommentAllowed(updateJobMainInfoPostDto.getIsCommentAllowed());
-                isUpdated = true;
             }
 
             List<String> imageUrls = jobPost.getImages().stream().map(Image::getUrl).collect(Collectors.toList());
@@ -199,34 +191,12 @@ public class JobPostServiceImpl implements JobPostService {
             }
 
             // 키워드 업데이트
-            List<String> originalKeywords = jobPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
             List<String> updatedKeywords = updateJobMainInfoPostDto.getSelectedKeywords();
-            if (!originalKeywords.equals(updatedKeywords)) {
-                List<String> addedKeywords = updatedKeywords.stream()
-                        .filter(keyword -> !originalKeywords.contains(keyword))
-                        .collect(Collectors.toList());
+            keywordService.updateKeyword(jobPost, updatedKeywords);
 
-                List<String> removedKeywords = originalKeywords.stream()
-                        .filter(keyword -> !updatedKeywords.contains(keyword))
-                        .collect(Collectors.toList());
-
-                if (!addedKeywords.isEmpty()) {
-                    addedKeywords.forEach(keyword -> {
-                        keywordService.createKeyword(keyword, jobPost);
-                    });
-                }
-
-                if (!removedKeywords.isEmpty()) {
-                    jobPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
-                }
-
-                isUpdated = true;
-            }
-
-            if (isUpdated) {
-                jobPostRepository.save(jobPost);
-                jobPostRepository.flush(); // 업데이트 내용 반영
-            }
+            jobPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            jobPostRepository.save(jobPost);
+            jobPostRepository.flush(); // 업데이트 내용 반영
 
             // save post images data
             if (images != null) {
@@ -299,42 +269,42 @@ public class JobPostServiceImpl implements JobPostService {
 
     @Override
     public List<JobPost> searchByCategory() {
-        return jobPostRepository.findAll();
+        return jobPostRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
     public List<JobPost> searchByTitle(String title) {
-        return jobPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+        return jobPostRepository.findByTitleContainingOrderByUpdatedAtDesc(title);
     }
 
     @Override
     public List<JobPost> searchBySubCategory(SubCategory subCategory) {
-        return jobPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+        return jobPostRepository.findBySubCategoryOrderByUpdatedAtDesc(subCategory);
     }
 
     @Override
     public List<JobPost> searchBySuburb(Suburb suburb) {
-        return jobPostRepository.findBySuburbOrderByCreatedAtDesc(suburb);
+        return jobPostRepository.findBySuburbOrderByUpdatedAtDesc(suburb);
     }
 
     @Override
     public List<JobPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
-        return jobPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+        return jobPostRepository.findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(title, subCategory);
     }
 
     @Override
     public List<JobPost> searchByTitleAndSuburb(String title, Suburb suburb) {
-        return jobPostRepository.findByTitleContainingAndSuburbOrderByCreatedAtDesc(title, suburb);
+        return jobPostRepository.findByTitleContainingAndSuburbOrderByUpdatedAtDesc(title, suburb);
     }
 
     @Override
     public List<JobPost> searchBySubCategoryAndSuburb(SubCategory subCategory, Suburb suburb) {
-        return jobPostRepository.findBySubCategoryAndSuburbOrderByCreatedAtDesc(subCategory, suburb);
+        return jobPostRepository.findBySubCategoryAndSuburbOrderByUpdatedAtDesc(subCategory, suburb);
     }
 
     @Override
     public List<JobPost> searchByTitleAndSubCategoryAndSuburb(String title, SubCategory subCategory, Suburb suburb) {
-        return jobPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByCreatedAtDesc(title, subCategory, suburb);
+        return jobPostRepository.findByTitleContainingAndSubCategoryAndSuburbOrderByUpdatedAtDesc(title, subCategory, suburb);
     }
 
     @Override

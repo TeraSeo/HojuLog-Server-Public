@@ -1,6 +1,5 @@
 package com.hojunara.web.service;
 
-import com.hojunara.web.aws.s3.AwsFileService;
 import com.hojunara.web.dto.request.StudyPostDto;
 import com.hojunara.web.dto.request.UpdateStudyPostDto;
 import com.hojunara.web.entity.*;
@@ -15,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,7 +65,7 @@ public class StudyPostServiceImpl implements StudyPostService {
     @Override
     public Page<StudyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
-            Page<StudyPost> posts = studyPostRepository.findAllBySubCategoryOrderByCreatedAtDesc(subCategory, pageable);
+            Page<StudyPost> posts = studyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
             log.info("Successfully got pageable Study Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -75,7 +77,7 @@ public class StudyPostServiceImpl implements StudyPostService {
     @Override
     public List<StudyPost> getRecent5Posts() {
         try {
-            List<StudyPost> posts = studyPostRepository.findTop5ByOrderByCreatedAtDesc();
+            List<StudyPost> posts = studyPostRepository.findTop5ByOrderByUpdatedAtDesc();
             log.info("Successfully got Recent 5 Study Posts");
             return posts;
         } catch (Exception e) {
@@ -139,27 +141,21 @@ public class StudyPostServiceImpl implements StudyPostService {
     @Override
     public Post updatePost(UpdateStudyPostDto updateStudyPostDto, MultipartFile[] images) {
         User user = userService.getUserById(updateStudyPostDto.getUserId());
+        StudyPost studyPost = getPostById(updateStudyPostDto.getPostId());
         try {
-            StudyPost studyPost = getPostById(updateStudyPostDto.getPostId());
-
-            boolean isUpdated = false;
             boolean isBlogUpdated = false;
 
             if (!studyPost.getTitle().equals(updateStudyPostDto.getTitle())) {
                 studyPost.setTitle(updateStudyPostDto.getTitle());
-                isUpdated = true;
             }
             if (!Objects.equals(studyPost.getSchool(), updateStudyPostDto.getSchool())) { // prevent null value comparison
                 studyPost.setSchool(updateStudyPostDto.getSchool());
-                isUpdated = true;
             }
             if (!studyPost.getIsPublic().equals(updateStudyPostDto.getIsPublic())) {
                 studyPost.setIsPublic(updateStudyPostDto.getIsPublic());
-                isUpdated = true;
             }
             if (!studyPost.getIsCommentAllowed().equals(updateStudyPostDto.getIsCommentAllowed())) {
                 studyPost.setIsCommentAllowed(updateStudyPostDto.getIsCommentAllowed());
-                isUpdated = true;
             }
 
             // 블로그 contents 업데이트
@@ -212,34 +208,12 @@ public class StudyPostServiceImpl implements StudyPostService {
             }
 
             // 키워드 업데이트
-            List<String> originalKeywords = studyPost.getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
             List<String> updatedKeywords = updateStudyPostDto.getSelectedKeywords();
-            if (!originalKeywords.equals(updatedKeywords)) {
-                List<String> addedKeywords = updatedKeywords.stream()
-                        .filter(keyword -> !originalKeywords.contains(keyword))
-                        .collect(Collectors.toList());
+            keywordService.updateKeyword(studyPost, updatedKeywords);
 
-                List<String> removedKeywords = originalKeywords.stream()
-                        .filter(keyword -> !updatedKeywords.contains(keyword))
-                        .collect(Collectors.toList());
-
-                if (!addedKeywords.isEmpty()) {
-                    addedKeywords.forEach(keyword -> {
-                        keywordService.createKeyword(keyword, studyPost);
-                    });
-                }
-
-                if (!removedKeywords.isEmpty()) {
-                    studyPost.getKeywords().removeIf(keyword -> removedKeywords.contains(keyword.getKeyWord()));
-                }
-
-                isUpdated = true;
-            }
-
-            if (isUpdated || isBlogUpdated) {
-                studyPostRepository.save(studyPost);
-                studyPostRepository.flush(); // 업데이트 내용 반영
-            }
+            studyPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            studyPostRepository.save(studyPost);
+            studyPostRepository.flush(); // 업데이트 내용 반영
 
             // contents 순서 알맞게 변경
             if (isBlogUpdated) {
@@ -353,22 +327,22 @@ public class StudyPostServiceImpl implements StudyPostService {
 
     @Override
     public List<StudyPost> searchByCategory() {
-        return studyPostRepository.findAll();
+        return studyPostRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
     public List<StudyPost> searchByTitle(String title) {
-        return studyPostRepository.findByTitleContainingOrderByCreatedAtDesc(title);
+        return studyPostRepository.findByTitleContainingOrderByUpdatedAtDesc(title);
     }
 
     @Override
     public List<StudyPost> searchBySubCategory(SubCategory subCategory) {
-        return studyPostRepository.findBySubCategoryOrderByCreatedAtDesc(subCategory);
+        return studyPostRepository.findBySubCategoryOrderByUpdatedAtDesc(subCategory);
     }
 
     @Override
     public List<StudyPost> searchByTitleAndSubCategory(String title, SubCategory subCategory) {
-        return studyPostRepository.findByTitleContainingAndSubCategoryOrderByCreatedAtDesc(title, subCategory);
+        return studyPostRepository.findByTitleContainingAndSubCategoryOrderByUpdatedAtDesc(title, subCategory);
     }
 
     @Override

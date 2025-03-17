@@ -39,7 +39,7 @@ public class TransactionPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return SummarizedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).imageUrl(imageUrl).price(price).priceType(priceType).createdAt(getCreatedAt()).build();
+        return SummarizedTransactionPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).imageUrl(imageUrl).price(price).priceType(priceType).createdAt(getUpdatedAt()).build();
     }
 
     public NormalTransactionPostDto convertPostToNormalTransactionPostDto() {
@@ -47,7 +47,7 @@ public class TransactionPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getUpdatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateTransactionPostDto convertToUpdateTransactionPostDto() {
@@ -78,6 +78,6 @@ public class TransactionPost extends NormalPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

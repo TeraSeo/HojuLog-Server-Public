@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @MappedSuperclass
 @Getter
@@ -16,6 +18,7 @@ import java.sql.Timestamp;
 @SuperBuilder
 @EntityListeners(value = {AuditingEntityListener.class})
 public abstract class PostBaseEntity {
+    private static final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
@@ -24,13 +27,15 @@ public abstract class PostBaseEntity {
 
     @PrePersist
     protected void onCreate() {
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        this.createdAt = now;
-        this.updatedAt = now;
+        LocalDateTime nowSydney = LocalDateTime.now(SYDNEY_ZONE);
+        Timestamp timestampSydney = Timestamp.valueOf(nowSydney);
+        this.createdAt = timestampSydney;
+        this.updatedAt = timestampSydney;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = new Timestamp(System.currentTimeMillis());
+        LocalDateTime nowSydney = LocalDateTime.now(SYDNEY_ZONE);
+        this.updatedAt = Timestamp.valueOf(nowSydney);
     }
 }

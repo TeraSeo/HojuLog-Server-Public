@@ -28,7 +28,7 @@ public class SocietyPost extends BlogPost {
 
     public SummarizedSocietyPostDto convertPostToSummarizedSocietyPostDto() {
         double randomAverageRate = Math.round(ThreadLocalRandom.current().nextDouble(4.0, 5.01) * 10.0) / 10.0;
-        return SummarizedSocietyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).averageRate(randomAverageRate).createdAt(getCreatedAt()).isPublic(getIsPublic()).build();
+        return SummarizedSocietyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).averageRate(randomAverageRate).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalSocietyPostDto convertPostToNormalSocietyPostDto() {
@@ -40,7 +40,7 @@ public class SocietyPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalSocietyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getCreatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalSocietyPostDto.builder().postId(getId()).title(getTitle()).description(description).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).createdAt(getUpdatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateSocietyPostDto convertToUpdateSocietyPostDto() {
@@ -66,6 +66,6 @@ public class SocietyPost extends BlogPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedSocietyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getCreatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedSocietyPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).subCategory(getSubCategory()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

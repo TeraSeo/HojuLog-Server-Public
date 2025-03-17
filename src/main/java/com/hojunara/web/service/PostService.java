@@ -22,7 +22,5 @@ public interface PostService {
 
     Boolean removePost(Long postId);
 
-    Long calculateLikeCountThisWeek(Long userId);
-
-    Boolean updatePinStatus(Long postId, Long userId);
+//    Long calculateLikeCountThisWeek(Long userId);
 }

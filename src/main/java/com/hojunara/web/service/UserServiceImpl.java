@@ -14,12 +14,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,7 +112,8 @@ public class UserServiceImpl implements UserService {
                 .email(userDto.getEmail())
                 .password(encodedPassword)
                 .registrationMethod(RegistrationMethod.Otp)
-                .log(0L)
+                .log(100L)
+                .likeCountThisWeek(0L)
                 .build();
         userRepository.save(user);
         log.info("Successfully created user");
@@ -208,7 +213,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getTop10UsersByLikesThisWeek() {
         try {
-            List<User> top10Users = userRepository.findTop10ByThisWeekLikedPosts();
+            Pageable pageable = PageRequest.of(0, 10);
+            List<User> top10Users = userRepository.findTop10ByThisWeekLikedPosts(pageable);
             log.info("Successfully get top 10 users by likes this week");
             return top10Users;
         } catch (Exception e) {
@@ -247,6 +253,7 @@ public class UserServiceImpl implements UserService {
             });
 
             userRepository.saveAll(users);
+            userRepository.resetLikeCountThisWeek();
             log.info("Successfully provided log this week");
             return true;
         } catch (Exception e) {
@@ -297,54 +304,43 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addLikeCountThisWeek(User user, Post post) {
+    public void addLikeCountThisWeek(Post post) {
         try {
-            boolean alreadyLiked = user.getThisWeekLikedPosts().stream()
-                    .anyMatch(existingPost -> existingPost.getId().equals(post.getId()));
-            if (!alreadyLiked) {
-                user.getThisWeekLikedPosts().add(post);
-                userRepository.save(user);
-                log.info("Successfully added like count this week");
-            } else {
-                log.info("User {} already liked Post {} this week", user.getId(), post.getId());
-            }
+            User user = post.getUser();
+            user.setLikeCountThisWeek(user.getLikeCountThisWeek() + 1);
+            userRepository.save(user);
+            log.info("Successfully added like count this week");
         } catch (Exception e) {
             log.error("Failed to add like count this week");
         }
     }
 
     @Override
-    public void removeLikeCountThisWeek(User user, Post post) {
+    public void removeLikeCountThisWeek(Post post) {
         try {
-            boolean removed = user.getThisWeekLikedPosts().removeIf(
-                    existingPost -> existingPost.getId().equals(post.getId())
-            );
-
-            if (removed) {
-                userRepository.save(user);
-                log.info("Removed like for Post {} by User {}", post.getId(), user.getId());
-            } else {
-                log.info("Post {} was not liked by User {}", post.getId(), user.getId());
-            }
+            User user = post.getUser();
+            if (user.getLikeCountThisWeek() > 0) user.setLikeCountThisWeek(user.getLikeCountThisWeek() - 1);
+            userRepository.save(user);
+            log.info("Removed like for Post {} by User {}", post.getId(), user.getId());
         } catch (Exception e) {
             log.error("Failed to remove like count this week", e);
         }
     }
 
-    @Override
-    public void removeLikedPostContaining(Post post) {
-        try {
-            List<User> users = userRepository.findAllByThisWeekLikedPostsContaining(post.getId());
-            for (User user : users) {
-                user.getThisWeekLikedPosts().remove(post);
-                userRepository.save(user);
-            }
-            log.info("Successfully removed liked post containing");
-        } catch (Exception e) {
-            log.error("Failed to remove liked post containing", e);
-            throw e;
-        }
-    }
+//    @Override
+//    public void removeLikedPostContaining(Post post) {
+//        try {
+//            List<User> users = userRepository.findAllByThisWeekLikedPostsContaining(post.getId());
+//            for (User user : users) {
+//                user.getThisWeekLikedPosts().remove(post);
+//                userRepository.save(user);
+//            }
+//            log.info("Successfully removed liked post containing");
+//        } catch (Exception e) {
+//            log.error("Failed to remove liked post containing", e);
+//            throw e;
+//        }
+//    }
 
     @Override
     public void removePaidPostContaining(Post post) {
@@ -379,6 +375,19 @@ public class UserServiceImpl implements UserService {
             log.info("Successfully updated log count for user ID {} to {}", user.getId(), logCount);
         } catch (Exception e) {
             log.error("Failed to update log count for user ID {} with log count {}", user.getId(), logCount, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Boolean updateAttendance(Long userId) {
+        User user = getUserById(userId);
+        try {
+            user.setLastAttendanceTime(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            user.setLog(user.getLog() + 10);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to check attendance", e);
             throw e;
         }
     }

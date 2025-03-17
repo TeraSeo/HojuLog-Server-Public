@@ -4,6 +4,7 @@ import lombok.*;
 import jakarta.persistence.*;
 import lombok.experimental.SuperBuilder;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class NormalPost extends Post {
+public class NormalPost extends PinnablePost {
 
     @Column(nullable = false)
     @Size(max = 5001)
