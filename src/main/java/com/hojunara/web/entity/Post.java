@@ -43,9 +43,11 @@ public abstract class Post extends PostBaseEntity {
     @Column(nullable = false)
     private Boolean isCommentAllowed;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<ViewedUser> viewedUsers = new ArrayList<>();
+    private Long viewCounts;
+
+//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @Builder.Default
+//    private List<ViewedUser> viewedUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -60,6 +62,6 @@ public abstract class Post extends PostBaseEntity {
     private List<PostLike> likes = new ArrayList<>();
 
     public SummarizedPostDto convertToSummarizedPostDto() {
-        return SummarizedPostDto.builder().id(getId()).title(getTitle()).category(category).subCategory(subCategory).viewCounts((long) getViewedUsers().size()).createdAt(getUpdatedAt()).build();
+        return SummarizedPostDto.builder().id(getId()).title(getTitle()).category(category).subCategory(subCategory).viewCounts(viewCounts).createdAt(getUpdatedAt()).build();
     }
 }

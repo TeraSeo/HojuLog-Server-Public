@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @DiscriminatorValue("TRAVEL")
 public class TravelPost extends BlogPost {
     @Column(nullable = false)
-    private String country;
+    private String travelSuburb;
 
     @Column(nullable = false)
     private String location;
@@ -44,14 +44,14 @@ public class TravelPost extends BlogPost {
                 .findFirst()
                 .orElse("");
 
-        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).country(country).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).location(location).createdAt(getUpdatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).travelSuburb(travelSuburb).viewCounts(getViewCounts()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).location(location).createdAt(getUpdatedAt()).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateTravelPostDto convertToUpdateTravelPostDto() {
         List<Map<String, String>> blogContents = BlogContent.convertBlogContentToMap(getBlogContents());
         List<String> keywords = getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
 
-        return UpdateTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).country(country).location(location).blogContents(blogContents).selectedKeywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return UpdateTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).travelSuburb(travelSuburb).location(location).blogContents(blogContents).selectedKeywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 
     public DetailedTravelPostDto convertPostToDetailedTravelPostDto(String userId) {
@@ -70,6 +70,6 @@ public class TravelPost extends BlogPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).location(location).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedTravelPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).location(location).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts(getViewCounts()).blogContents(blogContentMap).keywords(keywords).isPublic(getIsPublic()).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

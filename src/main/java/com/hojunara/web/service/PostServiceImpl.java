@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Pageable;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -113,29 +116,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void addViewCount(Long postId, String userId) {
-        if (!userId.isEmpty()) {
-            Post post = getPostById(postId);
-            try {
-                List<ViewedUser> viewedUsers = post.getViewedUsers();
-                boolean isViewed = false;
-                for (int i = 0; i < viewedUsers.size(); i++) {
-                    if (viewedUsers.get(i).getUserId() == Long.valueOf(userId)) {
-                        isViewed = true;
-                    }
-                }
-                if (!isViewed) {
-                    ViewedUser viewedUser = new ViewedUser();
-                    viewedUser.setPost(post);
-                    viewedUser.setUserId(Long.valueOf(userId));
-                    viewedUserRepository.save(viewedUser);
-                    post.getViewedUsers().add(viewedUser);
-                    log.info("Successfully added view count with user id: {}", userId);
-                }
-            } catch (Exception e) {
-                log.error("Failed to add view count with user id: {}", userId, e);
-                throw e;
-            }
+    public void addViewCount(Long postId) {
+        try {
+            postRepository.incrementViewCount(postId);
+            log.info("Successfully added view count");
+        } catch (Exception e) {
+            log.error("Failed to add view count", e);
+            throw e;
         }
     }
 

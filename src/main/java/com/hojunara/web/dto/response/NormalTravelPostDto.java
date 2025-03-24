@@ -17,7 +17,7 @@ public class NormalTravelPostDto {
 
     private String description;
 
-    private String country;
+    private String travelSuburb;
 
     private Timestamp createdAt;
 

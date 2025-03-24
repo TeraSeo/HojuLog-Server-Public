@@ -16,7 +16,7 @@ public interface PostService {
 
     Post getPostById(Long id);
 
-    void addViewCount(Long postId, String userId);
+    void addViewCount(Long postId);
 
     Page<Post> convertPostsAsPage(List<Post> posts, Pageable pageable);
 

@@ -22,7 +22,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String targetUrl = "http://www.hojulog.com/register/failed";
+        String targetUrl = "https://hojulog.com/register/failed";
         if (exception instanceof UserAlreadyExistsException) {
             targetUrl = UriComponentsBuilder.fromHttpUrl(targetUrl)
                     .queryParam("error", "존재하는 계정이 있습니다")

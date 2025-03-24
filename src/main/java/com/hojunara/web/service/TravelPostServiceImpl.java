@@ -110,10 +110,11 @@ public class TravelPostServiceImpl implements TravelPostService {
                     .category(Category.여행)
                     .subCategory(travelPostDto.getSubCategory())
                     .postType(PostType.BLOG)
-                    .country(travelPostDto.getCountry())
+                    .travelSuburb(travelPostDto.getTravelSuburb())
                     .location(travelPostDto.getLocation())
                     .isPublic(travelPostDto.getIsPublic())
                     .isCommentAllowed(travelPostDto.getIsCommentAllowed())
+                    .viewCounts(0L)
                     .build();
 
             travelPost.setUser(user);
@@ -149,8 +150,8 @@ public class TravelPostServiceImpl implements TravelPostService {
             if (!travelPost.getTitle().equals(updateTravelPostDto.getTitle())) {
                 travelPost.setTitle(updateTravelPostDto.getTitle());
             }
-            if (!travelPost.getCountry().equals(updateTravelPostDto.getCountry())) {
-                travelPost.setCountry(updateTravelPostDto.getCountry());
+            if (!travelPost.getTravelSuburb().equals(updateTravelPostDto.getTravelSuburb())) {
+                travelPost.setTravelSuburb(updateTravelPostDto.getTravelSuburb());
             }
             if (!travelPost.getLocation().equals(updateTravelPostDto.getLocation())) {
                 travelPost.setLocation(updateTravelPostDto.getLocation());
@@ -215,7 +216,8 @@ public class TravelPostServiceImpl implements TravelPostService {
             List<String> updatedKeywords = updateTravelPostDto.getSelectedKeywords();
             keywordService.updateKeyword(travelPost, updatedKeywords);
 
-            travelPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+            travelPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
             travelPostRepository.save(travelPost);
             travelPostRepository.flush(); // 업데이트 내용 반영
 
@@ -244,7 +246,8 @@ public class TravelPostServiceImpl implements TravelPostService {
                                     Map<String, String> blogContentToMap = BlogContent.convertBlogContentToMap(List.of(blogContent)).get(0);
                                     return blogContentToMap.get("content").equals(blogMap.get("content")) &&
                                             blogContentToMap.get("fontSize").equals(blogMap.get("fontSize")) &&
-                                            blogContentToMap.get("fontWeight").equals(blogMap.get("fontWeight"));
+                                            blogContentToMap.get("fontWeight").equals(blogMap.get("fontWeight")) &&
+                                            blogContentToMap.get("fontFamily").equals(blogMap.get("fontFamily"));
                                 }
                                 return false;
                             })

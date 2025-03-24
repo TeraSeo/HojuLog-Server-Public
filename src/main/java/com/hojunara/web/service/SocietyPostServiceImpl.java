@@ -112,6 +112,7 @@ public class SocietyPostServiceImpl implements SocietyPostService {
                     .postType(PostType.BLOG)
                     .isPublic(societyPostDto.getIsPublic())
                     .isCommentAllowed(societyPostDto.getIsCommentAllowed())
+                    .viewCounts(0L)
                     .build();
 
             societyPost.setUser(user);
@@ -207,7 +208,8 @@ public class SocietyPostServiceImpl implements SocietyPostService {
             List<String> updatedKeywords = updateSocietyPostDto.getSelectedKeywords();
             keywordService.updateKeyword(societyPost, updatedKeywords);
 
-            societyPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+            societyPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
             societyPostRepository.save(societyPost);
             societyPostRepository.flush(); // 업데이트 내용 반영
 
@@ -236,7 +238,8 @@ public class SocietyPostServiceImpl implements SocietyPostService {
                                     Map<String, String> blogContentToMap = BlogContent.convertBlogContentToMap(List.of(blogContent)).get(0);
                                     return blogContentToMap.get("content").equals(blogMap.get("content")) &&
                                             blogContentToMap.get("fontSize").equals(blogMap.get("fontSize")) &&
-                                            blogContentToMap.get("fontWeight").equals(blogMap.get("fontWeight"));
+                                            blogContentToMap.get("fontWeight").equals(blogMap.get("fontWeight")) &&
+                                            blogContentToMap.get("fontFamily").equals(blogMap.get("fontFamily"));
                                 }
                                 return false;
                             })

@@ -22,7 +22,7 @@ public class UpdateTravelPostDto {
     @NotNull
     private String title;
 
-    private String country;
+    private String travelSuburb;
 
     private String location;
 

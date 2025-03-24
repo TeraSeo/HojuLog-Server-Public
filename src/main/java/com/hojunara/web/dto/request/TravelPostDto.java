@@ -27,7 +27,7 @@ public class TravelPostDto {
     @NotNull
     private SubCategory subCategory;
 
-    private String country;
+    private String travelSuburb;
 
     private String location;
 

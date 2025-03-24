@@ -42,6 +42,7 @@ public class BlogContent {
                         .content(blogContent.get("content"))
                         .fontSize(Integer.parseInt(blogContent.getOrDefault("fontSize", "16")))
                         .fontWeight(Integer.parseInt(blogContent.getOrDefault("fontWeight", "400")))
+                        .fontFamily(blogContent.getOrDefault("fontFamily", "Arial"))
                         .build());
             } else if ("image".equals(blogContent.get("type"))) {
                 blogContentList.add(ImageContent.builder()
@@ -63,6 +64,7 @@ public class BlogContent {
                 map.put("content", descriptionContent.getContent());
                 map.put("fontSize", String.valueOf(descriptionContent.getFontSize()));
                 map.put("fontWeight", String.valueOf(descriptionContent.getFontWeight()));
+                map.put("fontFamily", String.valueOf(descriptionContent.getFontFamily()));
             } else if ("image".equals(blogContent.getType())) {
                 ImageContent imageContent = (ImageContent) blogContent;
                 map.put("type", "image");

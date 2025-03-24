@@ -122,6 +122,7 @@ public class TransactionPostServiceImpl implements TransactionPostService {
                     .price(transactionPostDto.getPrice())
                     .suburb(transactionPostDto.getSuburb())
                     .isCommentAllowed(transactionPostDto.getIsCommentAllowed())
+                    .viewCounts(0L)
                     .build();
 
 
@@ -199,7 +200,8 @@ public class TransactionPostServiceImpl implements TransactionPostService {
             List<String> updatedKeywords = updateTransactionMainInfoPostDto.getSelectedKeywords();
             keywordService.updateKeyword(transactionPost, updatedKeywords);
 
-            transactionPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+            transactionPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
             transactionPostRepository.save(transactionPost);
             transactionPostRepository.flush(); // 업데이트 내용 반영
 

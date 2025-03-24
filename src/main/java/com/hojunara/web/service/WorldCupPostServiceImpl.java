@@ -108,6 +108,7 @@ public class WorldCupPostServiceImpl implements WorldCupPostService {
                     .postType(PostType.WORLD_CUP)
                     .subCategory(SubCategory.valueOf(worldCupPostDto.getSubCategory()))
                     .isCommentAllowed(worldCupPostDto.getIsCommentAllowed())
+                    .viewCounts(0L)
                     .user(user)
                     .build();
 
@@ -159,7 +160,8 @@ public class WorldCupPostServiceImpl implements WorldCupPostService {
                 worldCupPost.setCoverImageUrl(coverImageUrl);
             }
 
-            worldCupPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+            worldCupPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
             worldCupPostRepository.save(worldCupPost);
             worldCupPostRepository.flush(); // 업데이트 내용 반영
 

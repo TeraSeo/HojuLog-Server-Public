@@ -47,7 +47,7 @@ public class TransactionPost extends NormalPost {
                 .map(Image::getUrl)
                 .findFirst()
                 .orElse(null);
-        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getUpdatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalTransactionPostDto.builder().postId(getId()).title(getTitle()).imageUrl(imageUrl).suburb(getSuburb()).viewCounts(getViewCounts()).price(getPrice()).transactionType(getTransactionType()).priceType(getPriceType()).commentCounts((long) getComments().size()).createdAt(getUpdatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateTransactionPostDto convertToUpdateTransactionPostDto() {
@@ -78,6 +78,6 @@ public class TransactionPost extends NormalPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedTransactionPostDto.builder().postId(getId()).title(getTitle()).userId(getUser().getId()).description(getDescription()).subCategory(getSubCategory()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).transactionType(transactionType).priceType(priceType).price(price).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts(getViewCounts()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

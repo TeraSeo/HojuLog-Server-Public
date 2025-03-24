@@ -17,5 +17,7 @@ public class DescriptionContent extends BlogContent {
 
     private int fontSize;
 
+    private String fontFamily;
+
     private int fontWeight;
 }

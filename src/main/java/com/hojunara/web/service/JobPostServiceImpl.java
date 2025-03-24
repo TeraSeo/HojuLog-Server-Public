@@ -121,6 +121,7 @@ public class JobPostServiceImpl implements JobPostService {
                     .location(jobPostDto.getLocation())
                     .suburb(jobPostDto.getSuburb())
                     .isCommentAllowed(jobPostDto.getIsCommentAllowed())
+                    .viewCounts(0L)
                     .build();
 
             jobPost.setUser(user);
@@ -194,7 +195,8 @@ public class JobPostServiceImpl implements JobPostService {
             List<String> updatedKeywords = updateJobMainInfoPostDto.getSelectedKeywords();
             keywordService.updateKeyword(jobPost, updatedKeywords);
 
-            jobPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+            jobPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
             jobPostRepository.save(jobPost);
             jobPostRepository.flush(); // 업데이트 내용 반영
 

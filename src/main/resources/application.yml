@@ -1,3 +1,7 @@
+server:
+  forward-headers-strategy: native
+  use-forward-headers: true
+
 spring:
   security:
     oauth2:

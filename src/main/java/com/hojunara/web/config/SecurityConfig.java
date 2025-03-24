@@ -107,7 +107,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://3.24.221.82");  // Set allowed origin for client
-        config.addAllowedOrigin("http://www.hojulog.com");
+        config.addAllowedOrigin("http://hojulog.com");
+        config.addAllowedOrigin("https://hojulog.com");
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedMethod("*");                      // Allow all HTTP methods
         config.addAllowedHeader("*");                      // Allow all headers

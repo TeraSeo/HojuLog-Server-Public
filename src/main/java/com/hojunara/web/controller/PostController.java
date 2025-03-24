@@ -467,9 +467,7 @@ public class PostController {
     public ResponseEntity<DetailedWorldCupPostDto> getSpecificWorldCupPost(@RequestParam Long postId, @RequestHeader String userId) {
         WorldCupPost worldCupPost = worldCupPostService.getPostById(postId);
         DetailedWorldCupPostDto detailedPropertyPostDto = worldCupPost.convertPostToDetailedWorldCupPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedPropertyPostDto);
     }
 
@@ -484,9 +482,8 @@ public class PostController {
     public ResponseEntity<DetailedPropertyPostDto> getSpecificPropertyPost(@RequestParam Long postId, @RequestHeader String userId) {
         PropertyPost propertyPost = propertyPostService.getPostById(postId);
         DetailedPropertyPostDto detailedPropertyPostDto = propertyPost.convertPostToDetailedPropertyPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
+
         return ResponseEntity.ok(detailedPropertyPostDto);
     }
 
@@ -494,9 +491,8 @@ public class PostController {
     public ResponseEntity<DetailedJobPostDto> getSpecificJobPost(@RequestParam Long postId, @RequestHeader String userId) {
         JobPost jobPost = jobPostService.getPostById(postId);
         DetailedJobPostDto detailedJobPostDto = jobPost.convertPostToDetailedJobPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
+
         return ResponseEntity.ok(detailedJobPostDto);
     }
 
@@ -504,9 +500,7 @@ public class PostController {
     public ResponseEntity<DetailedTransactionPostDto> getSpecificTransactionPost(@RequestParam Long postId, @RequestHeader String userId) {
         TransactionPost transactionPost = transactionPostService.getPostById(postId);
         DetailedTransactionPostDto detailedTransactionPostDto = transactionPost.convertPostToDetailedTransactionPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedTransactionPostDto);
     }
 
@@ -514,9 +508,7 @@ public class PostController {
     public ResponseEntity<DetailedSocietyPostDto> getSpecificSocietyPost(@RequestParam Long postId, @RequestHeader String userId) {
         SocietyPost societyPost = societyPostService.getPostById(postId);
         DetailedSocietyPostDto detailedSocietyPostDto = societyPost.convertPostToDetailedSocietyPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
         return ResponseEntity.ok(detailedSocietyPostDto);
     }
 
@@ -524,9 +516,7 @@ public class PostController {
     public ResponseEntity<DetailedTravelPostDto> getSpecificTravelPost(@RequestParam Long postId, @RequestHeader String userId) {
         TravelPost travelPost = travelPostService.getPostById(postId);
         DetailedTravelPostDto detailedTravelPostDto = travelPost.convertPostToDetailedTravelPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
 
         return ResponseEntity.ok(detailedTravelPostDto);
     }
@@ -577,9 +567,8 @@ public class PostController {
     public ResponseEntity<DetailedStudyPostDto> getSpecificStudyPost(@RequestParam Long postId, @RequestHeader String userId) {
         StudyPost studyPost = studyPostService.getPostById(postId);
         DetailedStudyPostDto detailedStudyPostDto = studyPost.convertPostToDetailedStudyPostDto(userId);
-        if (userId != "" && userId != null) {
-            postService.addViewCount(postId, userId);
-        }
+        postService.addViewCount(postId);
+
         return ResponseEntity.ok(detailedStudyPostDto);
     }
 

@@ -27,7 +27,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Autowired
     public OAuth2SuccessHandler(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-        setDefaultTargetUrl("http://www.hojulog.com/oauth2/redirect");
+        setDefaultTargetUrl("https://hojulog.com/oauth2/redirect");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 //        Optional<String> cookie = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
 //                .map(Cookie::getValue);
-        String targetUrl = "http://www.hojulog.com/oauth2/redirect";
+        String targetUrl = "https://hojulog.com/oauth2/redirect";
 
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
         String accessToken = jwtToken.getAccessToken();

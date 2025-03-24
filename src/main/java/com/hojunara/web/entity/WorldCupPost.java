@@ -30,7 +30,7 @@ public class WorldCupPost extends PinnablePost {
 
     public NormalWorldCupPostDto convertPostToNormalCupPostDto() {
         List<String> keywords = getKeywords().stream().map(Keyword::getKeyWord).collect(Collectors.toList());
-        return NormalWorldCupPostDto.builder().postId(getId()).title(getTitle()).subCategory(getSubCategory()).imageUrl(coverImageUrl).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).pinnedAdExpiry(getPinnedAdExpiry()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).build();
+        return NormalWorldCupPostDto.builder().postId(getId()).title(getTitle()).subCategory(getSubCategory()).imageUrl(coverImageUrl).createdAt(getUpdatedAt()).viewCounts(getViewCounts()).pinnedAdExpiry(getPinnedAdExpiry()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).build();
     }
 
     public UpdateDetailedWorldCupPostDto convertPostToUpdatePostDto() {
@@ -60,6 +60,6 @@ public class WorldCupPost extends PinnablePost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedWorldCupPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).candidateDtoList(candidateDtoList).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts((long) getViewedUsers().size()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedWorldCupPostDto.builder().postId(getId()).userId(getUser().getId()).title(getTitle()).subCategory(getSubCategory()).candidateDtoList(candidateDtoList).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).viewCounts(getViewCounts()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

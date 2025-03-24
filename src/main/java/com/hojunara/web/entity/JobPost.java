@@ -31,11 +31,11 @@ public class JobPost extends NormalPost {
     private String location;
 
     public SummarizedJobPostDto convertPostToSummarizedJobPostDto() {
-        return SummarizedJobPostDto.builder().postId(getId()).title(getTitle()).viewCounts((long) getViewedUsers().size()).subCategory(getSubCategory()).createdAt(getUpdatedAt()).build();
+        return SummarizedJobPostDto.builder().postId(getId()).title(getTitle()).viewCounts(getViewCounts()).subCategory(getSubCategory()).createdAt(getUpdatedAt()).build();
     }
 
     public NormalJobPostDto convertPostToNormalJobPostDto() {
-        return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts((long) getViewedUsers().size()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getUpdatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
+        return NormalJobPostDto.builder().postId(getId()).title(getTitle()).location(getLocation()).suburb(getSuburb()).viewCounts(getViewCounts()).jobType(getJobType()).subCategory(getSubCategory()).createdAt(getUpdatedAt()).pinnedAdExpiry(getPinnedAdExpiry()).build();
     }
 
     public UpdateJobPostDto convertToUpdateJobPostDto() {
@@ -66,6 +66,6 @@ public class JobPost extends NormalPost {
                     .anyMatch(id -> id.equals(parsedId));
         }
 
-        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).userId(getUser().getId()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts((long) getViewedUsers().size()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
+        return DetailedJobPostDto.builder().postId(getId()).title(getTitle()).description(getDescription()).subCategory(getSubCategory()).userId(getUser().getId()).contact(getContact()).email(getEmail()).imageUrls(imageUrls).jobType(jobType).location(location).viewCounts(getViewCounts()).likeCounts((long) getLikes().size()).commentCounts((long) getComments().size()).isUserLiked(isUserLiked).createdAt(getUpdatedAt()).keywords(keywords).isCommentAllowed(getIsCommentAllowed()).build();
     }
 }

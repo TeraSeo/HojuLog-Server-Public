@@ -127,6 +127,7 @@ public class PropertyPostServiceImpl implements PropertyPostService {
                     .isParkable(propertyPostDto.getIsParkable())
                     .isBillIncluded(propertyPostDto.getIsBillIncluded())
                     .isCommentAllowed(propertyPostDto.getIsCommentAllowed())
+                    .viewCounts(0L)
                     .build();
 
             propertyPost.setUser(user);
@@ -218,7 +219,8 @@ public class PropertyPostServiceImpl implements PropertyPostService {
             List<String> updatedKeywords = updatePropertyMainInfoPostDto.getSelectedKeywords();
             keywordService.updateKeyword(propertyPost, updatedKeywords);
 
-            propertyPost.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Australia/Sydney"))));
+            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+            propertyPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
             propertyPostRepository.save(propertyPost);
             propertyPostRepository.flush(); // 업데이트 내용 반영
 

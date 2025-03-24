@@ -27,15 +27,14 @@ public abstract class PostBaseEntity {
 
     @PrePersist
     protected void onCreate() {
-        LocalDateTime nowSydney = LocalDateTime.now(SYDNEY_ZONE);
-        Timestamp timestampSydney = Timestamp.valueOf(nowSydney);
-        this.createdAt = timestampSydney;
-        this.updatedAt = timestampSydney;
+        Timestamp timestamp = Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant());
+        this.createdAt = timestamp;
+        this.updatedAt = timestamp;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        LocalDateTime nowSydney = LocalDateTime.now(SYDNEY_ZONE);
-        this.updatedAt = Timestamp.valueOf(nowSydney);
+        Timestamp timestamp = Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant());
+        this.updatedAt = timestamp;
     }
 }
