@@ -22,6 +22,8 @@ public class DetailedUserDto {
 
     private List<Long> uploadedPostIds;
 
+    private List<Long> uploadedArticleIds;
+
     private Long log;
 
     private Long likeCountThisWeek;

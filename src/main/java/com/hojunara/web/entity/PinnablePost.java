@@ -24,4 +24,8 @@ public abstract class PinnablePost extends Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Keyword> keywords = new ArrayList<>();
+
+    public SummarizedPostDto convertToSummarizedPostDto() {
+        return SummarizedPostDto.builder().id(getId()).title(getTitle()).category(getCategory()).subCategory(getSubCategory()).viewCounts(getViewCounts()).createdAt(getUpdatedAt()).build();
+    }
 }

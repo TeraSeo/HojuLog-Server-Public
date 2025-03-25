@@ -316,6 +316,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void addOneLikeCountThisWeek(User user) {
+        try {
+            user.setLikeCountThisWeek(user.getLikeCountThisWeek() + 1);
+            userRepository.save(user);
+            log.info("Successfully added like count this week");
+        } catch (Exception e) {
+            log.error("Failed to add like count this week");
+        }
+    }
+
+    @Override
     public void removeLikeCountThisWeek(Post post) {
         try {
             User user = post.getUser();
@@ -324,6 +335,17 @@ public class UserServiceImpl implements UserService {
             log.info("Removed like for Post {} by User {}", post.getId(), user.getId());
         } catch (Exception e) {
             log.error("Failed to remove like count this week", e);
+        }
+    }
+
+    @Override
+    public void removeOneLikeCountThisWeek(User user) {
+        try {
+            user.setLikeCountThisWeek(user.getLikeCountThisWeek() - 1);
+            userRepository.save(user);
+            log.info("Successfully removed like count this week");
+        } catch (Exception e) {
+            log.error("Failed to remove like count this week");
         }
     }
 

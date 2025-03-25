@@ -112,20 +112,22 @@ public class User extends BaseEntity {
         return NormalUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(getLikeCountThisWeek()).role(role).isLocked(isLocked).build();
     }
 
-    public DetailedUserDto convertToDetailedUserDto() {
+    public DetailedUserDto convertToDetailedUserDto(List<PinnablePost> posts, List<ArticlePost> articles) {
         List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
-        return DetailedUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(getLikeCountThisWeek()).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).build();
+        List<Long> uploadedArticleIDs = articles.stream().map(Post::getId).limit(5).collect(Collectors.toList());
+        return DetailedUserDto.builder().id(id).username(username).log(log).likeCountThisWeek(getLikeCountThisWeek()).description(description).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).uploadedArticleIds(uploadedArticleIDs).build();
     }
 
     public SummarizedUserProfileDto convertToSummarizedUserProfileDto() {
         return SummarizedUserProfileDto.builder().id(id).username(username).profilePicture(profilePicture).build();
     }
 
-    public DetailedOwnUserDto convertToDetailedOwnUserDto() {
+    public DetailedOwnUserDto convertToDetailedOwnUserDto(List<PinnablePost> posts, List<ArticlePost> articles) {
         List<Long> uploadedPostIDs = posts.stream().map(Post::getId).limit(5).collect(Collectors.toList());
+        List<Long> uploadedArticleIDs = articles.stream().map(Post::getId).limit(5).collect(Collectors.toList());
         List<Long> likedPostIds = postLikes.stream().map(PostLike::getPost).limit(5).map(Post::getId).collect(Collectors.toList());
         List<Long> requestedIds = inquiries.stream().map(Inquiry::getId).limit(5).collect(Collectors.toList());
-        return DetailedOwnUserDto.builder().id(id).username(username).description(description).log(log).likeCountThisWeek(getLikeCountThisWeek()).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).role(role).lastAttendanceTime(lastAttendanceTime).build();
+        return DetailedOwnUserDto.builder().id(id).username(username).description(description).log(log).likeCountThisWeek(getLikeCountThisWeek()).profilePicture(profilePicture).uploadedPostIds(uploadedPostIDs).uploadedArticleIds(uploadedArticleIDs).likedPostIds(likedPostIds).requestedIds(requestedIds).role(role).lastAttendanceTime(lastAttendanceTime).build();
     }
 
     public UserRankDto convertToUserRankDto() {

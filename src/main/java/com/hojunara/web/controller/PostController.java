@@ -31,9 +31,10 @@ public class PostController {
     private final PinnablePostService pinnablePostService;
     private final WorldCupPostService worldCupPostService;
     private final CandidateService candidateService;
+    private final ArticlePostService articlePostService;
 
     @Autowired
-    public PostController(PostService postService, PropertyPostService propertyPostService, JobPostService jobPostService, TransactionPostService transactionPostService, SocietyPostService societyPostService, TravelPostService travelPostService, StudyPostService studyPostService, PinnablePostService pinnablePostService, WorldCupPostService worldCupPostService, CandidateService candidateService) {
+    public PostController(PostService postService, PropertyPostService propertyPostService, JobPostService jobPostService, TransactionPostService transactionPostService, SocietyPostService societyPostService, TravelPostService travelPostService, StudyPostService studyPostService, PinnablePostService pinnablePostService, WorldCupPostService worldCupPostService, CandidateService candidateService, ArticlePostService articlePostService) {
         this.postService = postService;
         this.propertyPostService = propertyPostService;
         this.jobPostService = jobPostService;
@@ -44,6 +45,25 @@ public class PostController {
         this.pinnablePostService = pinnablePostService;
         this.worldCupPostService = worldCupPostService;
         this.candidateService = candidateService;
+        this.articlePostService = articlePostService;
+    }
+
+    @PutMapping("update/article")
+    public ResponseEntity<Boolean> updateArticle(
+            @Valid @RequestPart UpdateArticlePostDto updateArticlePostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = articlePostService.updateArticle(updateArticlePostDto, images);
+        return ResponseEntity.ok(post != null);
+    }
+
+    @PostMapping("create/article")
+    public ResponseEntity<Boolean> createArticlePost(
+            @Valid @RequestPart ArticlePostDto articlePostDto,
+            @RequestPart(required = false) MultipartFile[] images
+    ) {
+        Post post = articlePostService.createArticle(articlePostDto, images);
+        return ResponseEntity.ok(post != null);
     }
 
     @PostMapping("create/property")
@@ -172,6 +192,18 @@ public class PostController {
     ) {
         Post post = studyPostService.updatePost(updateStudyPostDto, images);
         return ResponseEntity.ok(post != null);
+    }
+
+    @GetMapping("get/pageable/recent/article")
+    public ResponseEntity<ArticlePostPaginationResponse> getRecentPageableArticlePosts(@RequestParam int page, @RequestParam int size) {
+        Page<ArticlePost> posts = articlePostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        List<NormalArticlePostDto> postDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalArticlePostDto())
+                .collect(Collectors.toList());
+
+        ArticlePostPaginationResponse postPaginationResponse = ArticlePostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(postDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
     }
 
     @GetMapping("get/pageable/recent/worldcup")
@@ -342,9 +374,33 @@ public class PostController {
         return ResponseEntity.ok(postPaginationResponse);
     }
 
+    @GetMapping("get/pageable/own/articles")
+    public ResponseEntity<ArticlePostPaginationResponse> getPageableOwnArticles(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
+        Page<ArticlePost> posts = articlePostService.getAllPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        List<NormalArticlePostDto> normalArticlePostDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalArticlePostDto())
+                .collect(Collectors.toList());
+
+        ArticlePostPaginationResponse postPaginationResponse = ArticlePostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(normalArticlePostDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
+    @GetMapping("get/pageable/others/articles")
+    public ResponseEntity<ArticlePostPaginationResponse> getPageableOthersArticles(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
+        Page<ArticlePost> posts = articlePostService.getAllPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        List<NormalArticlePostDto> normalArticlePostDtoList = posts.getContent()
+                .stream()
+                .map(post -> post.convertPostToNormalArticlePostDto())
+                .collect(Collectors.toList());
+
+        ArticlePostPaginationResponse postPaginationResponse = ArticlePostPaginationResponse.builder().pageSize(posts.getTotalPages()).currentPagePostsCount(posts.getNumberOfElements()).currentPage(page).posts(normalArticlePostDtoList).build();
+        return ResponseEntity.ok(postPaginationResponse);
+    }
+
     @GetMapping("get/pageable/own/posts")
     public ResponseEntity<WholePostPaginationResponse> getPageableOwnPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
-        Page<Post> posts = postService.getPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        Page<PinnablePost> posts = pinnablePostService.getAllPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
         List<SummarizedPostDto> summarizedPostDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertToSummarizedPostDto())
@@ -356,7 +412,7 @@ public class PostController {
 
     @GetMapping("get/pageable/others/posts")
     public ResponseEntity<WholePostPaginationResponse> getPageableOthersPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
-        Page<Post> posts = postService.getPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
+        Page<PinnablePost> posts = pinnablePostService.getAllPostsByPageNUser(Long.valueOf(userId), PageRequest.of(page - 1, size));
         List<SummarizedPostDto> summarizedPostDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertToSummarizedPostDto())
@@ -463,12 +519,20 @@ public class PostController {
         return ResponseEntity.ok(candidateDtoList);
     }
 
+    @GetMapping("get/specific/article")
+    public ResponseEntity<DetailedArticlePostDto> getSpecificArticlePost(@RequestParam Long postId, @RequestHeader String userId) {
+        ArticlePost articlePost = articlePostService.getPostById(postId);
+        DetailedArticlePostDto detailedArticlePostDto = articlePost.convertPostToDetailedArticlePostDto(userId);
+        postService.addViewCount(postId);
+        return ResponseEntity.ok(detailedArticlePostDto);
+    }
+
     @GetMapping("get/specific/worldcup")
     public ResponseEntity<DetailedWorldCupPostDto> getSpecificWorldCupPost(@RequestParam Long postId, @RequestHeader String userId) {
         WorldCupPost worldCupPost = worldCupPostService.getPostById(postId);
-        DetailedWorldCupPostDto detailedPropertyPostDto = worldCupPost.convertPostToDetailedWorldCupPostDto(userId);
+        DetailedWorldCupPostDto detailedWorldCupPostDto = worldCupPost.convertPostToDetailedWorldCupPostDto(userId);
         postService.addViewCount(postId);
-        return ResponseEntity.ok(detailedPropertyPostDto);
+        return ResponseEntity.ok(detailedWorldCupPostDto);
     }
 
     @GetMapping("get/specific/update/worldcup")
@@ -519,6 +583,13 @@ public class PostController {
         postService.addViewCount(postId);
 
         return ResponseEntity.ok(detailedTravelPostDto);
+    }
+
+    @GetMapping("get/update/articleDto")
+    public ResponseEntity<UpdateArticlePostDto> getUpdateArticlePostDto(@RequestParam Long postId) {
+        ArticlePost articlePost = articlePostService.getPostById(postId);
+        UpdateArticlePostDto updateArticlePostDto = articlePost.convertPostToUpdateArticlePostDto();
+        return ResponseEntity.ok(updateArticlePostDto);
     }
 
     @GetMapping("get/update/propertyDto")

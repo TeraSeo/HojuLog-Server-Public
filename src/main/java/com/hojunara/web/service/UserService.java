@@ -39,8 +39,10 @@ public interface UserService {
     Boolean checkIsUserPaid(Long viewerId, Post post);
 
     void addLikeCountThisWeek(Post post);
+    void addOneLikeCountThisWeek(User user);
 
     void removeLikeCountThisWeek(Post post);
+    void removeOneLikeCountThisWeek(User user);
 
 //    void removeLikedPostContaining(Post post);
 

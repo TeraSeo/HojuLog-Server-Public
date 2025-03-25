@@ -1,12 +1,8 @@
 package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.response.*;
-import com.hojunara.web.entity.BlogPost;
-import com.hojunara.web.entity.Post;
-import com.hojunara.web.entity.User;
-import com.hojunara.web.service.BlogPostService;
-import com.hojunara.web.service.PostService;
-import com.hojunara.web.service.UserService;
+import com.hojunara.web.entity.*;
+import com.hojunara.web.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +19,16 @@ public class UserController {
     private final UserService userService;
     private final PostService postService;
     private final BlogPostService blogPostService;
+    private final PinnablePostService pinnablePostService;
+    private final ArticlePostService articlePostService;
 
     @Autowired
-    public UserController(UserService userService, PostService postService, BlogPostService blogPostService) {
+    public UserController(UserService userService, PostService postService, BlogPostService blogPostService, PinnablePostService pinnablePostService, ArticlePostService articlePostService) {
         this.userService = userService;
         this.postService = postService;
         this.blogPostService = blogPostService;
+        this.pinnablePostService = pinnablePostService;
+        this.articlePostService = articlePostService;
     }
 
     @GetMapping("get/summarised/specific")
@@ -41,7 +41,10 @@ public class UserController {
     @GetMapping("get/specific")
     public ResponseEntity<DetailedUserDto> getSpecificDetailedUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
-        DetailedUserDto detailedUserDto = user.convertToDetailedUserDto();
+
+        List<PinnablePost> top5PinnablePosts = pinnablePostService.getTop5PostsByUser(userId);
+        List<ArticlePost> top5Aricles = articlePostService.getTop5PostsByUser(userId);
+        DetailedUserDto detailedUserDto = user.convertToDetailedUserDto(top5PinnablePosts, top5Aricles);
         return ResponseEntity.ok(detailedUserDto);
     }
 

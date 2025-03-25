@@ -24,6 +24,8 @@ public class DetailedOwnUserDto {
 
     private List<Long> uploadedPostIds;
 
+    private List<Long> uploadedArticleIds;
+
     private List<Long> likedPostIds;
 
     private List<Long> requestedIds;

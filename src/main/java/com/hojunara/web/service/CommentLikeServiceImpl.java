@@ -20,11 +20,13 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
     private final CommentLikeRepository commentLikeRepository;
     private final CommentService commentService;
+    private final UserService userService;
 
     @Autowired
-    public CommentLikeServiceImpl(CommentLikeRepository commentLikeRepository, CommentService commentService) {
+    public CommentLikeServiceImpl(CommentLikeRepository commentLikeRepository, CommentService commentService, UserService userService) {
         this.commentLikeRepository = commentLikeRepository;
         this.commentService = commentService;
+        this.userService = userService;
     }
 
     @Override
@@ -64,6 +66,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
             comment.getLikes().add(commentLike);
             user.getCommentLikes().add(commentLike);
             commentLikeRepository.save(commentLike);
+            userService.addOneLikeCountThisWeek(user);
 
             log.info("Successfully created comment like with comment id: {}, user id: {}", comment.getId(), user.getId());
             return Long.valueOf(comment.getLikes().size());
@@ -88,6 +91,8 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
                 commentLikeRepository.deleteById(commentLike.getId());
                 log.info("Successfully deleted comment like with id: {}", commentLike.getId());
+
+                userService.removeOneLikeCountThisWeek(user);
 
                 return Long.valueOf(comment.getLikes().size());
             }

@@ -6,11 +6,14 @@ import com.hojunara.web.exception.PostNotFoundException;
 import com.hojunara.web.repository.PinnablePostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -61,6 +64,30 @@ public class PinnablePostsServiceImpl implements PinnablePostService {
             return false;
         } catch (Exception e) {
             log.error("Failed to pin post with post id: {}", postId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<PinnablePost> getTop5PostsByUser(Long userId) {
+        try {
+            List<PinnablePost> articlePosts = pinnablePostRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId);
+            log.info("Successfully found top 5 pinnable posts by userId: {}", userId);
+            return articlePosts;
+        } catch (Exception e) {
+            log.error("Failed to find top 5 pinnable posts by userId: {}", userId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PinnablePost> getAllPostsByPageNUser(Long userId, Pageable pageable) {
+        try {
+            Page<PinnablePost> pinnablePosts = pinnablePostRepository.findAllByUserId(userId, pageable);
+            log.info("Successfully found all pinnable posts by page and user");
+            return pinnablePosts;
+        } catch (Exception e) {
+            log.error("Failed to find all pinnable posts by page", e);
             throw e;
         }
     }

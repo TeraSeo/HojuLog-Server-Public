@@ -42,7 +42,7 @@ public class BlogContent {
                         .content(blogContent.get("content"))
                         .fontSize(Integer.parseInt(blogContent.getOrDefault("fontSize", "16")))
                         .fontWeight(Integer.parseInt(blogContent.getOrDefault("fontWeight", "400")))
-                        .fontFamily(blogContent.getOrDefault("fontFamily", "Arial"))
+                        .fontFamily(blogContent.getOrDefault("fontFamily", "프리텐다드"))
                         .build());
             } else if ("image".equals(blogContent.get("type"))) {
                 blogContentList.add(ImageContent.builder()
