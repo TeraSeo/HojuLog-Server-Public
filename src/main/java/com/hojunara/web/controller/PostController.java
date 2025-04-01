@@ -219,8 +219,24 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/recent/property")
-    public ResponseEntity<PropertyPostPaginationResponse> getRecentPageablePropertyPosts(@RequestParam int page, @RequestParam int size) {
-        Page<PropertyPost> posts = propertyPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+    public ResponseEntity<PropertyPostPaginationResponse> getRecentPageablePropertyPosts(@RequestParam int page, @RequestParam int size, @RequestParam Long minPrice, @RequestParam Long maxPrice, @RequestParam String period) {
+        Page<PropertyPost> posts;
+
+        Long min = minPrice == -1 ? 0 : minPrice;
+        Long max = maxPrice == -1 ? 999999999999999999L : maxPrice;
+
+        if (minPrice == -1 && maxPrice == -1 && period.equals("전체")) {
+            posts = propertyPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        }
+        else if (minPrice == -1 && maxPrice == -1) {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNPeriod(Period.valueOf(period), PageRequest.of(page - 1, size));
+        }
+        else if (period.equals("전체")) {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNMinMaxPrice(min, max, PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(min, max, Period.valueOf(period), PageRequest.of(page - 1, size));
+        }
         List<NormalPropertyPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalPropertyPostDto())
@@ -231,8 +247,15 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/recent/job")
-    public ResponseEntity<JobPostPaginationResponse> getRecentPageableJobPosts(@RequestParam int page, @RequestParam int size) {
-        Page<JobPost> posts = jobPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+    public ResponseEntity<JobPostPaginationResponse> getRecentPageableJobPosts(@RequestParam int page, @RequestParam int size, @RequestParam String jobType) {
+        Page<JobPost> posts;
+
+        if (jobType.equals("전체")) {
+            posts = jobPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = jobPostService.getCreatedAtDescPostsByPageNJobType(PageRequest.of(page - 1, size), JobType.valueOf(jobType));
+        }
         List<NormalJobPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalJobPostDto())
@@ -243,8 +266,21 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/recent/transaction")
-    public ResponseEntity<TransactionPostPaginationResponse> getRecentPageableTransactionPosts(@RequestParam int page, @RequestParam int size) {
-        Page<TransactionPost> posts = transactionPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+    public ResponseEntity<TransactionPostPaginationResponse> getRecentPageableTransactionPosts(@RequestParam int page, @RequestParam int size, @RequestParam String transactionType, @RequestParam String priceType) {
+        Page<TransactionPost> posts;
+        if (transactionType.equals("전체") && priceType.equals("전체")) {
+            posts = transactionPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        }
+        else if (transactionType.equals("전체")) {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNPriceType(PageRequest.of(page - 1, size), PriceType.valueOf(priceType));
+        }
+        else if (priceType.equals("전체")) {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNTransactionType(PageRequest.of(page - 1, size), TransactionType.valueOf(transactionType));
+        }
+        else {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNTransactionTypeNPriceType(PageRequest.of(page - 1, size), TransactionType.valueOf(transactionType), PriceType.valueOf(priceType));
+        }
+
         List<NormalTransactionPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalTransactionPostDto())
@@ -267,8 +303,15 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/recent/travel")
-    public ResponseEntity<TravelPostPaginationResponse> getRecentPageableTravelPosts(@RequestParam int page, @RequestParam int size) {
-        Page<TravelPost> posts = travelPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+    public ResponseEntity<TravelPostPaginationResponse> getRecentPageableTravelPosts(@RequestParam int page, @RequestParam int size, @RequestParam String travelSuburb) {
+        Page<TravelPost> posts;
+        if (travelSuburb.equals("전체")) {
+            posts = travelPostService.getCreatedAtDescPostsByPage(PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = travelPostService.getCreatedAtDescPostsByPageNSuburb(PageRequest.of(page - 1, size), travelSuburb);
+        }
+
         List<NormalTravelPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalTravelPostDto())
@@ -303,8 +346,24 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/property/subcategory")
-    public ResponseEntity<PropertyPostPaginationResponse> getRecentPageablePropertyPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
-        Page<PropertyPost> posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+    public ResponseEntity<PropertyPostPaginationResponse> getRecentPageablePropertyPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory, @RequestParam Long minPrice, @RequestParam Long maxPrice, @RequestParam String period) {
+        Page<PropertyPost> posts;
+
+        Long min = minPrice == -1 ? 0 : minPrice;
+        Long max = maxPrice == -1 ? 999999999999999999L : maxPrice;
+        if (minPrice == -1 && maxPrice == -1 && period.equals("전체")) {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        }
+        else if (minPrice == -1 && maxPrice == -1) {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period.valueOf(period), subCategory, PageRequest.of(page - 1, size));
+        }
+        else if (period.equals("전체")) {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(min, max, subCategory, PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = propertyPostService.getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(min, max, Period.valueOf(period), subCategory, PageRequest.of(page - 1, size));
+        }
+
         List<NormalPropertyPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalPropertyPostDto())
@@ -315,8 +374,15 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/job/subcategory")
-    public ResponseEntity<JobPostPaginationResponse> getRecentPageableJobPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
-        Page<JobPost> posts = jobPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+    public ResponseEntity<JobPostPaginationResponse> getRecentPageableJobPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory, @RequestParam String jobType) {
+        Page<JobPost> posts;
+        if (jobType.equals("전체")) {
+            posts = jobPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = jobPostService.getCreatedAtDescPostsByPageNSubCategoryNJobType(subCategory, JobType.valueOf(jobType), PageRequest.of(page - 1, size));
+        }
+
         List<NormalJobPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalJobPostDto())
@@ -327,8 +393,20 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/transaction/subcategory")
-    public ResponseEntity<TransactionPostPaginationResponse> getRecentPageableTransactionPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
-        Page<TransactionPost> posts = transactionPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+    public ResponseEntity<TransactionPostPaginationResponse> getRecentPageableTransactionPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory, @RequestParam String transactionType, @RequestParam String priceType) {
+        Page<TransactionPost> posts;
+        if (transactionType.equals("전체") && priceType.equals("전체")) {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        }
+        else if (transactionType.equals("전체")) {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNSubCategoryNPriceType(subCategory, PriceType.valueOf(priceType), PageRequest.of(page - 1, size));
+        }
+        else if (priceType.equals("전체")) {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNSubCategoryNTransactionType(subCategory, TransactionType.valueOf(transactionType), PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = transactionPostService.getCreatedAtDescPostsByPageNSubCategoryNTransactionTypeNPriceType(subCategory, TransactionType.valueOf(transactionType), PriceType.valueOf(priceType), PageRequest.of(page - 1, size));
+        }
         List<NormalTransactionPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalTransactionPostDto())
@@ -351,8 +429,15 @@ public class PostController {
     }
 
     @GetMapping("get/pageable/travel/subcategory")
-    public ResponseEntity<TravelPostPaginationResponse> getRecentPageableTravelPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory) {
-        Page<TravelPost> posts = travelPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+    public ResponseEntity<TravelPostPaginationResponse> getRecentPageableTravelPosts(@RequestParam int page, @RequestParam int size, @RequestParam SubCategory subCategory, @RequestParam String travelSuburb) {
+        Page<TravelPost> posts;
+        if (travelSuburb.equals("전체")) {
+            posts = travelPostService.getCreatedAtDescPostsByPageNSubCategory(subCategory, PageRequest.of(page - 1, size));
+        }
+        else {
+            posts = travelPostService.getCreatedAtDescPostsByPageNSubCategoryNSuburb(subCategory, PageRequest.of(page - 1, size), travelSuburb);
+        }
+
         List<NormalTravelPostDto> postDtoList = posts.getContent()
                 .stream()
                 .map(post -> post.convertPostToNormalTravelPostDto())

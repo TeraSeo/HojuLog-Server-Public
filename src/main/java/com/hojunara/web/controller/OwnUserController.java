@@ -57,4 +57,10 @@ public class OwnUserController {
         Boolean isAttended = userService.updateAttendance(userId);
         return ResponseEntity.ok(isAttended);
     }
+
+    @PutMapping("update/account/lock")
+    public ResponseEntity<Boolean> lockAccount(@RequestHeader("userId") Long userId) {
+        Boolean isLocked = userService.lockAccount(userId);
+        return ResponseEntity.ok(isLocked);
+    }
 }

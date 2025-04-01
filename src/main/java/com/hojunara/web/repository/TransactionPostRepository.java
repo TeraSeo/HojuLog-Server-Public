@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,6 +17,12 @@ public interface TransactionPostRepository extends JpaRepository<TransactionPost
     List<TransactionPost> findTop5ByOrderByUpdatedAtDesc();
 
     Page<TransactionPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
+
+    Page<TransactionPost> findAllBySubCategoryAndTransactionTypeOrderByUpdatedAtDesc(SubCategory subCategory, TransactionType transactionType, Pageable pageable);
+
+    Page<TransactionPost> findAllBySubCategoryAndPriceTypeOrderByUpdatedAtDesc(SubCategory subCategory, PriceType priceType, Pageable pageable);
+
+    Page<TransactionPost> findAllBySubCategoryAndTransactionTypeAndPriceTypeOrderByUpdatedAtDesc(SubCategory subCategory, TransactionType transactionType, PriceType priceType, Pageable pageable);
 
     List<TransactionPost> findByTitleContainingOrderByUpdatedAtDesc(String title);
 
@@ -39,4 +46,27 @@ public interface TransactionPostRepository extends JpaRepository<TransactionPost
             "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
             "p.updatedAt DESC")
     Page<TransactionPost> findAllWithPinnedFirst(Pageable pageable);
+
+    @Query("SELECT p FROM TransactionPost p " +
+            "WHERE p.transactionType = :transactionType " +
+            "ORDER BY " +
+            "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
+            "p.updatedAt DESC")
+    Page<TransactionPost> findAllWithPinnedFirstByTransactionType(@Param("transactionType") TransactionType transactionType, Pageable pageable);
+
+    @Query("SELECT p FROM TransactionPost p " +
+            "WHERE p.priceType = :priceType " +
+            "ORDER BY " +
+            "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
+            "p.updatedAt DESC")
+    Page<TransactionPost> findAllWithPinnedFirstByPriceType(@Param("priceType") PriceType priceType, Pageable pageable);
+
+    @Query("SELECT p FROM TransactionPost p " +
+            "WHERE p.transactionType = :transactionType AND p.priceType = :priceType " +
+            "ORDER BY " +
+            "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
+            "p.updatedAt DESC")
+    Page<TransactionPost> findAllWithPinnedFirstByTransactionTypeAndPriceType(@Param("transactionType") TransactionType transactionType,
+                                                                              @Param("priceType") PriceType priceType,
+                                                                              Pageable pageable);
 }

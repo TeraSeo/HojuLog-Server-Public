@@ -77,6 +77,10 @@ public class AuthController {
 
                 String email = authentication.getName();
                 User user = userService.getUserByEmail(email);
+
+                log.info("is user locked: " + user.getIsLocked() + "!!!!!!!!!!!!!!!!!!!!!");
+                if (user.getIsLocked()) return ResponseEntity.ok(false);
+
                 log.info("userId: " + user.getId().toString());
                 response.setHeader("userId", user.getId().toString());
 
@@ -92,6 +96,10 @@ public class AuthController {
 
                 String email = authentication.getName();
                 User user = userService.getUserByEmail(email);
+
+                log.info("is user locked: " + user.getIsLocked() + "!!!!!!!!!!!!!!!!!!!!!");
+                if (user.getIsLocked()) return ResponseEntity.ok(false);
+
                 response.setHeader("userId", user.getId().toString());
 
                 log.info("Refresh token is valid, new access token generated");

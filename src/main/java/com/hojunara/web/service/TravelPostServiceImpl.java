@@ -51,6 +51,18 @@ public class TravelPostServiceImpl implements TravelPostService {
     }
 
     @Override
+    public Page<TravelPost> getCreatedAtDescPostsByPageNSuburb(Pageable pageable, String travelSuburb) {
+        try {
+            Page<TravelPost> posts = travelPostRepository.findAllWithPinnedFirstByTravelSuburb(travelSuburb, pageable);
+            log.info("Successfully got pageable Travel Posts order by createdAt Desc and travel suburb: {}", travelSuburb);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Travel Posts order by createdAt Desc and travel suburb: {}", travelSuburb, e);
+            throw e;
+        }
+    }
+
+    @Override
     public Page<TravelPost> getCreatedAtDescPostsByPage(Pageable pageable) {
         try {
             Page<TravelPost> posts = travelPostRepository.findAllWithPinnedFirst(pageable);
@@ -70,6 +82,18 @@ public class TravelPostServiceImpl implements TravelPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get pageable Travel Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategoryNSuburb(SubCategory subCategory, Pageable pageable, String travelSuburb) {
+        try {
+            Page<TravelPost> posts = travelPostRepository.findAllBySubCategoryAndTravelSuburbOrderByUpdatedAtDesc(subCategory, travelSuburb, pageable);
+            log.info("Successfully got pageable Travel Posts order by createdAt Desc, subcategory: {} and travelSuburb: {}", subCategory, travelSuburb);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Travel Posts order by createdAt Desc, subcategory: {} and travelSuburb: {}", subCategory, travelSuburb, e);
             throw e;
         }
     }

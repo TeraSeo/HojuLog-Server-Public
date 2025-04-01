@@ -55,6 +55,7 @@ public class InitialAuthenticationFilter extends OncePerRequestFilter {
             else {
                 Optional<User> u = userRepository.findByEmail(email);
                 if (u.isEmpty()) return;
+                if (u.get().getIsLocked()) return;
 
                 Authentication a = new OtpAuthentication(email, code, List.of(new SimpleGrantedAuthority(u.get().getRole().toString())));
                 manager.authenticate(a);

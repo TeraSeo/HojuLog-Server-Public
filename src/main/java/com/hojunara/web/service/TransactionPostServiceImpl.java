@@ -67,6 +67,42 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     }
 
     @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionType(Pageable pageable, TransactionType transactionType) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirstByTransactionType(transactionType, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc and transactionType: {}", transactionType);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc and transactionType: {}", transactionType, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNPriceType(Pageable pageable, PriceType priceType) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirstByPriceType(priceType, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc and priceType: {}", priceType);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc and priceType: {}", priceType, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionTypeNPriceType(Pageable pageable, TransactionType transactionType, PriceType priceType) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirstByTransactionTypeAndPriceType(transactionType, priceType, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, transactionType: {} and priceType: {}", transactionType, priceType);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, transactionType: {} and priceType: {}", transactionType, priceType, e);
+            throw e;
+        }
+    }
+
+    @Override
     public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
             Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
@@ -74,6 +110,42 @@ public class TransactionPostServiceImpl implements TransactionPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get pageable Transaction Posts order by createdAt Des cand subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionType(SubCategory subCategory, TransactionType transactionType, Pageable pageable) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeOrderByUpdatedAtDesc(subCategory, transactionType, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, transactionType: {} and subcategory: {}", transactionType, subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, transactionType: {} and subcategory: {}", transactionType, subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNPriceType(SubCategory subCategory, PriceType priceType, Pageable pageable) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryAndPriceTypeOrderByUpdatedAtDesc(subCategory, priceType, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, priceType: {} and subcategory: {}", priceType, subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, priceType: {} and subcategory: {}", priceType, subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionTypeNPriceType(SubCategory subCategory, TransactionType transactionType, PriceType priceType, Pageable pageable) {
+        try {
+            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeAndPriceTypeOrderByUpdatedAtDesc(subCategory, transactionType, priceType, pageable);
+            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, transactionType: {}, priceType: {} and subcategory: {}", transactionType, priceType, subCategory);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, transactionType: {}, priceType: {} and subcategory: {}", transactionType, priceType, subCategory, e);
             throw e;
         }
     }

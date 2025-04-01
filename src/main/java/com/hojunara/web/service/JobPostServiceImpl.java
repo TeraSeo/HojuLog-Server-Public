@@ -67,6 +67,18 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Override
+    public Page<JobPost> getCreatedAtDescPostsByPageNJobType(Pageable pageable, JobType jobType) {
+        try {
+            Page<JobPost> posts = jobPostRepository.findAllWithPinnedFirstByJobType(jobType, pageable);
+            log.info("Successfully got pageable Job Posts order by createdAt Desc and jobType: {}", jobType);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Job Posts order by createdAt Desc and jobType: {}", jobType, e);
+            throw e;
+        }
+    }
+
+    @Override
     public Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
             Page<JobPost> posts = jobPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
@@ -74,6 +86,18 @@ public class JobPostServiceImpl implements JobPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get pageable Job Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<JobPost> getCreatedAtDescPostsByPageNSubCategoryNJobType(SubCategory subCategory, JobType jobType, Pageable pageable) {
+        try {
+            Page<JobPost> posts = jobPostRepository.findAllBySubCategoryAndJobTypeOrderByUpdatedAtDesc(subCategory, jobType, pageable);
+            log.info("Successfully got pageable Job Posts order by createdAt Desc, subcategory: {} and jobType: {}", subCategory, jobType);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Job Posts order by createdAt Desc, subcategory: {} and jobType: {}", subCategory, jobType, e);
             throw e;
         }
     }

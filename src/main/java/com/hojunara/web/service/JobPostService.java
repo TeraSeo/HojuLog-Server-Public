@@ -14,7 +14,11 @@ public interface JobPostService {
 
     Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable);
 
+    Page<JobPost> getCreatedAtDescPostsByPageNJobType(Pageable pageable, JobType jobType);
+
     Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+
+    Page<JobPost> getCreatedAtDescPostsByPageNSubCategoryNJobType(SubCategory subCategory, JobType jobType, Pageable pageable);
 
     List<JobPost> getRecent5Posts();
 

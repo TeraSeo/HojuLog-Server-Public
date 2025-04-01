@@ -414,4 +414,17 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Boolean lockAccount(Long userId) {
+        User user = getUserById(userId);
+        try {
+            user.setIsLocked(true);
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to lock account");
+            throw e;
+        }
+    }
+
 }

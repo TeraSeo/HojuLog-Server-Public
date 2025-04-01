@@ -62,12 +62,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
+                if (user.getIsLocked()) return;
+
                 response.setHeader("userId", user.getId().toString());
+
+                log.info("Access token is valid");
+
+                filterChain.doFilter(request, response);
             }
 
-            log.info("Access token is valid");
-
-            filterChain.doFilter(request, response);
             return;
         }
 
@@ -86,13 +89,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
+                if (user.getIsLocked()) return;
+
                 response.setHeader("userId", user.getId().toString());
+
+                log.info("Refresh token is valid, new access token generated");
+
+                response.setHeader("accessToken", newAccessToken);
+                filterChain.doFilter(request, response);
             }
 
-            log.info("Refresh token is valid, new access token generated");
-
-            response.setHeader("accessToken", newAccessToken);
-            filterChain.doFilter(request, response);
             return;
         }
 

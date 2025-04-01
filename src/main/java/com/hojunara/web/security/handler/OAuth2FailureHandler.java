@@ -1,6 +1,7 @@
 package com.hojunara.web.security.handler;
 
 import com.hojunara.web.exception.UserAlreadyExistsException;
+import com.hojunara.web.exception.UserLockedException;
 import com.hojunara.web.security.CookieUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,11 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
         if (exception instanceof UserAlreadyExistsException) {
             targetUrl = UriComponentsBuilder.fromHttpUrl(targetUrl)
                     .queryParam("error", "존재하는 계정이 있습니다")
+                    .toUriString();
+        }
+        else if (exception instanceof UserLockedException) {
+            targetUrl = UriComponentsBuilder.fromHttpUrl(targetUrl)
+                    .queryParam("error", "비활성화된 계정입니다")
                     .toUriString();
         }
 

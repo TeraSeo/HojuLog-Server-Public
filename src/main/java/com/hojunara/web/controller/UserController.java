@@ -2,10 +2,12 @@ package com.hojunara.web.controller;
 
 import com.hojunara.web.dto.response.*;
 import com.hojunara.web.entity.*;
+import com.hojunara.web.security.provider.JwtTokenProvider;
 import com.hojunara.web.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,14 +23,16 @@ public class UserController {
     private final BlogPostService blogPostService;
     private final PinnablePostService pinnablePostService;
     private final ArticlePostService articlePostService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserController(UserService userService, PostService postService, BlogPostService blogPostService, PinnablePostService pinnablePostService, ArticlePostService articlePostService) {
+    public UserController(UserService userService, PostService postService, BlogPostService blogPostService, PinnablePostService pinnablePostService, ArticlePostService articlePostService, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.postService = postService;
         this.blogPostService = blogPostService;
         this.pinnablePostService = pinnablePostService;
         this.articlePostService = articlePostService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @GetMapping("get/summarised/specific")
@@ -81,5 +85,13 @@ public class UserController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(userRankDtoList);
+    }
+
+    @GetMapping("get/is-locked")
+    public ResponseEntity<Boolean> getIsAccountLocked(@RequestHeader String accessToken) {
+        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+        String email = authentication.getName();
+        User user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(user.getIsLocked());
     }
 }

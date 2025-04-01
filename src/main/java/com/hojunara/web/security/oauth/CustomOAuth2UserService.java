@@ -3,6 +3,7 @@ package com.hojunara.web.security.oauth;
 import com.hojunara.web.entity.Role;
 import com.hojunara.web.entity.User;
 import com.hojunara.web.exception.UserAlreadyExistsException;
+import com.hojunara.web.exception.UserLockedException;
 import com.hojunara.web.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             );
         }
         else {
-            if (oAuthAttributes.registrationMethod.equals(u.get().getRegistrationMethod())) {
+            User user = u.get();
+            if (oAuthAttributes.registrationMethod.equals(user.getRegistrationMethod())) {
+                if (user.getIsLocked()) {
+                    throw new UserLockedException("User is locked with email: " + oAuthAttributes.getEmail());
+                }
+
                 log.info("oauth user loading succeeded");
                 return new DefaultOAuth2User(
                         Collections.singleton(new SimpleGrantedAuthority(u.get().getRole().toString())),

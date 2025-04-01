@@ -1,7 +1,6 @@
 package com.hojunara.web.entity;
 
 import com.hojunara.web.dto.request.*;
-import com.hojunara.web.dto.response.DetailedPropertyPostDto;
 import com.hojunara.web.dto.response.DetailedTransactionPostDto;
 import com.hojunara.web.dto.response.NormalTransactionPostDto;
 import com.hojunara.web.dto.response.SummarizedTransactionPostDto;

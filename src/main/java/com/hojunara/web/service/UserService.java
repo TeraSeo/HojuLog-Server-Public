@@ -51,4 +51,6 @@ public interface UserService {
     void updateUserLog(User user, Long logCount);
 
     Boolean updateAttendance(Long userId);
+
+    Boolean lockAccount(Long userId);
 }

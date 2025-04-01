@@ -14,7 +14,14 @@ public interface PropertyPostService {
 
     Page<PropertyPost> getCreatedAtDescPostsByPage(Pageable pageable);
 
+    Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPrice(Long minPrice, Long maxPrice, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNPeriod(Period period, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, Pageable pageable);
+
     Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(Long minPrice, Long maxPrice, SubCategory subCategory, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period period, SubCategory subCategory, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, SubCategory subCategory, Pageable pageable);
 
     List<PropertyPost> getRecent5Posts();
 

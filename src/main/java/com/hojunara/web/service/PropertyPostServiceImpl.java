@@ -67,6 +67,42 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     }
 
     @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPrice(Long minPrice, Long maxPrice, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetween(minPrice, maxPrice, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc, min price: {} and max price: {}", minPrice, maxPrice);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc, min price: {} and max price: {}", minPrice, maxPrice, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNPeriod(Period period, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirstByPeriod(period, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc and period: {}", period);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc and period: {}", period, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenAndPeriod(minPrice, maxPrice, period, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc, min price: {}, price: {} and period: {}", minPrice, maxPrice, period);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc, min price: {}, max price: {} and period: {}", minPrice, maxPrice, period, e);
+            throw e;
+        }
+    }
+
+    @Override
     public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
         try {
             Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
@@ -74,6 +110,42 @@ public class PropertyPostServiceImpl implements PropertyPostService {
             return posts;
         } catch (Exception e) {
             log.error("Failed to get pageable Property Posts order by createdAt Desc and subCategory: {}", subCategory, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(Long minPrice, Long maxPrice, SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenOrderByUpdatedAtDesc(subCategory, minPrice, maxPrice, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {} and max price: {}", subCategory, minPrice, maxPrice);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {} and max price: {}", subCategory, minPrice, maxPrice, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period period, SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryAndPeriodOrderByUpdatedAtDesc(subCategory, period, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc, subCategory: {} and period: {}", subCategory, period);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc, subCategory: {} and period: {}", subCategory, period, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, SubCategory subCategory, Pageable pageable) {
+        try {
+            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenAndPeriodOrderByUpdatedAtDesc(subCategory, minPrice, maxPrice, period, pageable);
+            log.info("Successfully got pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {}, max price: {} and period: {}", subCategory, minPrice, maxPrice, period);
+            return posts;
+        } catch (Exception e) {
+            log.error("Failed to get pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {}, max price: {} and period: {}", subCategory, minPrice, maxPrice, period, e);
             throw e;
         }
     }

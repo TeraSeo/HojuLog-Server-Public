@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +15,10 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long> {
     List<JobPost> findAllByOrderByUpdatedAtDesc();
 
     Page<JobPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
+
+    Page<JobPost> findAllBySubCategoryAndJobTypeOrderByUpdatedAtDesc(SubCategory subCategory,
+                                                                     JobType jobType,
+                                                                     Pageable pageable);
 
     List<JobPost> findTop5ByOrderByUpdatedAtDesc();
 
@@ -39,4 +44,11 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long> {
             "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
             "p.updatedAt DESC")
     Page<JobPost> findAllWithPinnedFirst(Pageable pageable);
+
+    @Query("SELECT p FROM JobPost p " +
+            "WHERE p.jobType = :jobType " +
+            "ORDER BY " +
+            "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
+            "p.updatedAt DESC")
+    Page<JobPost> findAllWithPinnedFirstByJobType(@Param("jobType") JobType jobType, Pageable pageable);
 }
