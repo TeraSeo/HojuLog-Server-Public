@@ -51,25 +51,43 @@ public class SocietyPostServiceImpl implements SocietyPostService {
     }
 
     @Override
-    public Page<SocietyPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<SocietyPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<SocietyPost> posts = societyPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable Society Posts order by createdAt Desc");
+            Page<SocietyPost> posts;
+            if (option.equals("최신순")) {
+                posts = societyPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = societyPostRepository.findAllWithPinnedFirstOrderByLikesDesc(pageable);
+            }
+            else {
+                posts = societyPostRepository.findAllWithPinnedFirstOrderByViewCountsDesc(pageable);
+            }
+            log.info("Successfully got pageable Society Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Society Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable Society Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<SocietyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<SocietyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<SocietyPost> posts = societyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
-            log.info("Successfully got pageable Society Posts order by createdAt Desc and subcategory: {}", subCategory);
+            Page<SocietyPost> posts;
+            if (option.equals("최신순")) {
+                posts = societyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = societyPostRepository.findAllBySubCategoryOrderByLikesDesc(subCategory, pageable);
+            }
+            else {
+                posts= societyPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
+            log.info("Successfully got pageable Society Posts order by option: {} and subcategory: {}", option, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Society Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            log.error("Failed to get pageable Society Posts order by option: {} and subcategory: {}", option, subCategory, e);
             throw e;
         }
     }

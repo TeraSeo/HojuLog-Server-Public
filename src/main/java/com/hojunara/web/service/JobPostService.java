@@ -12,13 +12,13 @@ import java.util.List;
 public interface JobPostService {
     List<JobPost> getWholePosts();
 
-    Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable);
+    Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable, String option);
 
-    Page<JobPost> getCreatedAtDescPostsByPageNJobType(Pageable pageable, JobType jobType);
+    Page<JobPost> getCreatedAtDescPostsByPageNJobType(Pageable pageable, JobType jobType, String option);
 
-    Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+    Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option);
 
-    Page<JobPost> getCreatedAtDescPostsByPageNSubCategoryNJobType(SubCategory subCategory, JobType jobType, Pageable pageable);
+    Page<JobPost> getCreatedAtDescPostsByPageNSubCategoryNJobType(SubCategory subCategory, JobType jobType, Pageable pageable, String option);
 
     List<JobPost> getRecent5Posts();
 

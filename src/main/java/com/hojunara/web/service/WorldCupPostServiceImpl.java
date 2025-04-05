@@ -71,25 +71,43 @@ public class WorldCupPostServiceImpl implements WorldCupPostService {
     }
 
     @Override
-    public Page<WorldCupPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<WorldCupPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<WorldCupPost> posts = worldCupPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable World Cup Posts order by createdAt Desc");
+            Page<WorldCupPost> posts;
+            if (option.equals("최신순")) {
+                posts = worldCupPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = worldCupPostRepository.findAllOrderByLikesWithPinnedFirst(pageable);
+            }
+            else {
+                posts = worldCupPostRepository.findAllOrderByViewCountsWithPinnedFirst(pageable);
+            }
+            log.info("Successfully got pageable World Cup Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable World Cup Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable World Cup Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<WorldCupPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<WorldCupPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<WorldCupPost> posts = worldCupPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
-            log.info("Successfully got pageable World cup Posts order by createdAt Desc and subCategory: {}", subCategory);
+            Page<WorldCupPost> posts;
+            if (option.equals("최신순")) {
+                posts = worldCupPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = worldCupPostRepository.findAllBySubCategoryOrderByLikesDesc(subCategory, pageable);
+            }
+            else {
+                posts = worldCupPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
+            log.info("Successfully got pageable World cup Posts order by option: {} and subCategory: {}", option, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable World cup Posts order by createdAt Desc and subCategory: {}", subCategory, e);
+            log.error("Failed to get pageable World cup Posts order by option: {} and subCategory: {}", option, subCategory, e);
             throw e;
         }
     }

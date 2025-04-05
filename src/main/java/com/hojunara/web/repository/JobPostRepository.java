@@ -16,9 +16,35 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long> {
 
     Page<JobPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
 
+    @Query("""
+    SELECT p FROM JobPost p
+    WHERE p.subCategory = :subCategory
+    ORDER BY SIZE(p.likes) DESC
+""")
+    Page<JobPost> findAllBySubCategoryOrderByLikesDesc(@Param("subCategory") SubCategory subCategory, Pageable pageable);
+
+    Page<JobPost> findAllBySubCategoryOrderByViewCountsDesc(SubCategory subCategory, Pageable pageable);
+
     Page<JobPost> findAllBySubCategoryAndJobTypeOrderByUpdatedAtDesc(SubCategory subCategory,
                                                                      JobType jobType,
                                                                      Pageable pageable);
+
+    @Query("""
+            SELECT p FROM JobPost p
+            WHERE p.subCategory = :subCategory AND p.jobType = :jobType
+            ORDER BY SIZE(p.likes) DESC
+        """)
+    Page<JobPost> findAllBySubCategoryAndJobTypeOrderByLikesDesc(
+            @Param("subCategory") SubCategory subCategory,
+            @Param("jobType") JobType jobType,
+            Pageable pageable
+    );
+
+    Page<JobPost> findAllBySubCategoryAndJobTypeOrderByViewCountsDesc(
+            SubCategory subCategory,
+            JobType jobType,
+            Pageable pageable
+    );
 
     List<JobPost> findTop5ByOrderByUpdatedAtDesc();
 
@@ -45,10 +71,48 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long> {
             "p.updatedAt DESC")
     Page<JobPost> findAllWithPinnedFirst(Pageable pageable);
 
+    @Query("""
+        SELECT p FROM JobPost p
+        LEFT JOIN p.likes l
+        GROUP BY p
+        ORDER BY 
+          CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+          COUNT(l) DESC
+        """)
+    Page<JobPost> findAllWithPinnedFirstOrderByLikesDesc(Pageable pageable);
+
+    @Query("""
+        SELECT p FROM JobPost p
+        ORDER BY 
+          CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+          p.viewCounts DESC
+        """)
+    Page<JobPost> findAllWithPinnedFirstOrderByViewCountsDesc(Pageable pageable);
+
     @Query("SELECT p FROM JobPost p " +
             "WHERE p.jobType = :jobType " +
             "ORDER BY " +
             "CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END, " +
             "p.updatedAt DESC")
     Page<JobPost> findAllWithPinnedFirstByJobType(@Param("jobType") JobType jobType, Pageable pageable);
+
+    @Query("""
+        SELECT p FROM JobPost p
+        LEFT JOIN p.likes l
+        WHERE p.jobType = :jobType
+        GROUP BY p
+        ORDER BY 
+          CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+          COUNT(l) DESC
+        """)
+    Page<JobPost> findAllWithPinnedFirstByJobTypeOrderByLikesDesc(@Param("jobType") JobType jobType, Pageable pageable);
+
+    @Query("""
+        SELECT p FROM JobPost p
+        WHERE p.jobType = :jobType
+        ORDER BY 
+          CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+          p.viewCounts DESC
+        """)
+    Page<JobPost> findAllWithPinnedFirstByJobTypeOrderByViewCountsDesc(@Param("jobType") JobType jobType, Pageable pageable);
 }

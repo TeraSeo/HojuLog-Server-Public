@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,97 +54,169 @@ public class PropertyPostServiceImpl implements PropertyPostService {
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc");
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstOrderByLikeCountDesc(pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllWithPinnedFirstOrderByViewCountsDesc(pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable Property Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPrice(Long minPrice, Long maxPrice, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPrice(Long minPrice, Long maxPrice, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetween(minPrice, maxPrice, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc, min price: {} and max price: {}", minPrice, maxPrice);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetween(minPrice, maxPrice, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenOrderByLikeCountDesc(minPrice, maxPrice, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenOrderByViewCountsDesc(minPrice, maxPrice, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {}, min price: {} and max price: {}", option, minPrice, maxPrice);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc, min price: {} and max price: {}", minPrice, maxPrice, e);
+            log.error("Failed to get pageable Property Posts order by option: {}, min price: {} and max price: {}", option, minPrice, maxPrice, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNPeriod(Period period, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNPeriod(Period period, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirstByPeriod(period, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc and period: {}", period);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPeriod(period, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPeriodOrderByLikeCountDesc(period, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPeriodOrderByViewCountsDesc(period, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {} and period: {}", option, period);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc and period: {}", period, e);
+            log.error("Failed to get pageable Property Posts order by option: {} and period: {}", option, period, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenAndPeriod(minPrice, maxPrice, period, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc, min price: {}, price: {} and period: {}", minPrice, maxPrice, period);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenAndPeriod(minPrice, maxPrice, period, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenAndPeriodOrderByLikesDesc(minPrice, maxPrice, period, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllWithPinnedFirstByPriceBetweenAndPeriodOrderByViewCountsDesc(minPrice, maxPrice, period, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {}, min price: {}, price: {} and period: {}", option, minPrice, maxPrice, period);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc, min price: {}, max price: {} and period: {}", minPrice, maxPrice, period, e);
+            log.error("Failed to get pageable Property Posts order by option: {}, min price: {}, max price: {} and period: {}", option, minPrice, maxPrice, period, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc and subCategory: {}", subCategory);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllBySubCategoryOrderByLikesDesc(subCategory, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {} and subCategory: {}", option, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc and subCategory: {}", subCategory, e);
+            log.error("Failed to get pageable Property Posts order by option: {} and subCategory: {}", option, subCategory, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(Long minPrice, Long maxPrice, SubCategory subCategory, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(Long minPrice, Long maxPrice, SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenOrderByUpdatedAtDesc(subCategory, minPrice, maxPrice, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {} and max price: {}", subCategory, minPrice, maxPrice);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenOrderByUpdatedAtDesc(subCategory, minPrice, maxPrice, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenOrderByLikesDesc(subCategory, minPrice, maxPrice, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenOrderByViewCountsDesc(subCategory, minPrice, maxPrice, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {}, subCategory: {}, min price: {} and max price: {}", option, subCategory, minPrice, maxPrice);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {} and max price: {}", subCategory, minPrice, maxPrice, e);
+            log.error("Failed to get pageable Property Posts order by option: {}, subCategory: {}, min price: {} and max price: {}", option, subCategory, minPrice, maxPrice, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period period, SubCategory subCategory, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period period, SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryAndPeriodOrderByUpdatedAtDesc(subCategory, period, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc, subCategory: {} and period: {}", subCategory, period);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllBySubCategoryAndPeriodOrderByUpdatedAtDesc(subCategory, period, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllBySubCategoryAndPeriodOrderByLikesDesc(subCategory, period, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllBySubCategoryAndPeriodOrderByViewCountsDesc(subCategory, period, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {}, subCategory: {} and period: {}", option, subCategory, period);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc, subCategory: {} and period: {}", subCategory, period, e);
+            log.error("Failed to get pageable Property Posts order by option: {}, subCategory: {} and period: {}", option, subCategory, period, e);
             throw e;
         }
     }
 
     @Override
-    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, SubCategory subCategory, Pageable pageable) {
+    public Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<PropertyPost> posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenAndPeriodOrderByUpdatedAtDesc(subCategory, minPrice, maxPrice, period, pageable);
-            log.info("Successfully got pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {}, max price: {} and period: {}", subCategory, minPrice, maxPrice, period);
+            Page<PropertyPost> posts;
+            if (option.equals("최신순")) {
+                posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenAndPeriodOrderByUpdatedAtDesc(subCategory, minPrice, maxPrice, period, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenAndPeriodOrderByLikesDesc(subCategory, minPrice, maxPrice, period, pageable);
+            }
+            else {
+                posts = propertyPostRepository.findAllBySubCategoryAndPriceBetweenAndPeriodOrderByViewCountsDesc(subCategory, minPrice, maxPrice, period, pageable);
+            }
+            log.info("Successfully got pageable Property Posts order by option: {}, subCategory: {}, min price: {}, max price: {} and period: {}", option, subCategory, minPrice, maxPrice, period);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Property Posts order by createdAt Desc, subCategory: {}, min price: {}, max price: {} and period: {}", subCategory, minPrice, maxPrice, period, e);
+            log.error("Failed to get pageable Property Posts order by option: {}, subCategory: {}, min price: {}, max price: {} and period: {}", option, subCategory, minPrice, maxPrice, period, e);
             throw e;
         }
     }

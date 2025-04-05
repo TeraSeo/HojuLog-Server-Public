@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,97 +54,169 @@ public class TransactionPostServiceImpl implements TransactionPostService {
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc");
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllOrderByLikeCountWithPinnedFirst(pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllOrderByViewCountsWithPinnedFirst(pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable Transaction Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionType(Pageable pageable, TransactionType transactionType) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionType(Pageable pageable, TransactionType transactionType, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirstByTransactionType(transactionType, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc and transactionType: {}", transactionType);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllWithPinnedFirstByTransactionType(transactionType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllOrderByLikeCountWithPinnedFirstByTransactionType(transactionType, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllOrderByViewCountsWithPinnedFirstByTransactionType(transactionType, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {} and transactionType: {}", option, transactionType);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc and transactionType: {}", transactionType, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {} and transactionType: {}", option, transactionType, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNPriceType(Pageable pageable, PriceType priceType) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNPriceType(Pageable pageable, PriceType priceType, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirstByPriceType(priceType, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc and priceType: {}", priceType);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllWithPinnedFirstByPriceType(priceType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllOrderByLikeCountWithPinnedFirstByPriceType(priceType, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllOrderByViewCountsWithPinnedFirstByPriceType(priceType, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {} and priceType: {}", option, priceType);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc and priceType: {}", priceType, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {} and priceType: {}", option, priceType, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionTypeNPriceType(Pageable pageable, TransactionType transactionType, PriceType priceType) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionTypeNPriceType(Pageable pageable, TransactionType transactionType, PriceType priceType, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllWithPinnedFirstByTransactionTypeAndPriceType(transactionType, priceType, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, transactionType: {} and priceType: {}", transactionType, priceType);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllWithPinnedFirstByTransactionTypeAndPriceType(transactionType, priceType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllOrderByLikeCountWithPinnedFirstByTransactionTypeAndPriceType(transactionType, priceType, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllOrderByViewCountsWithPinnedFirstByTransactionTypeAndPriceType(transactionType, priceType, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {}, transactionType: {} and priceType: {}", option, transactionType, priceType);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, transactionType: {} and priceType: {}", transactionType, priceType, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {}, transactionType: {} and priceType: {}", option, transactionType, priceType, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc and subcategory: {}", subCategory);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllBySubCategoryOrderByLikeCountDesc(subCategory, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {} and subcategory: {}", option, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Des cand subcategory: {}", subCategory, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {} and subcategory: {}", option, subCategory, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionType(SubCategory subCategory, TransactionType transactionType, Pageable pageable) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionType(SubCategory subCategory, TransactionType transactionType, Pageable pageable, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeOrderByUpdatedAtDesc(subCategory, transactionType, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, transactionType: {} and subcategory: {}", transactionType, subCategory);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeOrderByUpdatedAtDesc(subCategory, transactionType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeOrderByLikeCountDesc(subCategory, transactionType, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeOrderByViewCountsDesc(subCategory, transactionType, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {}, transactionType: {} and subcategory: {}", option, transactionType, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, transactionType: {} and subcategory: {}", transactionType, subCategory, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {}, transactionType: {} and subcategory: {}", option, transactionType, subCategory, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNPriceType(SubCategory subCategory, PriceType priceType, Pageable pageable) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNPriceType(SubCategory subCategory, PriceType priceType, Pageable pageable, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryAndPriceTypeOrderByUpdatedAtDesc(subCategory, priceType, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, priceType: {} and subcategory: {}", priceType, subCategory);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllBySubCategoryAndPriceTypeOrderByUpdatedAtDesc(subCategory, priceType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllBySubCategoryAndPriceTypeOrderByLikeCountDesc(subCategory, priceType, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllBySubCategoryAndPriceTypeOrderByViewCountsDesc(subCategory, priceType, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {}, priceType: {} and subcategory: {}", option, priceType, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, priceType: {} and subcategory: {}", priceType, subCategory, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {}, priceType: {} and subcategory: {}", option, priceType, subCategory, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionTypeNPriceType(SubCategory subCategory, TransactionType transactionType, PriceType priceType, Pageable pageable) {
+    public Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionTypeNPriceType(SubCategory subCategory, TransactionType transactionType, PriceType priceType, Pageable pageable, String option) {
         try {
-            Page<TransactionPost> posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeAndPriceTypeOrderByUpdatedAtDesc(subCategory, transactionType, priceType, pageable);
-            log.info("Successfully got pageable Transaction Posts order by createdAt Desc, transactionType: {}, priceType: {} and subcategory: {}", transactionType, priceType, subCategory);
+            Page<TransactionPost> posts;
+            if (option.equals("최신순")) {
+                posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeAndPriceTypeOrderByUpdatedAtDesc(subCategory, transactionType, priceType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeAndPriceTypeOrderByLikeCountDesc(subCategory, transactionType, priceType, pageable);
+            }
+            else {
+                posts = transactionPostRepository.findAllBySubCategoryAndTransactionTypeAndPriceTypeOrderByViewCountsDesc(subCategory, transactionType, priceType, pageable);
+            }
+            log.info("Successfully got pageable Transaction Posts order by option: {}, transactionType: {}, priceType: {} and subcategory: {}", option, transactionType, priceType, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Transaction Posts order by createdAt Desc, transactionType: {}, priceType: {} and subcategory: {}", transactionType, priceType, subCategory, e);
+            log.error("Failed to get pageable Transaction Posts order by option: {}, transactionType: {}, priceType: {} and subcategory: {}", option, transactionType, priceType, subCategory, e);
             throw e;
         }
     }

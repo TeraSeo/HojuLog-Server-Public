@@ -51,21 +51,39 @@ public class StudyPostServiceImpl implements StudyPostService {
     }
 
     @Override
-    public Page<StudyPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<StudyPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<StudyPost> posts = studyPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable Study Posts order by createdAt Desc");
+            Page<StudyPost> posts;
+            if (option.equals("최신순")) {
+                posts = studyPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = studyPostRepository.findAllWithPinnedFirstOrderByLikesDesc(pageable);
+            }
+            else {
+                posts = studyPostRepository.findAllWithPinnedFirstOrderByViewCountsDesc(pageable);
+            }
+            log.info("Successfully got pageable Study Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Study Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable Study Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<StudyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<StudyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<StudyPost> posts = studyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            Page<StudyPost> posts;
+            if (option.equals("최신순")) {
+                posts = studyPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = studyPostRepository.findAllBySubCategoryOrderByLikesDesc(subCategory, pageable);
+            }
+            else {
+                posts = studyPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
             log.info("Successfully got pageable Study Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {

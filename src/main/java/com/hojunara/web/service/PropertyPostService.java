@@ -12,16 +12,16 @@ import java.util.List;
 public interface PropertyPostService {
     List<PropertyPost> getWholePosts();
 
-    Page<PropertyPost> getCreatedAtDescPostsByPage(Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPage(Pageable pageable, String option);
 
-    Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPrice(Long minPrice, Long maxPrice, Pageable pageable);
-    Page<PropertyPost> getCreatedAtDescPostsByPageNPeriod(Period period, Pageable pageable);
-    Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPrice(Long minPrice, Long maxPrice, Pageable pageable, String option);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNPeriod(Period period, Pageable pageable, String option);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, Pageable pageable, String option);
 
-    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
-    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(Long minPrice, Long maxPrice, SubCategory subCategory, Pageable pageable);
-    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period period, SubCategory subCategory, Pageable pageable);
-    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, SubCategory subCategory, Pageable pageable);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPrice(Long minPrice, Long maxPrice, SubCategory subCategory, Pageable pageable, String option);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNPeriod(Period period, SubCategory subCategory, Pageable pageable, String option);
+    Page<PropertyPost> getCreatedAtDescPostsByPageNSubCategoryNMinMaxPriceNPeriod(Long minPrice, Long maxPrice, Period period, SubCategory subCategory, Pageable pageable, String option);
 
     List<PropertyPost> getRecent5Posts();
 

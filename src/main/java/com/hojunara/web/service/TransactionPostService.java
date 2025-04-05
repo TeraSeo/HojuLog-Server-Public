@@ -12,21 +12,21 @@ import java.util.List;
 public interface TransactionPostService {
     List<TransactionPost> getWholePosts();
 
-    Page<TransactionPost> getCreatedAtDescPostsByPage(Pageable pageable);
+    Page<TransactionPost> getCreatedAtDescPostsByPage(Pageable pageable, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionType(Pageable pageable, TransactionType transactionType);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionType(Pageable pageable, TransactionType transactionType, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNPriceType(Pageable pageable, PriceType priceType);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNPriceType(Pageable pageable, PriceType priceType, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionTypeNPriceType(Pageable pageable, TransactionType transactionType, PriceType priceType);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNTransactionTypeNPriceType(Pageable pageable, TransactionType transactionType, PriceType priceType, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionType(SubCategory subCategory, TransactionType transactionType, Pageable pageable);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionType(SubCategory subCategory, TransactionType transactionType, Pageable pageable, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNPriceType(SubCategory subCategory, PriceType priceType, Pageable pageable);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNPriceType(SubCategory subCategory, PriceType priceType, Pageable pageable, String option);
 
-    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionTypeNPriceType(SubCategory subCategory, TransactionType transactionType, PriceType priceType, Pageable pageable);
+    Page<TransactionPost> getCreatedAtDescPostsByPageNSubCategoryNTransactionTypeNPriceType(SubCategory subCategory, TransactionType transactionType, PriceType priceType, Pageable pageable, String option);
 
     List<TransactionPost> getRecent5Posts();
 

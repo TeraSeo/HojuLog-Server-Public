@@ -12,13 +12,13 @@ import java.util.List;
 public interface TravelPostService {
     List<TravelPost> getWholePosts();
 
-    Page<TravelPost> getCreatedAtDescPostsByPageNSuburb(Pageable pageable, String travelSuburb);
+    Page<TravelPost> getCreatedAtDescPostsByPageNSuburb(Pageable pageable, String travelSuburb, String option);
 
-    Page<TravelPost> getCreatedAtDescPostsByPage(Pageable pageable);
+    Page<TravelPost> getCreatedAtDescPostsByPage(Pageable pageable, String option);
 
-    Page<TravelPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+    Page<TravelPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option);
 
-    Page<TravelPost> getCreatedAtDescPostsByPageNSubCategoryNSuburb(SubCategory subCategory, Pageable pageable, String travelSuburb);
+    Page<TravelPost> getCreatedAtDescPostsByPageNSubCategoryNSuburb(SubCategory subCategory, Pageable pageable, String travelSuburb, String option);
 
     List<TravelPost> getRecent5Posts();
 

@@ -51,33 +51,60 @@ public class TravelPostServiceImpl implements TravelPostService {
     }
 
     @Override
-    public Page<TravelPost> getCreatedAtDescPostsByPageNSuburb(Pageable pageable, String travelSuburb) {
+    public Page<TravelPost> getCreatedAtDescPostsByPageNSuburb(Pageable pageable, String travelSuburb, String option) {
         try {
-            Page<TravelPost> posts = travelPostRepository.findAllWithPinnedFirstByTravelSuburb(travelSuburb, pageable);
-            log.info("Successfully got pageable Travel Posts order by createdAt Desc and travel suburb: {}", travelSuburb);
+            Page<TravelPost> posts;
+            if (option.equals("최신순")) {
+                posts = travelPostRepository.findAllWithPinnedFirstByTravelSuburb(travelSuburb, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = travelPostRepository.findAllWithPinnedFirstByTravelSuburbOrderByLikes(travelSuburb, pageable);
+            }
+            else {
+                posts = travelPostRepository.findAllWithPinnedFirstByTravelSuburbOrderByViews(travelSuburb, pageable);
+            }
+            log.info("Successfully got pageable Travel Posts order by option: {} and travel suburb: {}", option, travelSuburb);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Travel Posts order by createdAt Desc and travel suburb: {}", travelSuburb, e);
+            log.error("Failed to get pageable Travel Posts order by option: {} and travel suburb: {}", option, travelSuburb, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TravelPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<TravelPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<TravelPost> posts = travelPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable Travel Posts order by createdAt Desc");
+            Page<TravelPost> posts;
+            if (option.equals("최신순")) {
+                posts = travelPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = travelPostRepository.findAllWithPinnedFirstOrderByLikes(pageable);
+            }
+            else {
+                posts = travelPostRepository.findAllWithPinnedFirstOrderByViews(pageable);
+            }
+            log.info("Successfully got pageable Travel Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Travel Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable Travel Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<TravelPost> posts = travelPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            Page<TravelPost> posts;
+            if (option.equals("최신순")) {
+                posts = travelPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = travelPostRepository.findAllBySubCategoryOrderByLikesDesc(subCategory, pageable);
+            }
+            else {
+                posts = travelPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
             log.info("Successfully got pageable Travel Posts order by createdAt Desc and subcategory: {}", subCategory);
             return posts;
         } catch (Exception e) {
@@ -87,9 +114,18 @@ public class TravelPostServiceImpl implements TravelPostService {
     }
 
     @Override
-    public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategoryNSuburb(SubCategory subCategory, Pageable pageable, String travelSuburb) {
+    public Page<TravelPost> getCreatedAtDescPostsByPageNSubCategoryNSuburb(SubCategory subCategory, Pageable pageable, String travelSuburb, String option) {
         try {
-            Page<TravelPost> posts = travelPostRepository.findAllBySubCategoryAndTravelSuburbOrderByUpdatedAtDesc(subCategory, travelSuburb, pageable);
+            Page<TravelPost> posts;
+            if (option.equals("최신순")) {
+                posts = travelPostRepository.findAllBySubCategoryAndTravelSuburbOrderByUpdatedAtDesc(subCategory, travelSuburb, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = travelPostRepository.findAllBySubCategoryAndTravelSuburbOrderByLikesDesc(subCategory, travelSuburb, pageable);
+            }
+            else {
+                posts = travelPostRepository.findAllBySubCategoryAndTravelSuburbOrderByViewCountsDesc(subCategory, travelSuburb, pageable);
+            }
             log.info("Successfully got pageable Travel Posts order by createdAt Desc, subcategory: {} and travelSuburb: {}", subCategory, travelSuburb);
             return posts;
         } catch (Exception e) {

@@ -12,9 +12,9 @@ import java.util.List;
 public interface StudyPostService {
     List<StudyPost> getWholePosts();
 
-    Page<StudyPost> getCreatedAtDescPostsByPage(Pageable pageable);
+    Page<StudyPost> getCreatedAtDescPostsByPage(Pageable pageable, String option);
 
-    Page<StudyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+    Page<StudyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option);
 
     List<StudyPost> getRecent5Posts();
 

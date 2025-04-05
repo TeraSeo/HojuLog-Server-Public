@@ -13,9 +13,9 @@ import java.util.List;
 public interface SocietyPostService {
     List<SocietyPost> getWholePosts();
 
-    Page<SocietyPost> getCreatedAtDescPostsByPage(Pageable pageable);
+    Page<SocietyPost> getCreatedAtDescPostsByPage(Pageable pageable, String option);
 
-    Page<SocietyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable);
+    Page<SocietyPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option);
 
     List<SocietyPost> getRecent5Posts();
 

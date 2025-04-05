@@ -16,20 +16,86 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
 
     Page<PropertyPost> findAllBySubCategoryOrderByUpdatedAtDesc(SubCategory subCategory, Pageable pageable);
 
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.subCategory = :subCategory
+            GROUP BY p
+            ORDER BY COUNT(l) DESC, p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllBySubCategoryOrderByLikesDesc(@Param("subCategory") SubCategory subCategory, Pageable pageable);
+
+    Page<PropertyPost> findAllBySubCategoryOrderByViewCountsDesc(SubCategory subCategory, Pageable pageable);
+
     Page<PropertyPost> findAllBySubCategoryAndPriceBetweenOrderByUpdatedAtDesc(SubCategory subCategory,
                                                                                Long minPrice,
                                                                                Long maxPrice,
                                                                                Pageable pageable);
 
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.subCategory = :subCategory
+              AND p.price BETWEEN :minPrice AND :maxPrice
+            GROUP BY p
+            ORDER BY COUNT(l) DESC, p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllBySubCategoryAndPriceBetweenOrderByLikesDesc(@Param("subCategory") SubCategory subCategory,
+                                                                           @Param("minPrice") Long minPrice,
+                                                                           @Param("maxPrice") Long maxPrice,
+                                                                           Pageable pageable);
+
+    Page<PropertyPost> findAllBySubCategoryAndPriceBetweenOrderByViewCountsDesc(SubCategory subCategory,
+                                                                                Long minPrice,
+                                                                                Long maxPrice,
+                                                                                Pageable pageable);
+
     Page<PropertyPost> findAllBySubCategoryAndPeriodOrderByUpdatedAtDesc(SubCategory subCategory,
                                                                          Period period,
                                                                          Pageable pageable);
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.subCategory = :subCategory
+              AND p.period = :period
+            GROUP BY p
+            ORDER BY COUNT(l) DESC, p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllBySubCategoryAndPeriodOrderByLikesDesc(@Param("subCategory") SubCategory subCategory,
+                                                                     @Param("period") Period period,
+                                                                     Pageable pageable);
+
+    Page<PropertyPost> findAllBySubCategoryAndPeriodOrderByViewCountsDesc(SubCategory subCategory,
+                                                                          Period period,
+                                                                          Pageable pageable);
 
     Page<PropertyPost> findAllBySubCategoryAndPriceBetweenAndPeriodOrderByUpdatedAtDesc(SubCategory subCategory,
                                                                                         Long minPrice,
                                                                                         Long maxPrice,
                                                                                         Period period,
                                                                                         Pageable pageable);
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.subCategory = :subCategory
+              AND p.price BETWEEN :minPrice AND :maxPrice
+              AND p.period = :period
+            GROUP BY p
+            ORDER BY COUNT(l) DESC, p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllBySubCategoryAndPriceBetweenAndPeriodOrderByLikesDesc(@Param("subCategory") SubCategory subCategory,
+                                                                                    @Param("minPrice") Long minPrice,
+                                                                                    @Param("maxPrice") Long maxPrice,
+                                                                                    @Param("period") Period period,
+                                                                                    Pageable pageable);
+
+    Page<PropertyPost> findAllBySubCategoryAndPriceBetweenAndPeriodOrderByViewCountsDesc(SubCategory subCategory,
+                                                                                         Long minPrice,
+                                                                                         Long maxPrice,
+                                                                                         Period period,
+                                                                                         Pageable pageable);
 
     List<PropertyPost> findTop5ByOrderByUpdatedAtDesc();
 
@@ -56,6 +122,26 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
             "p.updatedAt DESC")
     Page<PropertyPost> findAllWithPinnedFirst(Pageable pageable);
 
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            GROUP BY p
+            ORDER BY
+              CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+              COUNT(l) DESC,
+              p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstOrderByLikeCountDesc(Pageable pageable);
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            ORDER BY
+              CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+              p.viewCounts DESC,
+              p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstOrderByViewCountsDesc(Pageable pageable);
+
     @Query("SELECT p FROM PropertyPost p " +
             "WHERE p.price BETWEEN :minPrice AND :maxPrice " +
             "ORDER BY " +
@@ -65,6 +151,36 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
                                                             @Param("maxPrice") Long maxPrice,
                                                             Pageable pageable);
 
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.price BETWEEN :minPrice AND :maxPrice
+            GROUP BY p
+            ORDER BY
+                CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+                COUNT(l) DESC,
+                p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstByPriceBetweenOrderByLikeCountDesc(
+            @Param("minPrice") Long minPrice,
+            @Param("maxPrice") Long maxPrice,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            WHERE p.price BETWEEN :minPrice AND :maxPrice
+            ORDER BY
+                CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+                p.viewCounts DESC,
+                p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstByPriceBetweenOrderByViewCountsDesc(
+            @Param("minPrice") Long minPrice,
+            @Param("maxPrice") Long maxPrice,
+            Pageable pageable
+    );
+
     @Query("SELECT p FROM PropertyPost p " +
             "WHERE p.period = :period " +
             "ORDER BY " +
@@ -72,6 +188,33 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
             "p.updatedAt DESC")
     Page<PropertyPost> findAllWithPinnedFirstByPeriod(@Param("period") Period period, Pageable pageable);
 
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.period = :period
+            GROUP BY p
+            ORDER BY
+                CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+                COUNT(l) DESC,
+                p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstByPeriodOrderByLikeCountDesc(
+            @Param("period") Period period,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            WHERE p.period = :period
+            ORDER BY
+                CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+                p.viewCounts DESC,
+                p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstByPeriodOrderByViewCountsDesc(
+            @Param("period") Period period,
+            Pageable pageable
+    );
 
     @Query("SELECT p FROM PropertyPost p " +
             "WHERE p.price BETWEEN :minPrice AND :maxPrice AND p.period = :period " +
@@ -82,4 +225,38 @@ public interface PropertyPostRepository extends JpaRepository<PropertyPost, Long
                                                                      @Param("maxPrice") Long maxPrice,
                                                                      @Param("period") Period period,
                                                                      Pageable pageable);
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            LEFT JOIN p.likes l
+            WHERE p.price BETWEEN :minPrice AND :maxPrice
+              AND p.period = :period
+            GROUP BY p
+            ORDER BY
+              CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+              COUNT(l) DESC,
+              p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstByPriceBetweenAndPeriodOrderByLikesDesc(
+            @Param("minPrice") Long minPrice,
+            @Param("maxPrice") Long maxPrice,
+            @Param("period") Period period,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT p FROM PropertyPost p
+            WHERE p.price BETWEEN :minPrice AND :maxPrice
+              AND p.period = :period
+            ORDER BY
+              CASE WHEN p.pinnedAdExpiry > CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+              p.viewCounts DESC,
+              p.updatedAt DESC
+        """)
+    Page<PropertyPost> findAllWithPinnedFirstByPriceBetweenAndPeriodOrderByViewCountsDesc(
+            @Param("minPrice") Long minPrice,
+            @Param("maxPrice") Long maxPrice,
+            @Param("period") Period period,
+            Pageable pageable
+    );
 }

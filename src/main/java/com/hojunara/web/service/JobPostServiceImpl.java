@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,49 +54,85 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Override
-    public Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable) {
+    public Page<JobPost> getCreatedAtDescPostsByPage(Pageable pageable, String option) {
         try {
-            Page<JobPost> posts = jobPostRepository.findAllWithPinnedFirst(pageable);
-            log.info("Successfully got pageable Job Posts order by createdAt Desc");
+            Page<JobPost> posts;
+            if (option.equals("최신순")) {
+                posts = jobPostRepository.findAllWithPinnedFirst(pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = jobPostRepository.findAllWithPinnedFirstOrderByLikesDesc(pageable);
+            }
+            else {
+                posts = jobPostRepository.findAllWithPinnedFirstOrderByViewCountsDesc(pageable);
+            }
+            log.info("Successfully got pageable Job Posts order by option: {}", option);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Job Posts order by createdAt Desc", e);
+            log.error("Failed to get pageable Job Posts order by option: {}", option, e);
             throw e;
         }
     }
 
     @Override
-    public Page<JobPost> getCreatedAtDescPostsByPageNJobType(Pageable pageable, JobType jobType) {
+    public Page<JobPost> getCreatedAtDescPostsByPageNJobType(Pageable pageable, JobType jobType, String option) {
         try {
-            Page<JobPost> posts = jobPostRepository.findAllWithPinnedFirstByJobType(jobType, pageable);
-            log.info("Successfully got pageable Job Posts order by createdAt Desc and jobType: {}", jobType);
+            Page<JobPost> posts;
+            if (option.equals("최신순")) {
+                posts = jobPostRepository.findAllWithPinnedFirstByJobType(jobType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = jobPostRepository.findAllWithPinnedFirstByJobTypeOrderByLikesDesc(jobType, pageable);
+            }
+            else {
+                posts = jobPostRepository.findAllWithPinnedFirstByJobTypeOrderByViewCountsDesc(jobType, pageable);
+            }
+            log.info("Successfully got pageable Job Posts order by option: {} and jobType: {}", option, jobType);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Job Posts order by createdAt Desc and jobType: {}", jobType, e);
+            log.error("Failed to get pageable Job Posts order by option: {} and jobType: {}", option, jobType, e);
             throw e;
         }
     }
 
     @Override
-    public Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable) {
+    public Page<JobPost> getCreatedAtDescPostsByPageNSubCategory(SubCategory subCategory, Pageable pageable, String option) {
         try {
-            Page<JobPost> posts = jobPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
-            log.info("Successfully got pageable Job Posts order by createdAt Desc and subcategory: {}", subCategory);
+            Page<JobPost> posts;
+            if (option.equals("최신순")) {
+                posts = jobPostRepository.findAllBySubCategoryOrderByUpdatedAtDesc(subCategory, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = jobPostRepository.findAllBySubCategoryOrderByLikesDesc(subCategory, pageable);
+            }
+            else {
+                posts = jobPostRepository.findAllBySubCategoryOrderByViewCountsDesc(subCategory, pageable);
+            }
+            log.info("Successfully got pageable Job Posts order by option: {} and subcategory: {}", option, subCategory);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Job Posts order by createdAt Desc and subcategory: {}", subCategory, e);
+            log.error("Failed to get pageable Job Posts order by option: {} and subcategory: {}", option, subCategory, e);
             throw e;
         }
     }
 
     @Override
-    public Page<JobPost> getCreatedAtDescPostsByPageNSubCategoryNJobType(SubCategory subCategory, JobType jobType, Pageable pageable) {
+    public Page<JobPost> getCreatedAtDescPostsByPageNSubCategoryNJobType(SubCategory subCategory, JobType jobType, Pageable pageable, String option) {
         try {
-            Page<JobPost> posts = jobPostRepository.findAllBySubCategoryAndJobTypeOrderByUpdatedAtDesc(subCategory, jobType, pageable);
-            log.info("Successfully got pageable Job Posts order by createdAt Desc, subcategory: {} and jobType: {}", subCategory, jobType);
+            Page<JobPost> posts;
+            if (option.equals("최신순")) {
+                posts = jobPostRepository.findAllBySubCategoryAndJobTypeOrderByUpdatedAtDesc(subCategory, jobType, pageable);
+            }
+            else if (option.equals("좋아요순")) {
+                posts = jobPostRepository.findAllBySubCategoryAndJobTypeOrderByLikesDesc(subCategory, jobType, pageable);
+            }
+            else {
+                posts = jobPostRepository.findAllBySubCategoryAndJobTypeOrderByViewCountsDesc(subCategory, jobType, pageable);
+            }
+            log.info("Successfully got pageable Job Posts order by option: {}, subcategory: {} and jobType: {}", option, subCategory, jobType);
             return posts;
         } catch (Exception e) {
-            log.error("Failed to get pageable Job Posts order by createdAt Desc, subcategory: {} and jobType: {}", subCategory, jobType, e);
+            log.error("Failed to get pageable Job Posts order by option: {}, subcategory: {} and jobType: {}", option, subCategory, jobType, e);
             throw e;
         }
     }
