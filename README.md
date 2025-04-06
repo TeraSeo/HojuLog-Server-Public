@@ -2,7 +2,7 @@
 A secure and scalable technical blog platform built with Spring Boot and React.
 
 ## 🔗 Frontend github link
-
+[https://github.com/TeraSeo/Hojulog-Frontend](https://github.com/TeraSeo/Hojulog-Frontend)
 
 ## 🔗 Live Site  
 [https://hojulog.com](https://hojulog.com)
