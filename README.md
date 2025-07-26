@@ -36,6 +36,7 @@ Built with Spring Boot and React, it ensures secure authentication via Spring Se
 ## 🚀 Deployment  
 The application is deployed on AWS:  
 - Backend runs on **EC2** with **pm2**
+- Frontend runs on EC2 with nginx
 - Database is managed on **AWS RDS (MySQL)**  
 - Domain and SSL via **Route 53 + Certbot (Let's Encrypt)**
 
