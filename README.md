@@ -54,8 +54,8 @@ The application is deployed on AWS:
 
 ### 🧩 Customizable Blog Format
 <img width="1505" height="756" alt="Screenshot 2025-07-27 at 12 20 22 AM" src="https://github.com/user-attachments/assets/3b889a02-7d8d-4a05-b32d-4df67757f11c" />
-<img width="1506" height="758" alt="Screenshot 2025-07-27 at 12 20 42 AM" src="https://github.com/user-attachments/assets/ab527b31-8da9-445d-8fda-47a5e7b121<img width="1412" height="746" alt="Screenshot 2025-07-27 at 12 21 26 AM" src="https://github.com/user-attachments/assets/7e52257c-c288-4d7b-818a-6e25bb1b5684" />
-f4" />
+<img width="1506" height="758" alt="Screenshot 2025-07-27 at 12 20 42 AM" src="https://github.com/user-attachments/assets/ab527b31-8da9-445d-8fda-47a5e7b121f4" />
+<img width="1412" height="746" alt="Screenshot 2025-07-27 at 12 21 26 AM" src="https://github.com/user-attachments/assets/7e52257c-c288-4d7b-818a-6e25bb1b5684" />
 <img width="1238" height="738" alt="Screenshot 2025-07-27 at 12 21 44 AM" src="https://github.com/user-attachments/assets/f5048081-dd8c-4dd9-9dcb-375b6a718912" />
 > Offers a flexible post creation experience with support for:
 > - 🗺 Google Maps API integration for selecting post locations  
