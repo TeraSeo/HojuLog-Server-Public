@@ -1,7 +1,7 @@
 # Hojulog 📝  
 A secure and scalable technical blog platform built with Spring Boot and React.
 
-## 🔗 Frontend github link
+## 🔗 Frontend Github Link
 [https://github.com/TeraSeo/Hojulog-Frontend](https://github.com/TeraSeo/Hojulog-Frontend)
 
 ## 🔗 Live Site  
