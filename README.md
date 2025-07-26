@@ -42,7 +42,7 @@ The application is deployed on AWS:
 ## 📊 ER Diagram
 <img width="948" height="463" alt="Screenshot 2025-07-26 at 11 54 03 PM" src="https://github.com/user-attachments/assets/bf4ae560-cb7d-4036-972c-14393150450f" />
 
-## 4. 📸 Screenshots & Key Features
+## 📸 Screenshots & Key Features
 
 ### 🏠 Home Page – Category Filtered Posts
 > Browse posts by category such as society, travel, study, and more.
