@@ -15,6 +15,8 @@ public class SummarizedTravelPostDto {
 
     private String title;
 
+    private String description;
+
     private String location;
 
     private Timestamp createdAt;

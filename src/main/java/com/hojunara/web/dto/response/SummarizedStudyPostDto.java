@@ -15,6 +15,8 @@ public class SummarizedStudyPostDto {
 
     private String title;
 
+    private String description;
+
     private Timestamp createdAt;
 
     private Boolean isPublic;

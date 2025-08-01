@@ -32,7 +32,15 @@ public class TravelPost extends BlogPost {
     private String location;
 
     public SummarizedTravelPostDto convertPostToSummarizedTravelPostDto() {
-        return SummarizedTravelPostDto.builder().postId(getId()).title(getTitle()).location(location).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
+        List<BlogContent> blogContents = getBlogContents();
+        String description = blogContents.stream()
+                .filter(blogContent -> blogContent.getType().equals("description"))
+                .map(blogContent -> (DescriptionContent) blogContent)
+                .map(DescriptionContent::getContent)
+                .findFirst()
+                .orElse("");
+
+        return SummarizedTravelPostDto.builder().postId(getId()).title(getTitle()).description(description).location(location).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalTravelPostDto convertPostToNormalTravelPostDto() {

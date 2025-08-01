@@ -27,8 +27,15 @@ import java.util.stream.Collectors;
 public class SocietyPost extends BlogPost {
 
     public SummarizedSocietyPostDto convertPostToSummarizedSocietyPostDto() {
-        double randomAverageRate = Math.round(ThreadLocalRandom.current().nextDouble(4.0, 5.01) * 10.0) / 10.0;
-        return SummarizedSocietyPostDto.builder().postId(getId()).title(getTitle()).username(getUser().getUsername()).averageRate(randomAverageRate).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
+        List<BlogContent> blogContents = getBlogContents();
+        String description = blogContents.stream()
+                .filter(blogContent -> blogContent.getType().equals("description"))
+                .map(blogContent -> (DescriptionContent) blogContent)
+                .map(DescriptionContent::getContent)
+                .findFirst()
+                .orElse("");
+
+        return SummarizedSocietyPostDto.builder().postId(getId()).title(getTitle()).description(description).username(getUser().getUsername()).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalSocietyPostDto convertPostToNormalSocietyPostDto() {

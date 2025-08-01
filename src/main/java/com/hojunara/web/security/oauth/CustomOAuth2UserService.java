@@ -53,7 +53,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             String randomPassword = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(randomPassword);
 
-            User user = User.builder().username(oAuthAttributes.getName()).email(oAuthAttributes.getEmail()).password(encodedPassword).registrationMethod(oAuthAttributes.getRegistrationMethod()).log(0L).likeCountThisWeek(0L).build();
+            User user = User.builder().username(oAuthAttributes.getName()).email(oAuthAttributes.getEmail()).password(encodedPassword).registrationMethod(oAuthAttributes.getRegistrationMethod()).log(100L).likeCountThisWeek(0L).build();
             userRepository.save(user);
 
             log.info("oauth user loading succeeded");

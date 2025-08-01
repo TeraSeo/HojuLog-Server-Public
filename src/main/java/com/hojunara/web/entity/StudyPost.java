@@ -28,7 +28,15 @@ public class StudyPost extends BlogPost {
     private String school;
 
     public SummarizedStudyPostDto convertPostToSummarizedStudyPostDto() {
-        return SummarizedStudyPostDto.builder().postId(getId()).title(getTitle()).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
+        List<BlogContent> blogContents = getBlogContents();
+        String description = blogContents.stream()
+                .filter(blogContent -> blogContent.getType().equals("description"))
+                .map(blogContent -> (DescriptionContent) blogContent)
+                .map(DescriptionContent::getContent)
+                .findFirst()
+                .orElse("");
+
+        return SummarizedStudyPostDto.builder().postId(getId()).title(getTitle()).description(description).createdAt(getUpdatedAt()).isPublic(getIsPublic()).build();
     }
 
     public NormalStudyPostDto convertPostToNormalStudyPostDto() {

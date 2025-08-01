@@ -15,9 +15,9 @@ public class SummarizedSocietyPostDto {
 
     private String title;
 
-    private String username;
+    private String description;
 
-    private double averageRate;
+    private String username;
 
     private Timestamp createdAt;
 
