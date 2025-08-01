@@ -11,6 +11,15 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Service for handling file operations with AWS S3, such as uploading and deleting files.
+ * <p>
+ * This service supports uploading post images and profile images,
+ * and deleting profile images from the specified S3 bucket.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @Slf4j
 @Service
 public class AwsFileService {
@@ -20,11 +29,23 @@ public class AwsFileService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    /**
+     * Constructs an AwsFileService with the given Amazon S3 client.
+     *
+     * @param amazonS3Client the Amazon S3 client
+     */
     @Autowired
     public AwsFileService(AmazonS3Client amazonS3Client) {
         this.amazonS3Client = amazonS3Client;
     }
 
+    /**
+     * Uploads a post image file to S3 under the user's email-based directory.
+     *
+     * @param uploadFile the file to be uploaded
+     * @param email the email of the user uploading the file
+     * @return the URL of the uploaded file, or an empty string if upload fails
+     */
     public String uploadPostFile(MultipartFile uploadFile, String email) {
         try {
             String originalFileName = uploadFile.getOriginalFilename();
@@ -33,12 +54,19 @@ public class AwsFileService {
             String fileName = email + "/post/" + timestamp + "_" + uuid + "_" + originalFileName;
             String uploadImageUrl = putS3(uploadFile, fileName);
             return uploadImageUrl;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Failed to upload post file", e);
             return "";
         }
     }
 
+    /**
+     * Uploads a profile image file to S3 under the user's email-based directory.
+     *
+     * @param uploadFile the file to be uploaded
+     * @param email the email of the user uploading the file
+     * @return the URL of the uploaded file, or an empty string if upload fails
+     */
     public String uploadProfileFile(MultipartFile uploadFile, String email) {
         try {
             String originalFileName = uploadFile.getOriginalFilename();
@@ -47,12 +75,20 @@ public class AwsFileService {
             String fileName = email + "/profile/" + timestamp + "_" + uuid + "_" + originalFileName;
             String uploadImageUrl = putS3(uploadFile, fileName);
             return uploadImageUrl;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Failed to upload profile file", e);
             return "";
         }
     }
 
+    /**
+     * Uploads a file to the configured S3 bucket with the give fileName.
+     *
+     * @param uploadFile the file to be uploaded
+     * @param fileName the S3 object key (path inside the bucket)
+     * @return the full URL of the uploaded file in S3
+     * @throws RuntimeException if an IOException occurs during upload
+     */
     public String putS3(MultipartFile uploadFile, String fileName) {
         try {
             ObjectMetadata metadata= new ObjectMetadata();
@@ -65,12 +101,15 @@ public class AwsFileService {
         } catch (IOException e) {
             log.error("Failed to upload s3 file with filename: " + fileName);
             throw new RuntimeException(e);
-        } catch (Exception e) {
-            log.error("Failed to upload s3 file with filename: " + fileName);
-            throw e;
         }
     }
 
+    /**
+     * Removes a profile image file from the S3 bucket based on the user's email and the given file URL.
+     *
+     * @param email the email of the user whose profile image should be deleted
+     * @param fileName the full URL of the file to be deleted
+     */
     public void removeProfileFile(String email, String fileName) {
         try {
             if (fileName != null && fileName != "") {
