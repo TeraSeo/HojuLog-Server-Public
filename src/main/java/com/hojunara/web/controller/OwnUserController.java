@@ -16,6 +16,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * REST controller for managing the authenticated user's profile and activity.
+ * <p>
+ * Provides endpoints for retrieving profile data, updating user info,
+ * checking attendance, and locking the account.
+ * All endpoints are prefixed with <code>/api/own/user</code>.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/own/user")
 @Slf4j
@@ -33,6 +43,13 @@ public class OwnUserController {
         this.articlePostService = articlePostService;
     }
 
+    /**
+     * Retrieves detailed information about the authenticated user, including top 5
+     * pinnable and article posts.
+     *
+     * @param userId the ID of the authenticated user (from request header)
+     * @return a {@link DetailedOwnUserDto} containing user profile and top posts
+     */
     @GetMapping("get/specific")
     public ResponseEntity<DetailedOwnUserDto> getSpecificOwnUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
@@ -43,6 +60,15 @@ public class OwnUserController {
         return ResponseEntity.ok(detailedOwnUserDto);
     }
 
+    /**
+     * Updates the authenticated user's profile information, including optional profile image.
+     *
+     * @param userId the ID of the authenticated user (from request header)
+     * @param username the new username
+     * @param description the new profile description
+     * @param profilePicture optional new profile image
+     * @return {@code true} if the update was successful
+     */
     @PutMapping("update")
     public ResponseEntity<Boolean> updateUser(@RequestHeader("userId") Long userId,
                                               @RequestParam("username") String username,
@@ -52,12 +78,24 @@ public class OwnUserController {
         return ResponseEntity.ok(isUpdated);
     }
 
+    /**
+     * Updates the user's attendance record for the current day.
+     *
+     * @param userId the ID of the authenticated user (from request header)
+     * @return {@code true} if attendance was marked successfully
+     */
     @PutMapping("update/attendance")
     public ResponseEntity<Boolean> updateAttendance(@RequestHeader("userId") Long userId) {
         Boolean isAttended = userService.updateAttendance(userId);
         return ResponseEntity.ok(isAttended);
     }
 
+    /**
+     * Locks the authenticated user's account.
+     *
+     * @param userId the ID of the authenticated user (from request header)
+     * @return {@code true} if the account was successfully locked
+     */
     @PutMapping("update/account/lock")
     public ResponseEntity<Boolean> lockAccount(@RequestHeader("userId") Long userId) {
         Boolean isLocked = userService.lockAccount(userId);

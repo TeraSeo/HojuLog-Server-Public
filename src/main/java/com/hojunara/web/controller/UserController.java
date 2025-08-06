@@ -13,6 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for handling user-related operations.
+ * <p>
+ * Provides endpoints for retrieving user profiles, checking payment status,
+ * viewing secret posts, and fetching ranking information.
+ * All endpoints are prefixed with <code>/api/user</code>.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/user")
 @Slf4j
@@ -35,6 +45,12 @@ public class UserController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /**
+     * Returns summarized user information for the specified user.
+     *
+     * @param userId the ID of the user
+     * @return the summarized user information
+     */
     @GetMapping("get/summarised/specific")
     public ResponseEntity<SummarizedUserDto> getSpecificSummarizedUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
@@ -42,6 +58,12 @@ public class UserController {
         return ResponseEntity.ok(summarisedUserDto);
     }
 
+    /**
+     * Returns detailed user information including top 5 pinned and article posts.
+     *
+     * @param userId the ID of the user
+     * @return the detailed user profile
+     */
     @GetMapping("get/specific")
     public ResponseEntity<DetailedUserDto> getSpecificDetailedUser(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
@@ -52,6 +74,12 @@ public class UserController {
         return ResponseEntity.ok(detailedUserDto);
     }
 
+    /**
+     * Returns summarized user profile including only basic profile information.
+     *
+     * @param userId the ID of the user
+     * @return the summarized user profile
+     */
     @GetMapping("get/summarized/specific/profile")
     public ResponseEntity<SummarizedUserProfileDto> getSpecificSummarizedUserProfile(@RequestHeader Long userId) {
         User user = userService.getUserById(userId);
@@ -59,6 +87,13 @@ public class UserController {
         return ResponseEntity.ok(summarizedUserProfileDto);
     }
 
+    /**
+     * Grants access for a user to view a secret blog post.
+     *
+     * @param viewerId the ID of the user attempting to view the post
+     * @param postId the ID of the secret blog post
+     * @return true if the user is allowed to view the post
+     */
     @PutMapping("view/secret/post")
     public ResponseEntity<Boolean> viewSecretPost(@RequestParam Long viewerId, @RequestParam Long postId) {
         BlogPost post = blogPostService.getBlogPostById(postId);
@@ -66,6 +101,13 @@ public class UserController {
         return ResponseEntity.ok(isValid);
     }
 
+    /**
+     * Checks whether the user has paid access to the given post.
+     *
+     * @param viewerId the ID of the user
+     * @param postId the ID of the post
+     * @return true if the user has paid for the post
+     */
     @GetMapping("check/is/paid")
     public ResponseEntity<Boolean> checkIsUserPaidPost(@RequestParam Long viewerId, @RequestParam Long postId) {
         Post post = postService.getPostById(postId);
@@ -73,6 +115,11 @@ public class UserController {
         return ResponseEntity.ok(isPaid);
     }
 
+    /**
+     * Retrieves a list of the top 10 users ranked by likes received this week.
+     *
+     * @return list of ranked users
+     */
     @GetMapping("get/top10/users")
     public ResponseEntity<List<UserRankDto>> getTop10WeeklyLikedUsers() {
         List<User> users = userService.getTop10UsersByLikesThisWeek();
@@ -87,6 +134,12 @@ public class UserController {
         return ResponseEntity.ok(userRankDtoList);
     }
 
+    /**
+     * Checks whether the user's account is currently locked.
+     *
+     * @param accessToken the JWT access token of the user
+     * @return true if the account is locked
+     */
     @GetMapping("get/is-locked")
     public ResponseEntity<Boolean> getIsAccountLocked(@RequestHeader String accessToken) {
         Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);

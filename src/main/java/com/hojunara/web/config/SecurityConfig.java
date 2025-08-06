@@ -27,6 +27,25 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
+/**
+ * Spring Security configuration for the application.
+ * <p>
+ * This configuration sets up security filters, CORS policy, OAuth2 login,
+ * JWT authentication, and OTP-based login using custom filters and providers.
+ * </p>
+ * Provides beans for:
+ * <ul>
+ *     <li>{@link SecurityFilterChain}</li>
+ *     <li>{@link BCryptPasswordEncoder}</li>
+ *     <li>{@link AuthenticationManager}</li>
+ *     <li>{@link InitialAuthenticationFilter}</li>
+ *     <li>{@link JwtAuthenticationFilter}</li>
+ *     <li>{@link CorsFilter}</li>
+ *     <li>{@link HttpCookieOAuth2AuthorizationRequestRepository}</li>
+ * </ul>
+ *
+ * @author Taejun Seo
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -46,6 +65,14 @@ public class SecurityConfig {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Defines the security filter chain with CORS, CSRF, OAuth2 login, and JWT filters.
+     *
+     * @param http the {@link HttpSecurity} configuration
+     * @param initialAuthenticationFilter filter for username/password + OTP login
+     * @param jwtAuthenticationFilter filter for validating JWT tokens
+     * @return the configured {@link SecurityFilterChain}
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, InitialAuthenticationFilter initialAuthenticationFilter, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
@@ -87,6 +114,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Provides an {@link AuthenticationManager} configured with both OTP and username-password providers.
+     *
+     * @param otpAuthenticationProvider the custom OTP-based provider
+     * @param usernamePasswordAuthenticationProvider the username-password-based provider
+     * @return the configured {@link AuthenticationManager}
+     */
     @Bean
     public AuthenticationManager authenticationManager(OtpAuthenticationProvider otpAuthenticationProvider, UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider) {
         return new ProviderManager(List.of(otpAuthenticationProvider, usernamePasswordAuthenticationProvider));
@@ -102,6 +136,11 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtTokenProvider, userRepository);
     }
 
+    /**
+     * Configures and returns a CORS filter allowing specific origins and headers.
+     *
+     * @return the configured {@link CorsFilter}
+     */
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

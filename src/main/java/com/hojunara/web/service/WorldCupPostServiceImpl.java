@@ -14,9 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.AbstractMap;
 import java.util.List;
@@ -159,37 +157,32 @@ public class WorldCupPostServiceImpl implements WorldCupPostService {
     public WorldCupPost updatePost(UpdateWorldCupPostDto updateWorldCupPostDto, MultipartFile[] images, MultipartFile coverImage) {
         User user = userService.getUserById(updateWorldCupPostDto.getUserId());
         WorldCupPost worldCupPost = getPostById(updateWorldCupPostDto.getPostId());
-        try {
-            String userEmail = user.getEmail();
+        String userEmail = user.getEmail();
 
-            if (!worldCupPost.getTitle().equals(updateWorldCupPostDto.getWorldCupTitle())) {
-                worldCupPost.setTitle(updateWorldCupPostDto.getWorldCupTitle());
-            }
-            if (!worldCupPost.getIsCommentAllowed().equals(updateWorldCupPostDto.getIsCommentAllowed())) {
-                worldCupPost.setIsCommentAllowed(updateWorldCupPostDto.getIsCommentAllowed());
-            }
-
-            List<String> updatedKeywords = updateWorldCupPostDto.getSelectedKeywords();
-            keywordService.updateKeyword(worldCupPost, updatedKeywords);
-
-            if (coverImage != null) {
-                awsFileService.removeProfileFile(userEmail, worldCupPost.getCoverImageUrl());
-                String coverImageUrl = awsFileService.uploadPostFile(coverImage, userEmail);
-                worldCupPost.setCoverImageUrl(coverImageUrl);
-            }
-
-            final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
-            worldCupPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
-            worldCupPostRepository.save(worldCupPost);
-            worldCupPostRepository.flush(); // 업데이트 내용 반영
-
-            candidateService.updateCandidate(updateWorldCupPostDto.getCandidateTitleList(), updateWorldCupPostDto.getImageUrlList(), images, worldCupPost, userEmail);
-
-            return worldCupPost;
-        } catch (Exception e) {
-            log.error("Failed to update world cup post", e);
-            throw e;
+        if (!worldCupPost.getTitle().equals(updateWorldCupPostDto.getWorldCupTitle())) {
+            worldCupPost.setTitle(updateWorldCupPostDto.getWorldCupTitle());
         }
+        if (!worldCupPost.getIsCommentAllowed().equals(updateWorldCupPostDto.getIsCommentAllowed())) {
+            worldCupPost.setIsCommentAllowed(updateWorldCupPostDto.getIsCommentAllowed());
+        }
+
+        List<String> updatedKeywords = updateWorldCupPostDto.getSelectedKeywords();
+        keywordService.updateKeyword(worldCupPost, updatedKeywords);
+
+        if (coverImage != null) {
+            awsFileService.removeProfileFile(userEmail, worldCupPost.getCoverImageUrl());
+            String coverImageUrl = awsFileService.uploadPostFile(coverImage, userEmail);
+            worldCupPost.setCoverImageUrl(coverImageUrl);
+        }
+
+        final ZoneId SYDNEY_ZONE = ZoneId.of("Australia/Sydney");
+        worldCupPost.setUpdatedAt(Timestamp.from(java.time.ZonedDateTime.now(SYDNEY_ZONE).toInstant()));
+        worldCupPostRepository.save(worldCupPost);
+        worldCupPostRepository.flush();
+
+        candidateService.updateCandidate(updateWorldCupPostDto.getCandidateTitleList(), updateWorldCupPostDto.getImageUrlList(), images, worldCupPost, userEmail);
+
+        return worldCupPost;
     }
 
     @Override

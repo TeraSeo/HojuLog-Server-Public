@@ -17,6 +17,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller that handles user registration, OTP delivery,
+ * and JWT token validation for access and refresh tokens.
+ *
+ * All endpoints are under the <code>/api/auth</code> path.
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/auth")
 @Slf4j
@@ -33,7 +41,12 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @CrossOrigin(origins = {"http://3.24.221.82", "https://hojulog.com", "http://hojulog.com", "http://localhost:3000"})
+    /**
+     * Registers a new user with the provided information.
+     *
+     * @param userDto the registration details
+     * @return a success or failure response with appropriate message
+     */
     @PostMapping("register")
     public ResponseEntity<ApiResponse> register(@RequestBody UserDto userDto) {
         try {
@@ -46,7 +59,12 @@ public class AuthController {
         }
     }
 
-    @CrossOrigin(origins = {"http://3.24.221.82", "https://hojulog.com", "http://hojulog.com", "http://localhost:3000"})
+    /**
+     * Sends a one-time password (OTP) to the user's email.
+     *
+     * @param email the email to send the OTP to
+     * @return {@code true} if the OTP was sent successfully, {@code false} otherwise
+     */
     @PostMapping("send/otp")
     public ResponseEntity<Boolean> sendOtp(@RequestParam String email) {
         try {
@@ -57,7 +75,19 @@ public class AuthController {
         }
     }
 
-    @CrossOrigin(origins = {"http://3.24.221.82", "https://hojulog.com", "http://hojulog.com", "http://localhost:3000"})
+    /**
+     * Validates access and refresh tokens and returns authentication status.
+     * <p>
+     * If the access token is valid, sets the authentication context.
+     * If only the refresh token is valid, generates a new access token.
+     * Adds user ID and possibly new access token to the response headers.
+     * </p>
+     *
+     * @param accessToken the access token (optional)
+     * @param refreshToken the refresh token (optional)
+     * @param response the HTTP response to set headers on
+     * @return {@code true} if authenticated, {@code false} if user is locked (by admin), or error response
+     */
     @PostMapping("validate/token")
     public ResponseEntity<?> validateToken(@RequestHeader(required = false) String accessToken,
                                            @RequestHeader(required = false) String refreshToken,

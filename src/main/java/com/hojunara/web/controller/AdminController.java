@@ -24,6 +24,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller that provides admin-level endpoints for managing users, inquiries, and authentication validation.
+ * <p>
+ * Provides endpoints for
+ * <ul>
+ *     <li>JWT token validation for admin role</li>
+ *     <li>User and inquiry data retrieval and updates</li>
+ *     <li>Pagination for user and inquiry listings</li>
+ *     <li>Weekly log (point in the application) provision to users</li>
+ * </ul>
+ * All endpoints are prefixed with <code>/api/admin</code>.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/admin")
 @Slf4j
@@ -41,7 +56,14 @@ public class AdminController {
         this.postService = postService;
     }
 
-
+    /**
+     * Validates the given JWT access and refresh tokens to check if the user is an admin.
+     *
+     * @param accessToken the access token from the request header
+     * @param refreshToken the refresh token from the request header
+     * @return {@code true} if the token is valid and the user is an admin, {@code false} otherwise;
+     *         400 if both tokens are missing, 401 if invalid
+     */
     @PostMapping("validate/token")
     public ResponseEntity<?> validateToken(@RequestHeader(required = false) String accessToken,
                                            @RequestHeader(required = false) String refreshToken) {
@@ -75,6 +97,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * Returns basic admin dashboard data with the first 5 user and inquiry IDs.
+     *
+     * @return an {@link AdminResponseDto} containing limited lists of user and inquiry IDs
+     */
     @GetMapping("get/specific")
     public ResponseEntity<AdminResponseDto> getAdminSpecific() {
         List<Long> userIds = userService.getWholeUsers().stream().map(User::getId).limit(5).collect(Collectors.toList());
@@ -83,6 +110,12 @@ public class AdminController {
         return ResponseEntity.ok(adminResponseDto);
     }
 
+    /**
+     * Retrieves detailed information of a user by user ID.
+     *
+     * @param userId the ID of the user to retrieve
+     * @return a {@link NormalUserDto} with user details
+     */
     @GetMapping("get/user")
     public ResponseEntity<NormalUserDto> getUserInfo(@RequestParam Long userId) {
         User user = userService.getUserById(userId);
@@ -90,6 +123,13 @@ public class AdminController {
         return ResponseEntity.ok(normalUserDto);
     }
 
+    /**
+     * Retrieves paginated user data.
+     *
+     * @param page the page number (1-based)
+     * @param size the number of users per page
+     * @return a {@link UserPaginationResponseData} containing user list and pagination metadata
+     */
     @GetMapping("get/pageable/user")
     public ResponseEntity<UserPaginationResponseData> getWholePageableUserData(@RequestParam int page, @RequestParam int size) {
         Page<User> users = userService.getWholeUserByPage(PageRequest.of(page - 1, size));
@@ -105,6 +145,12 @@ public class AdminController {
         return ResponseEntity.ok(userPaginationResponseData);
     }
 
+    /**
+     * Retrieves summarized information for a specific inquiry by its ID.
+     *
+     * @param inquiryId the ID of the inquiry to retrieve
+     * @return a {@link ResponseEntity} containing the {@link SummarizedInquiryDto} of the inquiry
+     */
     @GetMapping("get/inquiry")
     public ResponseEntity<SummarizedInquiryDto> getInquiryInfo(@RequestParam Long inquiryId) {
         Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
@@ -112,6 +158,12 @@ public class AdminController {
         return ResponseEntity.ok(summarizedInquiryDto);
     }
 
+    /**
+     * Retrieves detailed information for a specific inquiry by its ID.
+     *
+     * @param inquiryId the ID of the inquiry to retrieve
+     * @return a {@link ResponseEntity} containing the {@link DetailedInquiryDto} of the inquiry
+     */
     @GetMapping("get/specific/inquiry")
     public ResponseEntity<DetailedInquiryDto> getSpecificInquiry(@RequestParam Long inquiryId) {
         Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
@@ -119,6 +171,13 @@ public class AdminController {
         return ResponseEntity.ok(detailedInquiryDto);
     }
 
+    /**
+     * Retrieves paginated inquiry data.
+     *
+     * @param page the page number (1-based)
+     * @param size the number of inquiries per page
+     * @return a {@link WholeInquiryPaginationResponse} containing inquiry list and pagination metadata
+     */
     @GetMapping("get/pageable/inquiry")
     public ResponseEntity<WholeInquiryPaginationResponse> getWholePageableInquiryData(@RequestParam int page, @RequestParam int size) {
         Page<Inquiry> inquiries = inquiryService.getWholeInquiriesByPage(PageRequest.of(page - 1, size));
@@ -130,18 +189,35 @@ public class AdminController {
         return ResponseEntity.ok(wholeInquiryPaginationResponse);
     }
 
+    /**
+     * Updates user information using admin privileges.
+     *
+     * @param adminUpdateUserDto the DTO containing fields to update
+     * @return {@code true} if the update was successful
+     */
     @PutMapping("update/user")
     public ResponseEntity<Boolean> updateUserData(@RequestBody AdminUpdateUserDto adminUpdateUserDto) {
         Boolean isUpdated = userService.updateUserByAdmin(adminUpdateUserDto);
         return ResponseEntity.ok(isUpdated);
     }
 
+    /**
+     * Updates an inquiry with admin-provided information.
+     *
+     * @param adminUpdateInquiryDto the updated inquiry data
+     * @return {@code true} if the update was successful
+     */
     @PutMapping("update/inquiry")
     public ResponseEntity<Boolean> updateInquiryData(@RequestBody AdminUpdateInquiryDto adminUpdateInquiryDto) {
         Boolean isUpdated = inquiryService.updateInquiry(adminUpdateInquiryDto);
         return ResponseEntity.ok(isUpdated);
     }
 
+    /**
+     * Sends weekly log rewards to the top 10 users by like count.
+     *
+     * @return {@code true} if logs were successfully provided
+     */
     @PutMapping("provide/logs/this-week")
     public ResponseEntity<Boolean> provideLogsThisWeek() {
         List<User> users = userService.getTop10UsersByLikesThisWeek();
