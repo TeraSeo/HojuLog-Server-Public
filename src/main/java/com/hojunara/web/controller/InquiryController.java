@@ -17,6 +17,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for handling user inquiries.
+ * <p>
+ * Provides endpoints for creating, retrieving, and paginating inquiries.
+ * All endpoints are prefixed with <code>/api/inquiry</code>.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/inquiry")
 public class InquiryController {
@@ -27,6 +36,12 @@ public class InquiryController {
         this.inquiryService = inquiryService;
     }
 
+    /**
+     * Retrieves summarized information for a specific inquiry.
+     *
+     * @param inquiryId the ID of the inquiry
+     * @return a {@link SummarizedInquiryDto} with basic inquiry info
+     */
     @GetMapping("get/specific")
     public ResponseEntity<SummarizedInquiryDto> getSpecificInquiry(@RequestParam Long inquiryId) {
         Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
@@ -34,6 +49,12 @@ public class InquiryController {
         return ResponseEntity.ok(summarizedInquiryDto);
     }
 
+    /**
+     * Retrieves detailed information for a specific inquiry.
+     *
+     * @param inquiryId the ID of the inquiry
+     * @return a {@link DetailedInquiryDto} with full inquiry details
+     */
     @GetMapping("get/detailed")
     public ResponseEntity<DetailedInquiryDto> getDetailedInquiry(@RequestParam Long inquiryId) {
         Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
@@ -41,6 +62,13 @@ public class InquiryController {
         return ResponseEntity.ok(detailedInquiryDto);
     }
 
+    /**
+     * Creates a new inquiry with optional image attachments.
+     *
+     * @param inquiryDto the DTO containing inquiry content
+     * @param images optional image attachments
+     * @return {@code true} if the inquiry was created successfully
+     */
     @PostMapping("create")
     public ResponseEntity<Boolean> createInquiry(
             @Valid @RequestPart InquiryDto inquiryDto,
@@ -50,6 +78,14 @@ public class InquiryController {
         return ResponseEntity.ok(inquiry != null);
     }
 
+    /**
+     * Retrieves a paginated list of inquiries created by the specified user.
+     *
+     * @param userId the ID of the user
+     * @param page the page number (1-based)
+     * @param size the number of inquiries per page
+     * @return a {@link WholeInquiryPaginationResponse} with inquiry list and pagination info
+     */
     @GetMapping("get/pageable/inquiries")
     public ResponseEntity<WholeInquiryPaginationResponse> getPageableInquiriesPosts(@RequestHeader int userId, @RequestParam int page, @RequestParam int size) {
         Page<Inquiry> inquiries = inquiryService.getCreatedAtDescInquiriesByPage(Long.valueOf(userId), PageRequest.of(page - 1, size));

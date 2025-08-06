@@ -111,15 +111,10 @@ public class AwsFileService {
      * @param fileName the full URL of the file to be deleted
      */
     public void removeProfileFile(String email, String fileName) {
-        try {
-            if (fileName != null && fileName != "") {
-                String fileUrl = email + "/profile/" + fileName.substring(fileName.lastIndexOf('/') + 1);
-                amazonS3Client.deleteObject(bucket, fileUrl);
-                log.info("Successfully removed profile file with file url: " + fileUrl);
-            }
-        } catch (Exception e) {
-            log.error("Failed to remove profile file");
-            throw e;
+        if (fileName != null && !fileName.isEmpty()) {
+            String fileUrl = email + "/profile/" + fileName.substring(fileName.lastIndexOf('/') + 1);
+            amazonS3Client.deleteObject(bucket, fileUrl);
+            log.info("Successfully removed profile file with file url: " + fileUrl);
         }
     }
 }

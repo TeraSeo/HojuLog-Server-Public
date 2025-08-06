@@ -11,6 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for handling post like functionality.
+ * <p>
+ * Provides endpoints for liking and unliking posts.
+ * All endpoints are prefixed with <code>/api/post-like</code>.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/post-like")
 @Slf4j
@@ -28,6 +37,12 @@ public class PostLikeController {
     }
 
 
+    /**
+     * Creates a new like for the specified post by the specified user.
+     *
+     * @param postLikeRequestDto the DTO containing userId and postId
+     * @return {@link ResponseEntity} with the updated number of likes for the post
+     */
     @PostMapping("create")
     public ResponseEntity<Long> createPostLike(@RequestBody PostLikeRequestDto postLikeRequestDto) {
         User user = userService.getUserById(postLikeRequestDto.getUserId());
@@ -37,6 +52,13 @@ public class PostLikeController {
         return ResponseEntity.ok(likesCount);
     }
 
+    /**
+     * Deletes a like for the specified post by the specified user.
+     *
+     * @param postId the ID of the post
+     * @param userId the ID of the user
+     * @return {@link ResponseEntity} with the updated number of likes for the post
+     */
     @DeleteMapping("delete")
     public ResponseEntity<Long> deletePostLike(@RequestParam Long postId, @RequestParam Long userId) {
         Long likesCount = postLikeService.deletePostLikeById(userId, postId);

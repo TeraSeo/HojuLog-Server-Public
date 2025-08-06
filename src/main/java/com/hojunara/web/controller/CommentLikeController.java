@@ -11,6 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for managing likes on comments.
+ * <p>
+ * Provides endpoints for creating and deleting likes by users on both parent and response comments.
+ * All endpoints are prefixed with <code>/api/comment-like</code>.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @RestController
 @RequestMapping("api/comment-like")
 @Slf4j
@@ -27,6 +36,12 @@ public class CommentLikeController {
         this.commentLikeService = commentLikeService;
     }
 
+    /**
+     * Creates a like for the specified comment by the given user.
+     *
+     * @param commentLikeRequestDto contains the user ID and comment ID
+     * @return the updated like count of the comment
+     */
     @PostMapping("create")
     public ResponseEntity<Long> createPostLike(@RequestBody CommentLikeRequestDto commentLikeRequestDto) {
         User user = userService.getUserById(commentLikeRequestDto.getUserId());
@@ -36,6 +51,13 @@ public class CommentLikeController {
         return ResponseEntity.ok(likesCount);
     }
 
+    /**
+     * Removes a like for the specified comment by the given user.
+     *
+     * @param commentId the ID of the comment
+     * @param userId the ID of the user who liked the comment
+     * @return the updated like count of the comment
+     */
     @DeleteMapping("delete")
     public ResponseEntity<Long> deletePostLike(@RequestParam Long commentId, @RequestParam Long userId) {
         Long likesCount = commentLikeService.deleteCommentLikeById(commentId, userId);

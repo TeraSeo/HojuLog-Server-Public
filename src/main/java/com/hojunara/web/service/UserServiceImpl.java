@@ -20,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -123,25 +122,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean updateUser(Long userId, String username, String description, MultipartFile profilePicture) {
         User existingUser = getUserById(userId);
-        try {
-            String profilePictureUrl = "";
+        String profilePictureUrl = "";
 
-            if (profilePicture != null) {
-                awsFileService.removeProfileFile(existingUser.getEmail(), existingUser.getProfilePicture());
-                profilePictureUrl = awsFileService.uploadProfileFile(profilePicture, existingUser.getEmail());
-                existingUser.setProfilePicture(profilePictureUrl);
-            }
-
-            existingUser.setUsername(username);
-            existingUser.setDescription(description);
-
-            log.info("Successfully updated user with id: {}", userId);
-
-            return true;
-        } catch (Exception e) {
-            log.error("Failed to update user with id: {}", userId, e);
-            throw e;
+        if (profilePicture != null) {
+            awsFileService.removeProfileFile(existingUser.getEmail(), existingUser.getProfilePicture());
+            profilePictureUrl = awsFileService.uploadProfileFile(profilePicture, existingUser.getEmail());
+            existingUser.setProfilePicture(profilePictureUrl);
         }
+
+        existingUser.setUsername(username);
+        existingUser.setDescription(description);
+
+        log.info("Successfully updated user with id: {}", userId);
+
+        return true;
     }
 
     @Override
@@ -246,8 +240,6 @@ public class UserServiceImpl implements UserService {
                 Long reward = logRewards.getOrDefault(i, 10L);
                 user.setLog(user.getLog() + reward);
 
-//                user.setLikeCountThisWeek(0L);
-
                 String message = String.format("축하드립니다! 🏆 이주에 %d위를 하셔서 %s로그가 지급 됐습니다!", i, reward);
                 notificationService.createNotification("이주의 순위", message, user);
             });
@@ -348,21 +340,6 @@ public class UserServiceImpl implements UserService {
             log.error("Failed to remove like count this week");
         }
     }
-
-//    @Override
-//    public void removeLikedPostContaining(Post post) {
-//        try {
-//            List<User> users = userRepository.findAllByThisWeekLikedPostsContaining(post.getId());
-//            for (User user : users) {
-//                user.getThisWeekLikedPosts().remove(post);
-//                userRepository.save(user);
-//            }
-//            log.info("Successfully removed liked post containing");
-//        } catch (Exception e) {
-//            log.error("Failed to remove liked post containing", e);
-//            throw e;
-//        }
-//    }
 
     @Override
     public void removePaidPostContaining(Post post) {
