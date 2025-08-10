@@ -10,6 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * Service interface for managing {@link ArticlePost} entities.
+ * <p>
+ * Provides methods for retrieving, creating, updating, and paginating {@link ArticlePost} data.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 public interface ArticlePostService {
     ArticlePost getPostById(Long postId);
 
