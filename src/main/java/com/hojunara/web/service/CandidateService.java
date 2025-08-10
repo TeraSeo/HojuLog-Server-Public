@@ -6,8 +6,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * Service interface for managing {@link Candidate} entities.
+ * <p>
+ * Provides methods for retrieving, creating, updating candidates, and updating victory status.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 public interface CandidateService {
-    Candidate getPostById(Long id);
+    Candidate getPostById(Long candidateId);
 
     void createCandidate(List<String> candidateTitleList, List<String> imageUrlList, MultipartFile[] images, WorldCupPost worldCupPost, String email);
 

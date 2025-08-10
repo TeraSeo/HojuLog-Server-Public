@@ -6,8 +6,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * Service interface for managing {@link BlogContent} entities.
+ * <p>
+ * Provides methods for retrieving, creating, updating, and saving {@link BlogContent} data.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 public interface BlogContentService {
-    BlogContent getBlogContentById(Long id);
+    BlogContent getBlogContentById(Long contentId);
 
     void createBlogContent(BlogContent blogContent, BlogPost blogPost);
 

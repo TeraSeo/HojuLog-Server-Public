@@ -8,6 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation of the {@link BlogImageContentService} interface for managing {@link ImageContent} associated with a {@link BlogPost}.
+ * <p>
+ * Provides functionality for creating and saving {@link ImageContent} and associating it with the given {@link BlogPost}.
+ * </p>
+ *
+ * @author Taejun Seo
+ */
 @Service
 @Slf4j
 @Transactional(rollbackFor = Exception.class)
@@ -20,16 +28,17 @@ public class BlogImageContentServiceImpl implements BlogImageContentService {
         this.imageContentRepository = imageContentRepository;
     }
 
+    /**
+     * Creates a new {@link ImageContent} and associates it with the provided {@link BlogPost}.
+     *
+     * @param imageContent the {@link ImageContent} to be created
+     * @param blogPost the {@link BlogPost} to associate the {@link ImageContent} with
+     */
     @Override
     public void createBlogImageContent(ImageContent imageContent, BlogPost blogPost) {
-        try {
-            imageContent.setPost(blogPost);
-            blogPost.getBlogContents().add(imageContent);
-            imageContentRepository.save(imageContent);
-            log.info("Successfully created blog image content");
-        } catch (Exception e) {
-            log.error("Failed to create blog image content");
-            throw e;
-        }
+        imageContent.setPost(blogPost);
+        blogPost.getBlogContents().add(imageContent);
+        imageContentRepository.save(imageContent);
+        log.info("Successfully created blog image content");
     }
 }
